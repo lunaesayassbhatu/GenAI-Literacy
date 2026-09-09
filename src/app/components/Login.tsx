@@ -205,9 +205,13 @@ export function Login() {
               ASU Sunwave
             </h1>
             <p className="text-gray-500 text-sm">
-              {isSignUp
-                ? "Create your account to get started"
-                : "Welcome back! Dive into learning 🐬"}
+              {isSignUp ? (
+                "Create your account to get started"
+              ) : (
+                <span className="font-bold">
+                  Master responsible GenAI use for ASU students, faculty and staff
+                </span>
+              )}
             </p>
           </div>
 
