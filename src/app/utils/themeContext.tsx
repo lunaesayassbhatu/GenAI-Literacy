@@ -38,7 +38,7 @@ const lightTheme: ThemeColors = {
 };
 
 const darkTheme: ThemeColors = {
-  background: '#0D0508',
+  background: '#000000', // matches the login screen's gradient starting color
   cardBackground: '#1A0C10',
   cardBorder: 'rgba(255,198,39,0.13)',
   textPrimary: '#F0E0E4',

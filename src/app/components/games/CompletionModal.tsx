@@ -1,21 +1,38 @@
 import { useNavigate } from "react-router-dom";
-import { Zap, RotateCcw, ArrowLeft } from "lucide-react";
+import { Zap, RotateCcw, ArrowLeft, X } from "lucide-react";
 
 interface CompletionModalProps {
   xpEarned: number;
   message: string;
   onPlayAgain: () => void;
+  onClose?: () => void;
 }
 
-export function CompletionModal({ xpEarned, message, onPlayAgain }: CompletionModalProps) {
+export function CompletionModal({ xpEarned, message, onPlayAgain, onClose }: CompletionModalProps) {
   const navigate = useNavigate();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: "rgba(0,0,0,0.75)" }}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ backgroundColor: "rgba(0,0,0,0.75)" }}
+      onClick={onClose}
+    >
       <div
-        className="w-full max-w-sm rounded-3xl p-8 text-center shadow-2xl"
+        className="relative w-full max-w-sm rounded-3xl p-8 text-center shadow-2xl"
         style={{ backgroundColor: "#1a1a2e", border: "1px solid rgba(212,83,126,0.3)" }}
+        onClick={(e) => e.stopPropagation()}
       >
+        {onClose && (
+          <button
+            type="button"
+            aria-label="Close and review the board"
+            onClick={onClose}
+            className="absolute top-4 right-4 p-1.5 rounded-full transition-colors hover:bg-white/10"
+            style={{ color: "rgba(255,255,255,0.6)" }}
+          >
+            <X size={18} />
+          </button>
+        )}
         <div className="text-6xl mb-4">🎉</div>
         <h2 className="text-2xl font-bold mb-2" style={{ color: "#ffffff" }}>
           {message}

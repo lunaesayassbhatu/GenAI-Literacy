@@ -3,6 +3,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowLeft, Zap, ArrowRight, CheckCircle2 } from "lucide-react";
 import { WaveMascot } from "./WaveMascot";
+import { CharacterMascot } from "./CharacterMascot";
 import { useTheme } from "../utils/themeContext";
 import { getUserData, updateUserData, awardBadge } from "../utils/userData";
 import { MODULES } from "../utils/modulesData";
@@ -14,15 +15,26 @@ import {
   getModuleXP,
   setModuleXP,
   getCommittedModuleXP,
-  setCommittedModuleXP
+  setCommittedModuleXP,
+  markModuleEverCompleted
 } from "../utils/moduleProgress";
 import { DolphinMascot } from "./DolphinMascot";
+import type { CharacterId } from "../utils/userData";
+import { getCharacterInfo } from "../data/charactersData";
 
 type WaveMood = "default" | "thinking" | "celebrate" | "hint" | "spin";
 
 function normalizeHintText(value: unknown): string {
   if (typeof value !== "string") return "";
   return value.replace(/\s+/g, " ").trim();
+}
+
+/** Detects which recurring persona (if any) a message is telling a real-world story about. */
+function detectStoryCharacter(text: string): CharacterId | null {
+  if (/\bAisha\b/.test(text)) return "aisha";
+  if (/\bDev\b/.test(text)) return "dev";
+  if (/\bJordan\b/.test(text)) return "jordan";
+  return null;
 }
 
 function buildKnowledgeCheckHints(data: any): string[] {
@@ -133,6 +145,7 @@ export function ModuleLearning() {
   const isReviewMode = searchParams.get("mode") === "review";
 
   const module = MODULES.find(m => m.id === moduleId);
+  const nextModule = MODULES[MODULES.findIndex(m => m.id === moduleId) + 1] ?? null;
 
   // Determine which question variant to use for this run.
   // - Review mode: always use the saved variant — never advance the counter.
@@ -292,12 +305,22 @@ export function ModuleLearning() {
     }
   };
 
-  const handleComplete = () => {
+  const finishModule = () => {
     const safeModuleId = moduleId ?? "";
     saveModuleProgress(safeModuleId, steps.length - 1, steps.length, variantIndex);
+    markModuleEverCompleted(safeModuleId);
     awardBadge("first-module", "Module Complete", "Complete your first module", "📚");
+  };
+
+  const handleComplete = () => {
+    finishModule();
     // Unmount effect will commit XP; navigate triggers unmount
     navigate("/learning-lab");
+  };
+
+  const handleCompleteAndGoToNext = () => {
+    finishModule();
+    if (nextModule) navigate(`/module/${nextModule.id}`);
   };
 
   const awardXP = (amount: number) => {
@@ -415,7 +438,18 @@ export function ModuleLearning() {
       </nav>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-6 py-12">
+      <main
+        className="max-w-4xl mx-auto px-6 py-12"
+        style={{
+          paddingBottom:
+            !isReviewMode &&
+            currentStep.type !== "intro" &&
+            currentStep.type !== "completion" &&
+            currentStep.type !== "wave-talk"
+              ? "6rem"
+              : undefined
+        }}
+      >
         {isReviewMode ? (
           <ReviewModeContent
             questions={reviewContent}
@@ -499,32 +533,41 @@ export function ModuleLearning() {
                   colors={colors}
                   totalXP={xpEarned}
                   onComplete={handleComplete}
+                  nextModule={nextModule}
+                  onNextModule={handleCompleteAndGoToNext}
                 />
               )}
 
-              {/* Next Button — hidden for steps that manage their own navigation */}
-              {currentStep.type !== "intro" &&
-                currentStep.type !== "completion" &&
-                currentStep.type !== "wave-talk" && (
-                <div className="flex justify-end mt-8">
-                  <button
-                    onClick={handleNext}
-                    disabled={!canProceed}
-                    className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:scale-105"
-                    style={{
-                      backgroundColor: canProceed ? colors.accentGold : '#7A5A62',
-                      color: canProceed ? '#0D0508' : '#F0E0E4'
-                    }}
-                  >
-                    <span>Next</span>
-                    <ArrowRight size={20} />
-                  </button>
-                </div>
-              )}
             </motion.div>
           </AnimatePresence>
         )}
       </main>
+
+      {/* Next Button — fixed in place so it never shifts as step content grows/shrinks */}
+      {!isReviewMode &&
+        currentStep.type !== "intro" &&
+        currentStep.type !== "completion" &&
+        currentStep.type !== "wave-talk" && (
+        <div
+          className="fixed bottom-0 left-0 right-0 z-30 border-t"
+          style={{ backgroundColor: colors.background, borderColor: colors.cardBorder }}
+        >
+          <div className="max-w-4xl mx-auto px-6 py-4 flex justify-end">
+            <button
+              onClick={handleNext}
+              disabled={!canProceed}
+              className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:scale-105"
+              style={{
+                backgroundColor: canProceed ? colors.accentGold : '#7A5A62',
+                color: canProceed ? '#0D0508' : '#F0E0E4'
+              }}
+            >
+              <span>Next</span>
+              <ArrowRight size={20} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Corner mascot — hidden in review mode and during wave-talk */}
       {!isReviewMode && currentStep.type !== "wave-talk" && (
@@ -554,6 +597,11 @@ export function ModuleLearning() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Player's chosen character — accompanies the learner through every step */}
+      <div className="fixed top-24 right-6 z-40">
+        <CharacterMascot character={userData?.selectedCharacter} size={64} />
+      </div>
     </div>
   );
 }
@@ -1008,39 +1056,59 @@ function ScenarioStep({ data, colors, onProceed, onAwardXP, onWaveReaction }: an
 }
 
 function KnowledgeCheckStep({ data, colors, onProceed, onAwardXP, onWaveReaction }: any) {
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [pendingIndex, setPendingIndex] = useState<number | null>(null);
+  const [submittedIndex, setSubmittedIndex] = useState<number | null>(null);
+  const [triedWrong, setTriedWrong] = useState<Set<number>>(new Set());
   const [showFeedback, setShowFeedback] = useState(false);
   const [answerRevealed, setAnswerRevealed] = useState(false);
+  const [locked, setLocked] = useState(false);
 
-  const handleAnswer = (index: number) => {
-    if (selectedAnswer !== null) return;
-    
-    setSelectedAnswer(index);
+  const handleSelectOption = (index: number) => {
+    if (locked || triedWrong.has(index)) return;
+    setPendingIndex(index);
+  };
+
+  const handleSubmit = () => {
+    if (pendingIndex === null || locked) return;
+
+    setSubmittedIndex(pendingIndex);
     setShowFeedback(true);
     onProceed();
 
-    const isCorrect = data.options[index].correct;
-    
+    const isCorrect = data.options[pendingIndex].correct;
+
     if (isCorrect) {
+      setLocked(true);
       onWaveReaction("celebrate");
       onAwardXP(data.xpReward);
     } else {
+      setTriedWrong((prev) => new Set(prev).add(pendingIndex));
       onWaveReaction("hint");
     }
   };
 
+  const handleTryAgain = () => {
+    setPendingIndex(null);
+    setSubmittedIndex(null);
+    setShowFeedback(false);
+  };
+
   const handleRevealAnswer = () => {
-    if (selectedAnswer !== null) return;
+    if (locked) return;
 
     const correctIndex = data.options.findIndex((option: any) => option.correct);
     if (correctIndex < 0) return;
 
-    setSelectedAnswer(correctIndex);
+    setPendingIndex(correctIndex);
+    setSubmittedIndex(correctIndex);
     setShowFeedback(true);
     setAnswerRevealed(true);
+    setLocked(true);
     onProceed();
     onWaveReaction("hint");
   };
+
+  const wasWrongSubmit = submittedIndex !== null && !locked;
 
   return (
     <div
@@ -1054,7 +1122,7 @@ function KnowledgeCheckStep({ data, colors, onProceed, onAwardXP, onWaveReaction
         className="text-sm font-bold"
         style={{ color: colors.accentGold }}
       >
-        ☑️ Knowledge Check {data.number} · Section {data.section}
+        ☑️ Knowledge Check {data.number}
       </div>
 
       <h3 className="text-xl font-bold" style={{ color: colors.textPrimary }}>
@@ -1063,28 +1131,31 @@ function KnowledgeCheckStep({ data, colors, onProceed, onAwardXP, onWaveReaction
 
       <div className="space-y-3">
         {data.options.map((option: any, index: number) => {
-          const isSelected = selectedAnswer === index;
+          const isPending = pendingIndex === index && submittedIndex === null;
+          const isWrongSubmitted = submittedIndex === index && !option.correct;
           const isCorrect = option.correct;
-          const showAsCorrect = selectedAnswer !== null && isCorrect;
-          
+          const showAsCorrect = locked && isCorrect;
+          const isTried = triedWrong.has(index) && submittedIndex !== index;
+
           return (
             <button
               key={index}
-              onClick={() => handleAnswer(index)}
-              disabled={selectedAnswer !== null}
+              onClick={() => handleSelectOption(index)}
+              disabled={locked || triedWrong.has(index)}
               className="w-full flex items-start gap-4 p-4 rounded-xl border-2 transition-all text-left disabled:cursor-not-allowed hover:border-opacity-100"
               style={{
                 backgroundColor: colors.cardBackground,
+                opacity: isTried ? 0.5 : 1,
                 borderColor: (() => {
-                  if (isSelected && isCorrect) return '#10B981';
-                  if (isSelected && !isCorrect) return colors.accentPink;
-                  if (showAsCorrect) return 'rgba(75,183,196,0.6)';
+                  if (isWrongSubmitted) return colors.accentPink;
+                  if (showAsCorrect) return '#10B981';
+                  if (isPending) return colors.accentTeal;
                   return 'rgba(122,90,98,0.3)';
                 })(),
                 ...(() => {
-                  if (isSelected && isCorrect) return { backgroundColor: 'rgba(16,185,129,0.1)' };
-                  if (isSelected && !isCorrect) return { backgroundColor: 'rgba(232,84,122,0.1)' };
-                  if (showAsCorrect) return { backgroundColor: 'rgba(75,183,196,0.1)' };
+                  if (isWrongSubmitted) return { backgroundColor: 'rgba(232,84,122,0.1)' };
+                  if (showAsCorrect) return { backgroundColor: 'rgba(16,185,129,0.1)' };
+                  if (isPending) return { backgroundColor: 'rgba(75,183,196,0.08)' };
                   return {};
                 })()
               }}
@@ -1093,20 +1164,20 @@ function KnowledgeCheckStep({ data, colors, onProceed, onAwardXP, onWaveReaction
                 className="w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0"
                 style={{
                   borderColor: (() => {
-                    if (isSelected && isCorrect) return '#10B981';
-                    if (isSelected && !isCorrect) return colors.accentPink;
-                    if (showAsCorrect) return colors.accentTeal;
+                    if (isWrongSubmitted) return colors.accentPink;
+                    if (showAsCorrect) return '#10B981';
+                    if (isPending) return colors.accentTeal;
                     return colors.textSecondary;
                   })(),
                   backgroundColor: (() => {
-                    if (isSelected && isCorrect) return '#10B981';
-                    if (isSelected && !isCorrect) return colors.accentPink;
-                    if (showAsCorrect) return colors.accentTeal;
+                    if (isWrongSubmitted) return colors.accentPink;
+                    if (showAsCorrect) return '#10B981';
+                    if (isPending) return colors.accentTeal;
                     return 'transparent';
                   })()
                 }}
               >
-                {(isSelected || showAsCorrect) && (
+                {(isPending || isWrongSubmitted || showAsCorrect) && (
                   <div className="w-2 h-2 rounded-full bg-white" />
                 )}
               </div>
@@ -1116,8 +1187,8 @@ function KnowledgeCheckStep({ data, colors, onProceed, onAwardXP, onWaveReaction
         })}
       </div>
 
-      {selectedAnswer === null && (
-        <div className="flex justify-end">
+      <div className="flex justify-end gap-3">
+        {!locked && !wasWrongSubmit && (
           <button
             onClick={handleRevealAnswer}
             className="px-4 py-2 rounded-lg font-semibold border transition-all hover:scale-105"
@@ -1129,10 +1200,28 @@ function KnowledgeCheckStep({ data, colors, onProceed, onAwardXP, onWaveReaction
           >
             Reveal Answer
           </button>
-        </div>
-      )}
+        )}
+        {wasWrongSubmit ? (
+          <button
+            onClick={handleTryAgain}
+            className="px-5 py-2 rounded-lg font-bold transition-all hover:scale-105"
+            style={{ backgroundColor: colors.accentPink, color: '#FFFFFF' }}
+          >
+            Try Again
+          </button>
+        ) : !locked && (
+          <button
+            onClick={handleSubmit}
+            disabled={pendingIndex === null}
+            className="px-5 py-2 rounded-lg font-bold transition-all hover:scale-105 disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ backgroundColor: colors.accentGold, color: '#0D0508' }}
+          >
+            Submit
+          </button>
+        )}
+      </div>
 
-      {showFeedback && selectedAnswer !== null && (
+      {showFeedback && submittedIndex !== null && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1140,12 +1229,12 @@ function KnowledgeCheckStep({ data, colors, onProceed, onAwardXP, onWaveReaction
           style={{
             backgroundColor: answerRevealed
               ? 'rgba(75,183,196,0.1)'
-              : data.options[selectedAnswer].correct
+              : data.options[submittedIndex].correct
                 ? 'rgba(16,185,129,0.1)'
                 : 'rgba(232,84,122,0.1)',
             borderColor: answerRevealed
               ? colors.accentTeal
-              : data.options[selectedAnswer].correct
+              : data.options[submittedIndex].correct
                 ? '#10B981'
                 : colors.accentPink
           }}
@@ -1153,7 +1242,7 @@ function KnowledgeCheckStep({ data, colors, onProceed, onAwardXP, onWaveReaction
           <p style={{ color: colors.textPrimary }}>
             {answerRevealed
               ? `💡 Answer revealed: ${data.correctFeedback}`
-              : data.options[selectedAnswer].correct
+              : data.options[submittedIndex].correct
                 ? data.correctFeedback
                 : data.wrongFeedback}
           </p>
@@ -1487,7 +1576,7 @@ function DragDropStep({ data, colors, onProceed, onAwardXP, onWaveReaction }: an
   );
 }
 
-function CompletionStep({ data, colors, totalXP, onComplete }: any) {
+function CompletionStep({ data, colors, totalXP, onComplete, nextModule, onNextModule }: any) {
   return (
     <div
       className="rounded-2xl p-12 text-center space-y-8 border-2"
@@ -1566,16 +1655,44 @@ function CompletionStep({ data, colors, totalXP, onComplete }: any) {
         </ul>
       </div>
 
-      <button
-        onClick={onComplete}
-        className="px-10 py-5 rounded-xl font-bold text-xl transition-all hover:scale-105"
-        style={{
-          backgroundColor: colors.accentGold,
-          color: '#0D0508'
-        }}
-      >
-        Back to Learning Lab →
-      </button>
+      <div className="flex flex-wrap gap-4 justify-center">
+        {nextModule ? (
+          <>
+            <button
+              onClick={onNextModule}
+              className="px-10 py-5 rounded-xl font-bold text-xl transition-all hover:scale-105"
+              style={{
+                backgroundColor: colors.accentGold,
+                color: '#0D0508'
+              }}
+            >
+              Continue to {nextModule.name} →
+            </button>
+            <button
+              onClick={onComplete}
+              className="px-6 py-5 rounded-xl font-semibold transition-all hover:scale-105 border"
+              style={{
+                color: colors.textPrimary,
+                borderColor: colors.cardBorder,
+                backgroundColor: "transparent"
+              }}
+            >
+              Back to Learning Lab
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={onComplete}
+            className="px-10 py-5 rounded-xl font-bold text-xl transition-all hover:scale-105"
+            style={{
+              backgroundColor: colors.accentGold,
+              color: '#0D0508'
+            }}
+          >
+            Back to Learning Lab →
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -1590,6 +1707,8 @@ function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext
   const messages: { text: string; mood: string }[] = data.messages;
   const isLast = msgIndex === messages.length - 1;
   const current = messages[msgIndex];
+  const currentStoryCharacter = detectStoryCharacter(current.text);
+  const currentCharacterInfo = currentStoryCharacter ? getCharacterInfo(currentStoryCharacter) : null;
 
   // Width of the dolphin column — used to indent previous messages so they align
   const DOLPHIN_COL = "w-28"; // ~112 px
@@ -1619,21 +1738,33 @@ function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext
       <div className="space-y-3">
 
         {/* Previous messages — full brightness so users can read what came before */}
-        {messages.slice(0, msgIndex).map((msg, idx) => (
-          <div key={idx} className="flex gap-4">
-            <div className={`${DOLPHIN_COL} flex-shrink-0`} /> {/* spacer */}
-            <div
-              className="flex-1 rounded-2xl px-5 py-3"
-              style={{ border: `1px solid rgba(255,198,39,0.25)` }}
-            >
-              <p
-                className="text-sm leading-relaxed"
-                style={{ color: colors.textPrimary }}
-                dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*(.*?)\*/g, '<em>$1</em>') }}
-              />
+        {messages.slice(0, msgIndex).map((msg, idx) => {
+          const storyCharacter = detectStoryCharacter(msg.text);
+          const characterInfo = storyCharacter ? getCharacterInfo(storyCharacter) : null;
+          return (
+            <div key={idx} className="flex gap-4">
+              <div className={`${DOLPHIN_COL} flex-shrink-0`} /> {/* spacer */}
+              <div
+                className="flex-1 rounded-2xl px-5 py-3"
+                style={{ border: `1px solid ${characterInfo ? `${characterInfo.color}55` : 'rgba(255,198,39,0.25)'}` }}
+              >
+                {characterInfo && (
+                  <div className="flex items-center gap-2 mb-2">
+                    <CharacterMascot character={storyCharacter!} variant="portrait" size={22} animate={false} />
+                    <span className="text-xs font-bold tracking-wide" style={{ color: characterInfo.color }}>
+                      🌍 {characterInfo.name}'s Real-World Example
+                    </span>
+                  </div>
+                )}
+                <p
+                  className="text-sm leading-relaxed"
+                  style={{ color: colors.textPrimary }}
+                  dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*(.*?)\*/g, '<em>$1</em>') }}
+                />
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         {/* Active row — dolphin bounces in, bubble fades up smoothly */}
         <AnimatePresence mode="wait">
@@ -1671,8 +1802,10 @@ function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext
               transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
               style={{
                 backgroundColor: colors.cardBackground,
-                border: `2px solid ${colors.accentGold}`,
-                boxShadow: `0 0 24px rgba(255,198,39,0.08)`
+                border: `2px solid ${currentCharacterInfo ? currentCharacterInfo.color : colors.accentGold}`,
+                boxShadow: currentCharacterInfo
+                  ? `0 0 24px ${currentCharacterInfo.color}22`
+                  : `0 0 24px rgba(255,198,39,0.08)`
               }}
             >
               {/* Pointer pointing left toward Wave */}
@@ -1680,10 +1813,18 @@ function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext
                 className="absolute -left-[9px] top-6 w-4 h-4 rotate-45"
                 style={{
                   backgroundColor: colors.cardBackground,
-                  borderLeft: `2px solid ${colors.accentGold}`,
-                  borderBottom: `2px solid ${colors.accentGold}`
+                  borderLeft: `2px solid ${currentCharacterInfo ? currentCharacterInfo.color : colors.accentGold}`,
+                  borderBottom: `2px solid ${currentCharacterInfo ? currentCharacterInfo.color : colors.accentGold}`
                 }}
               />
+              {currentCharacterInfo && (
+                <div className="flex items-center gap-2 mb-2">
+                  <CharacterMascot character={currentStoryCharacter!} variant="portrait" size={26} animate={false} />
+                  <span className="text-xs font-bold tracking-wide" style={{ color: currentCharacterInfo.color }}>
+                    🌍 {currentCharacterInfo.name}'s Real-World Example
+                  </span>
+                </div>
+              )}
               <p
                 className="leading-relaxed"
                 style={{ color: colors.textPrimary }}

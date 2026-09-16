@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useState } from "react";
+import { X } from "lucide-react";
 import { DolphinMascot } from "./DolphinMascot";
 import { useTheme } from "../utils/themeContext";
 
@@ -108,10 +109,22 @@ export function WaveMascot({
               if (compactHintMode) setIsBubbleOpen(false);
             }}
           >
-            <div className="text-xs font-bold mb-1 tracking-wider" style={{ color: colors.accentGoldText }}>
+            <button
+              type="button"
+              aria-label="Dismiss message"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsBubbleOpen(false);
+              }}
+              className="absolute top-2 right-2 p-1 rounded-full transition-opacity hover:opacity-70"
+              style={{ color: colors.textSecondary }}
+            >
+              <X size={14} />
+            </button>
+            <div className="text-xs font-bold mb-1 tracking-wider pr-4" style={{ color: colors.accentGoldText }}>
               WAVE · YOUR GUIDE
             </div>
-            <div className="text-sm leading-relaxed whitespace-pre-line" style={{ color: colors.textPrimary }}>
+            <div className="text-sm leading-relaxed whitespace-pre-line pr-4" style={{ color: colors.textPrimary }}>
               {message}
             </div>
             {!compactHintMode && actionLabel && onActionClick && (
@@ -144,7 +157,7 @@ export function WaveMascot({
               </button>
             )}
             {compactHintMode && (
-              <div className="mt-2 text-[11px] opacity-60" style={{ color: colors.textSecondary }}>
+              <div className="mt-2 text-[11px] font-semibold" style={{ color: colors.accentGoldText }}>
                 Click to close
               </div>
             )}
@@ -219,6 +232,11 @@ export function WaveMascot({
               onAnimationComplete();
             }
           }}
+          onClick={() => {
+            if (!isBubbleOpen) setIsBubbleOpen(true);
+          }}
+          style={{ cursor: isBubbleOpen ? "default" : "pointer" }}
+          title={isBubbleOpen ? undefined : "Show Wave's message"}
         >
           <DolphinMascot
             size={80}

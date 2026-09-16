@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Header } from "./Header";
+import { CharacterMascot } from "./CharacterMascot";
 import { getUserData, updateUserData, type UserType } from "../utils/userData";
 import { getCurrentLevel, getXPProgress, getXPToNextLevel } from "../utils/xpSystem";
 import { MODULES, getCurrentLesson, type Module, type Lesson } from "../utils/modulesData";
 import { loadModuleProgress } from "../utils/moduleProgress";
+import { getFriends, addFriend, removeFriend, type Friend } from "../utils/friends";
 import { useTheme } from "../utils/themeContext";
 import { motion } from "motion/react";
 import {
@@ -38,6 +40,38 @@ export function Profile() {
       window.removeEventListener("focus", sync);
     };
   }, []);
+
+  const [friends, setFriends] = useState<Friend[]>([]);
+  const [showAddFriend, setShowAddFriend] = useState(false);
+  const [friendInput, setFriendInput] = useState("");
+  const [friendError, setFriendError] = useState<string | null>(null);
+  const [addingFriend, setAddingFriend] = useState(false);
+  const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
+  const [selectedBadge, setSelectedBadge] = useState<{ name: string; icon: string; description: string; earnedDate?: string } | null>(null);
+
+  useEffect(() => {
+    getFriends().then(setFriends);
+  }, []);
+
+  const handleAddFriend = async () => {
+    setAddingFriend(true);
+    setFriendError(null);
+    const result = await addFriend(friendInput);
+    setAddingFriend(false);
+    if (!result.success) {
+      setFriendError(result.error || "Something went wrong.");
+      return;
+    }
+    setFriendInput("");
+    setShowAddFriend(false);
+    getFriends().then(setFriends);
+  };
+
+  const handleRemoveFriend = async (id: string) => {
+    await removeFriend(id);
+    setSelectedFriend(null);
+    getFriends().then(setFriends);
+  };
   const [editForm, setEditForm] = useState({
     userType: userData?.userType || "student",
     year: userData?.year || "",
@@ -69,12 +103,6 @@ export function Profile() {
     .sort((a, b) => b.exp - a.exp)
     .map((u, i) => ({ ...u, rank: i + 1 }));
 
-  const friendsData = [
-    { name: "Jessica Lee",  status: "online",  avatar: "👩‍🎓", streak: 7  },
-    { name: "David Kim",    status: "offline", avatar: "👨‍💼", streak: 5  },
-    { name: "Maria Garcia", status: "online",  avatar: "👩‍💻", streak: 12 },
-    { name: "James Wilson", status: "offline", avatar: "👨‍🎓", streak: 3  },
-  ];
 
   const availableBadges = [
     { id: "first-checkin",       name: "First Day",            icon: "🌟", description: "Start your GenAI learning journey"       },
@@ -89,12 +117,20 @@ export function Profile() {
   ];
 
   const handleSaveProfile = () => {
-    updateUserData({ userType: editForm.userType as UserType, year: editForm.year, major: editForm.major });
+    updateUserData({
+      userType: editForm.userType as UserType,
+      year: editForm.year,
+      major: editForm.major,
+    });
     setIsEditing(false);
   };
 
   const handleCancelEdit = () => {
-    setEditForm({ userType: userData.userType || "student", year: userData.year || "", major: userData.major || "" });
+    setEditForm({
+      userType: userData.userType || "student",
+      year: userData.year || "",
+      major: userData.major || "",
+    });
     setIsEditing(false);
   };
 
@@ -109,10 +145,18 @@ export function Profile() {
           style={{ background: "linear-gradient(135deg, #8B1A2E 0%, #6B1530 100%)" }}>
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div className="flex items-center gap-6 flex-wrap">
-              <div className="w-24 h-24 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: "rgba(255,255,255,0.2)" }}>
-                <span className="text-4xl">👤</span>
-              </div>
+              <Link
+                to="/choose-character"
+                className="w-24 h-24 rounded-full flex items-end justify-center overflow-hidden transition-transform hover:scale-105"
+                style={{ backgroundColor: "rgba(255,255,255,0.2)" }}
+                title="Change your character"
+              >
+                {userData.selectedCharacter ? (
+                  <CharacterMascot character={userData.selectedCharacter} variant="portrait" size={88} animate={false} />
+                ) : (
+                  <span className="text-4xl m-auto">👤</span>
+                )}
+              </Link>
               <div>
                 <h1 className="text-3xl font-bold mb-1" style={{ color: "#F0E0E4" }}>{username}</h1>
                 <p className="mb-1" style={{ color: "rgba(240,224,228,0.8)" }}>
@@ -173,6 +217,7 @@ export function Profile() {
                   </div>
                 </>)}
               </div>
+
               <div className="flex gap-3 mt-4">
                 <button onClick={handleSaveProfile}
                   className="flex items-center gap-2 px-4 py-2 rounded-lg hover:opacity-80"
@@ -280,7 +325,7 @@ export function Profile() {
               sub: "Analyze more to learn better! 📚",
             },
           ].map((card, i) => (
-            <motion.div key={i} whileHover={{ scale: 1.03 }}
+            <div key={i}
               className="rounded-2xl shadow-lg p-6 relative overflow-hidden"
               style={{ backgroundColor: colors.cardBackground, border: `2px solid ${card.border}` }}>
               <div className="flex items-center justify-between mb-4">
@@ -291,7 +336,7 @@ export function Profile() {
                 </div>
               </div>
               <p className="text-sm" style={{ color: colors.textSecondary }}>{card.sub}</p>
-            </motion.div>
+            </div>
           ))}
         </div>
 
@@ -396,33 +441,136 @@ export function Profile() {
               <h2 className="text-xl font-black" style={{ color: "#16a34a" }}>Friends</h2>
             </div>
             <div className="space-y-2 mb-4">
-              {friendsData.map((friend, i) => (
-                <motion.div key={i} whileHover={{ scale: 1.02 }}
-                  className="flex items-center justify-between p-3 rounded-xl"
+              {friends.length === 0 && !showAddFriend && (
+                <p className="text-sm text-center py-4" style={{ color: colors.textSecondary }}>
+                  No friends added yet.
+                </p>
+              )}
+              {friends.map((friend) => (
+                <motion.button
+                  key={friend.id}
+                  whileHover={{ scale: 1.02 }}
+                  onClick={() => setSelectedFriend(friend)}
+                  className="w-full flex items-center justify-between p-3 rounded-xl text-left transition-colors"
                   style={{ background: "rgba(128,128,128,0.04)", border: "1px solid rgba(128,128,128,0.1)" }}>
                   <div className="flex items-center gap-3">
-                    <div className="relative">
-                      <span className="text-2xl">{friend.avatar}</span>
-                      <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 ${friend.status === "online" ? "bg-green-500" : "bg-gray-400"}`}
-                        style={{ borderColor: colors.cardBackground }} />
-                    </div>
+                    <span className="text-2xl">👤</span>
                     <div>
-                      <p className="font-black text-sm" style={{ color: colors.textPrimary }}>{friend.name}</p>
-                      <p className="text-xs" style={{ color: colors.textSecondary }}>🔥 {friend.streak} day streak</p>
+                      <p className="font-black text-sm" style={{ color: colors.textPrimary }}>{friend.username}</p>
+                      <p className="text-xs" style={{ color: colors.textSecondary }}>
+                        Added {new Date(friend.createdAt).toLocaleDateString()}
+                      </p>
                     </div>
                   </div>
-                  <span className={`text-xs font-bold px-2 py-1 rounded-full ${friend.status === "online" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
-                    {friend.status}
-                  </span>
-                </motion.div>
+                </motion.button>
               ))}
             </div>
-            <button className="w-full py-3 rounded-xl font-bold text-white transition-all hover:scale-105 hover:shadow-lg"
-              style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
-              + Add Friends
-            </button>
+
+            {showAddFriend ? (
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <input
+                    autoFocus
+                    value={friendInput}
+                    onChange={(e) => { setFriendInput(e.target.value); setFriendError(null); }}
+                    onKeyDown={(e) => { if (e.key === "Enter") handleAddFriend(); }}
+                    placeholder="Their username"
+                    className="flex-1 px-3 py-2 rounded-lg border text-sm"
+                    style={{ borderColor: colors.cardBorder, backgroundColor: colors.background, color: colors.textPrimary }}
+                  />
+                  <button
+                    onClick={handleAddFriend}
+                    disabled={addingFriend || !friendInput.trim()}
+                    className="px-4 py-2 rounded-lg font-bold text-white text-sm transition-all hover:scale-105 disabled:opacity-50"
+                    style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
+                    {addingFriend ? "Adding..." : "Add"}
+                  </button>
+                  <button
+                    onClick={() => { setShowAddFriend(false); setFriendError(null); setFriendInput(""); }}
+                    className="px-3 py-2 rounded-lg font-semibold text-sm transition-colors hover:opacity-80"
+                    style={{ backgroundColor: "rgba(128,128,128,0.1)", color: colors.textSecondary }}>
+                    Cancel
+                  </button>
+                </div>
+                {friendError && (
+                  <p className="text-xs font-semibold" style={{ color: "#ef4444" }}>{friendError}</p>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowAddFriend(true)}
+                className="w-full py-3 rounded-xl font-bold text-white transition-all hover:scale-105 hover:shadow-lg"
+                style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
+                + Add Friends
+              </button>
+            )}
           </div>
         </div>
+
+        {/* Friend detail popover */}
+        {selectedFriend && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ backgroundColor: "rgba(0,0,0,0.6)" }}
+            onClick={() => setSelectedFriend(null)}
+          >
+            <div
+              className="w-full max-w-xs rounded-2xl p-6 text-center"
+              style={{ backgroundColor: colors.cardBackground, border: `1px solid ${colors.cardBorder}` }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className="text-5xl">👤</span>
+              <h3 className="text-lg font-black mt-2" style={{ color: colors.textPrimary }}>{selectedFriend.username}</h3>
+              <p className="text-sm mb-5" style={{ color: colors.textSecondary }}>
+                Friends since {new Date(selectedFriend.createdAt).toLocaleDateString()}
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleRemoveFriend(selectedFriend.id)}
+                  className="flex-1 py-2 rounded-lg font-bold text-sm transition-colors hover:opacity-80"
+                  style={{ backgroundColor: "rgba(239,68,68,0.12)", color: "#ef4444" }}>
+                  Remove Friend
+                </button>
+                <button
+                  onClick={() => setSelectedFriend(null)}
+                  className="flex-1 py-2 rounded-lg font-semibold text-sm transition-colors hover:opacity-80"
+                  style={{ backgroundColor: "rgba(128,128,128,0.1)", color: colors.textSecondary }}>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Badge detail popover */}
+        {selectedBadge && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ backgroundColor: "rgba(0,0,0,0.6)" }}
+            onClick={() => setSelectedBadge(null)}
+          >
+            <div
+              className="w-full max-w-xs rounded-2xl p-6 text-center"
+              style={{ backgroundColor: colors.cardBackground, border: `1px solid ${colors.cardBorder}` }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className="text-5xl">{selectedBadge.icon}</span>
+              <h3 className="text-lg font-black mt-2" style={{ color: colors.textPrimary }}>{selectedBadge.name}</h3>
+              <p className="text-sm mb-1" style={{ color: colors.textSecondary }}>{selectedBadge.description}</p>
+              {selectedBadge.earnedDate ? (
+                <p className="text-xs mb-5" style={{ color: "#8C1D40" }}>Earned {selectedBadge.earnedDate}</p>
+              ) : (
+                <p className="text-xs mb-5 font-semibold" style={{ color: "#0ea5e9" }}>Not yet earned</p>
+              )}
+              <button
+                onClick={() => setSelectedBadge(null)}
+                className="w-full py-2 rounded-lg font-semibold text-sm transition-colors hover:opacity-80"
+                style={{ backgroundColor: "rgba(128,128,128,0.1)", color: colors.textSecondary }}>
+                Close
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* ── Your Badges ──────────────────────────────────────── */}
         <div className="rounded-2xl shadow-lg p-6"
@@ -431,7 +579,15 @@ export function Profile() {
           {badges.length > 0 ? (
             <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
               {badges.map((badge) => (
-                <motion.div key={badge.id} whileHover={{ scale: 1.08, rotate: 2 }}
+                <motion.button
+                  key={badge.id}
+                  whileHover={{ scale: 1.08, rotate: 2 }}
+                  onClick={() => setSelectedBadge({
+                    name: badge.name,
+                    icon: badge.icon,
+                    description: badge.description,
+                    earnedDate: new Date(badge.earnedDate).toLocaleDateString(),
+                  })}
                   className="p-4 rounded-xl text-center border"
                   style={{ borderColor: "rgba(157,78,221,0.3)", background: "rgba(157,78,221,0.05)" }}>
                   <div className="text-4xl mb-2">{badge.icon}</div>
@@ -439,7 +595,7 @@ export function Profile() {
                   <p className="text-xs mt-1" style={{ color: colors.textSecondary }}>
                     {new Date(badge.earnedDate).toLocaleDateString()}
                   </p>
-                </motion.div>
+                </motion.button>
               ))}
             </div>
           ) : (
@@ -465,13 +621,14 @@ export function Profile() {
             {availableBadges
               .filter((b) => !badges.some((earned) => earned.id === b.id))
               .map((badge) => (
-                <div key={badge.id}
+                <button key={badge.id}
+                  onClick={() => setSelectedBadge({ name: badge.name, icon: badge.icon, description: badge.description })}
                   className="p-4 rounded-xl text-center border-2 border-dashed opacity-60 hover:opacity-80 transition-opacity"
                   style={{ borderColor: "rgba(157,78,221,0.4)", background: "rgba(128,128,128,0.04)" }}>
                   <div className="text-4xl mb-2 grayscale">{badge.icon}</div>
-                  <p className="text-sm font-bold mb-1" style={{ color: colors.textPrimary }}>{badge.name}</p>
-                  <p className="text-xs" style={{ color: colors.textSecondary }}>{badge.description}</p>
-                </div>
+                  <p className="text-sm font-bold" style={{ color: colors.textPrimary }}>{badge.name}</p>
+                  <p className="text-xs mt-1" style={{ color: colors.textSecondary, opacity: 0.7 }}>Tap for details</p>
+                </button>
               ))}
           </div>
         </div>

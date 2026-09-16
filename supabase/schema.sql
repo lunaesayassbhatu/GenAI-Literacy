@@ -17,8 +17,12 @@ create table if not exists public.profiles (
   user_type text not null default 'student',
   year text,
   major text,
-  language text not null default 'en'
+  language text not null default 'en',
+  selected_character text
 );
+
+-- Safe to re-run against a database where profiles already existed before this column was added.
+alter table public.profiles add column if not exists selected_character text;
 
 alter table public.profiles enable row level security;
 
@@ -28,6 +32,14 @@ create policy "Users manage own profile"
   for all
   using (auth.uid() = id)
   with check (auth.uid() = id);
+
+-- Separate, read-only policy so any signed-in user can look someone up by
+-- username when adding a friend — the policy above only lets you read your own row.
+drop policy if exists "Users can look up others by username" on public.profiles;
+create policy "Users can look up others by username"
+  on public.profiles
+  for select
+  using (auth.role() = 'authenticated');
 
 -- ---------------------------------------------------------------------------
 -- user_stats: XP, streaks, and other rollup stats, one row per user
@@ -113,6 +125,26 @@ alter table public.module_xp enable row level security;
 drop policy if exists "Users manage own module xp" on public.module_xp;
 create policy "Users manage own module xp"
   on public.module_xp
+  for all
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+-- ---------------------------------------------------------------------------
+-- friends: a user's added friends, by username (minimal — no request/accept step)
+-- ---------------------------------------------------------------------------
+create table if not exists public.friends (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  friend_username text not null,
+  created_at timestamptz not null default now(),
+  unique (user_id, friend_username)
+);
+
+alter table public.friends enable row level security;
+
+drop policy if exists "Users manage own friends list" on public.friends;
+create policy "Users manage own friends list"
+  on public.friends
   for all
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);

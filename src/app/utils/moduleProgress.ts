@@ -4,6 +4,7 @@ const PROGRESS_KEY = "asu_genai_module_progress";
 const VARIANT_COUNTER_KEY = "asu_genai_variant_counters";
 const MODULE_XP_KEY = "asu_genai_module_xp";
 const COMMITTED_MODULE_XP_KEY = "asu_genai_committed_module_xp";
+const EVER_COMPLETED_KEY = "asu_genai_ever_completed_modules";
 
 export interface StepProgress {
   stepIndex: number;   // last step the user reached (0-based)
@@ -112,6 +113,24 @@ export function resetModuleProgress(moduleId: string): void {
   if (!(moduleId in store)) return;
   delete store[moduleId];
   saveStore(store);
+}
+
+/**
+ * Whether the user has ever fully finished this module at least once.
+ * Unlike step progress, this is never cleared by resetModuleProgress/restart —
+ * it's what keeps the "Review" option available even after a restart.
+ */
+export function hasEverCompletedModule(moduleId: string): boolean {
+  const store = loadNumberStore(EVER_COMPLETED_KEY);
+  return store[moduleId] === 1;
+}
+
+export function markModuleEverCompleted(moduleId: string): void {
+  if (!moduleId) return;
+  const store = loadNumberStore(EVER_COMPLETED_KEY);
+  if (store[moduleId] === 1) return;
+  store[moduleId] = 1;
+  saveNumberStore(EVER_COMPLETED_KEY, store);
 }
 
 export function getModuleXP(moduleId: string): number {

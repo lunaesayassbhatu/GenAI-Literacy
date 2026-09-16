@@ -1,16 +1,19 @@
 import { useState } from "react";
 import { Header } from "./Header";
+import { CharacterMascot } from "./CharacterMascot";
 import { MODULES } from "../utils/modulesData";
 import { useTheme } from "../utils/themeContext";
 import { motion } from "motion/react";
 import { Lock, Zap, Clock, CheckCircle2, ArrowRight, RotateCcw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { getUserData } from "../utils/userData";
 import {
   getCompletedLessonCount,
   loadModuleProgress,
   resetModuleProgress,
   getModuleXP,
   resetModuleXP,
+  hasEverCompletedModule,
 } from "../utils/moduleProgress";
 
 export function LearningLab() {
@@ -46,7 +49,7 @@ export function LearningLab() {
 
         {/* Modules Grid */}
         <div className="space-y-6">
-          {MODULES.map((module) => {
+          {MODULES.map((module, moduleIndex) => {
             const savedProgress = loadModuleProgress(module.id);
             const totalLessons = module.lessons.length;
             const completedLessons = getCompletedLessonCount(module.id, totalLessons);
@@ -89,6 +92,12 @@ export function LearningLab() {
                   <div className="flex-1">
                     <div className="flex items-start justify-between gap-4 mb-3">
                       <div>
+                        <span
+                          className="text-xs font-bold uppercase tracking-wider"
+                          style={{ color: module.locked ? colors.textSecondary : module.iconColor }}
+                        >
+                          Module {moduleIndex + 1}
+                        </span>
                         <h3 className="text-2xl font-semibold mb-2" style={{ color: colors.textPrimary }}>
                           {module.name}
                         </h3>
@@ -116,7 +125,7 @@ export function LearningLab() {
                                 <span>Restart</span>
                               </button>
                             )}
-                            {isInProgress && (
+                            {(isInProgress || hasEverCompletedModule(module.id)) && (
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -258,6 +267,11 @@ export function LearningLab() {
           })}
         </div>
       </main>
+
+      {/* Player's chosen character */}
+      <div className="fixed top-24 right-6 z-40">
+        <CharacterMascot character={getUserData()?.selectedCharacter} size={64} />
+      </div>
     </div>
   );
 }
