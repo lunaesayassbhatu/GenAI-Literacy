@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { GameHeader } from "./GameHeader";
 import { XPToast } from "./XPToast";
+import { CharacterMascot } from "../CharacterMascot";
 import { BUILD_SCENARIOS, BuildScenario, PromptPiece } from "../../data/gameData";
-import { addXP, awardBadge, saveHighScore, getHighScore } from "../../utils/userData";
+import { addXP, awardBadge, saveHighScore, getHighScore, getUserData } from "../../utils/userData";
 import { useNavigate } from "react-router-dom";
 import { RotateCcw, ArrowLeft, XCircle } from "lucide-react";
 
@@ -266,6 +267,11 @@ export function BuildAPromptGame() {
           Submit Prompt ({placed.length} piece{placed.length !== 1 ? "s" : ""})
         </button>
       </main>
+
+      {/* Player's chosen character */}
+      <div className="fixed top-24 right-6 z-40">
+        <CharacterMascot character={getUserData()?.selectedCharacter} size={64} />
+      </div>
     </div>
   );
 }

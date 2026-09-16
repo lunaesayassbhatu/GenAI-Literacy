@@ -9,6 +9,7 @@ export interface Badge {
 }
 
 export type UserType = 'student' | 'professor' | 'faculty' | 'staff';
+export type CharacterId = 'aisha' | 'dev' | 'jordan';
 
 export interface UserData {
   username: string;
@@ -25,6 +26,7 @@ export interface UserData {
   major?: string;
   isReturningUser?: boolean;
   language?: string;
+  selectedCharacter?: CharacterId;
 }
 
 export function getUserData(): UserData | null {
@@ -56,6 +58,7 @@ async function syncUserToSupabase(data: UserData): Promise<void> {
       year: data.year || null,
       major: data.major || null,
       language: data.language || 'en',
+      selected_character: data.selectedCharacter || null,
     }, { onConflict: 'id' }),
     supabase.from('user_stats').upsert({
       id: user.id,

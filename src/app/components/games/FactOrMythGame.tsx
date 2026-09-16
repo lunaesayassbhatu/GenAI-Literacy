@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { GameHeader } from "./GameHeader";
 import { XPToast } from "./XPToast";
+import { CharacterMascot } from "../CharacterMascot";
 import { STATEMENTS, Statement } from "../../data/gameData";
-import { addXP, awardBadge, saveHighScore, getHighScore } from "../../utils/userData";
+import { addXP, awardBadge, saveHighScore, getHighScore, getUserData } from "../../utils/userData";
 import { useNavigate } from "react-router-dom";
 import { RotateCcw, ArrowLeft } from "lucide-react";
 
@@ -542,6 +543,11 @@ export function FactOrMythGame() {
           to   { opacity: 1; transform: scale(1)    translateY(0); }
         }
       `}</style>
+
+      {/* Player's chosen character */}
+      <div className="fixed top-24 right-6 z-40">
+        <CharacterMascot character={getUserData()?.selectedCharacter} size={64} />
+      </div>
     </div>
   );
 }

@@ -67,6 +67,7 @@ export async function hydrateLocalStorageFromSupabase(userId: string, userEmail:
     email: userEmail,
     username: profile?.username ?? existingLocal.username ?? "",
     language: profile?.language ?? existingLocal.language ?? "en",
+    selectedCharacter: profile?.selected_character ?? existingLocal.selectedCharacter ?? undefined,
     userType: profile?.user_type ?? existingLocal.userType ?? "student",
     year: profile?.year ?? existingLocal.year ?? "",
     major: profile?.major ?? existingLocal.major ?? "",
@@ -119,6 +120,7 @@ export async function migrateLocalStorageToSupabase(): Promise<void> {
         year: u.year || null,
         major: u.major || null,
         language: u.language || 'en',
+        selected_character: u.selectedCharacter || null,
       }, { onConflict: 'id' }),
       supabase.from('user_stats').upsert({
         id: user.id,

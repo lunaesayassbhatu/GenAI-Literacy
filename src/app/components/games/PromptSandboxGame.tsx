@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { GameHeader } from "./GameHeader";
 import { XPToast } from "./XPToast";
+import { CharacterMascot } from "../CharacterMascot";
 import { MISSIONS, Mission } from "../../data/gameData";
-import { addXP, awardBadge, saveHighScore, getHighScore } from "../../utils/userData";
+import { addXP, awardBadge, saveHighScore, getHighScore, getUserData } from "../../utils/userData";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, CheckCircle2, XCircle } from "lucide-react";
 
@@ -237,6 +238,11 @@ export function PromptSandboxGame() {
       </main>
 
       <XPToast amount={score?.xp ?? 0} visible={showToast} />
+
+      {/* Player's chosen character */}
+      <div className="fixed top-24 right-6 z-40">
+        <CharacterMascot character={getUserData()?.selectedCharacter} size={64} />
+      </div>
     </div>
   );
 }

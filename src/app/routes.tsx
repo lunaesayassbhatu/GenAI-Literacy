@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
+import { createBrowserRouter, Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "./utils/authContext";
 import { getUserData } from "./utils/userData";
 import { AskWaveChat } from "./components/AskWaveChat";
@@ -9,6 +9,7 @@ import { Games } from "./components/Games";
 import { MatchingGame } from "./components/MatchingGame";
 import { Profile } from "./components/Profile";
 import { ModuleLearning } from "./components/ModuleLearning";
+import { ChooseCharacter } from "./components/ChooseCharacter";
 import { EthicsMatchingGame } from "./components/games/EthicsMatchingGame";
 import { FactOrMythGame } from "./components/games/FactOrMythGame";
 import { BuildAPromptGame } from "./components/games/BuildAPromptGame";
@@ -36,6 +37,16 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+// Requires a chosen character before reaching Learning Lab / Games
+const CharacterRequiredRoute = ({ children }: { children: React.ReactNode }) => {
+  const location = useLocation();
+  const hasCharacter = Boolean(getUserData()?.selectedCharacter);
+
+  if (!hasCharacter) return <Navigate to="/choose-character" state={{ from: location.pathname }} replace />;
+
+  return <>{children}</>;
+};
+
 export const router = createBrowserRouter([
   {
     element: <RootLayout />,
@@ -53,10 +64,20 @@ export const router = createBrowserRouter([
     )
   },
   {
+    path: "/choose-character",
+    element: (
+      <ProtectedRoute>
+        <ChooseCharacter />
+      </ProtectedRoute>
+    )
+  },
+  {
     path: "/learning-lab",
     element: (
       <ProtectedRoute>
-        <LearningLab />
+        <CharacterRequiredRoute>
+          <LearningLab />
+        </CharacterRequiredRoute>
       </ProtectedRoute>
     )
   },
@@ -64,7 +85,9 @@ export const router = createBrowserRouter([
     path: "/module/:moduleId",
     element: (
       <ProtectedRoute>
-        <ModuleLearning />
+        <CharacterRequiredRoute>
+          <ModuleLearning />
+        </CharacterRequiredRoute>
       </ProtectedRoute>
     )
   },
@@ -72,7 +95,9 @@ export const router = createBrowserRouter([
     path: "/games",
     element: (
       <ProtectedRoute>
-        <Games />
+        <CharacterRequiredRoute>
+          <Games />
+        </CharacterRequiredRoute>
       </ProtectedRoute>
     )
   },
@@ -80,7 +105,9 @@ export const router = createBrowserRouter([
     path: "/game/matching",
     element: (
       <ProtectedRoute>
-        <MatchingGame />
+        <CharacterRequiredRoute>
+          <MatchingGame />
+        </CharacterRequiredRoute>
       </ProtectedRoute>
     )
   },
@@ -88,7 +115,9 @@ export const router = createBrowserRouter([
     path: "/games/ethics",
     element: (
       <ProtectedRoute>
-        <EthicsMatchingGame />
+        <CharacterRequiredRoute>
+          <EthicsMatchingGame />
+        </CharacterRequiredRoute>
       </ProtectedRoute>
     )
   },
@@ -96,7 +125,9 @@ export const router = createBrowserRouter([
     path: "/games/fact-or-myth",
     element: (
       <ProtectedRoute>
-        <FactOrMythGame />
+        <CharacterRequiredRoute>
+          <FactOrMythGame />
+        </CharacterRequiredRoute>
       </ProtectedRoute>
     )
   },
@@ -104,7 +135,9 @@ export const router = createBrowserRouter([
     path: "/games/build-a-prompt",
     element: (
       <ProtectedRoute>
-        <BuildAPromptGame />
+        <CharacterRequiredRoute>
+          <BuildAPromptGame />
+        </CharacterRequiredRoute>
       </ProtectedRoute>
     )
   },
@@ -112,7 +145,9 @@ export const router = createBrowserRouter([
     path: "/games/sandbox",
     element: (
       <ProtectedRoute>
-        <PromptSandboxGame />
+        <CharacterRequiredRoute>
+          <PromptSandboxGame />
+        </CharacterRequiredRoute>
       </ProtectedRoute>
     )
   },

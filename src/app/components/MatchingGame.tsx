@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { Header } from "./Header";
 import { DolphinMascot } from "./DolphinMascot";
 import { FloatingWave } from "./FloatingWave";
+import { CharacterMascot } from "./CharacterMascot";
 import { CheckCircle2, XCircle, RotateCcw, Trophy } from "lucide-react";
-import { awardBadge, addXP, saveHighScore } from "../utils/userData";
+import { awardBadge, addXP, saveHighScore, getUserData } from "../utils/userData";
 import { motion } from "motion/react";
 import confetti from "canvas-confetti";
 import { useTheme } from "../utils/themeContext";
@@ -378,6 +379,11 @@ export function MatchingGame() {
 
       {/* Floating Wave Mascot */}
       <FloatingWave message={waveMessage} expression={waveExpression} />
+
+      {/* Player's chosen character */}
+      <div className="fixed top-24 right-6 z-40">
+        <CharacterMascot character={getUserData()?.selectedCharacter} size={64} />
+      </div>
     </div>
   );
 }
