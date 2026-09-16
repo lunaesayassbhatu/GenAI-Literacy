@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DolphinMascot } from "./DolphinMascot";
 import { LogIn, Mail, Lock, Globe, User, UserPlus, Shield, Zap } from "lucide-react";
@@ -121,6 +121,30 @@ export function Login() {
     setEmailError("");
   };
 
+  const torchRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const torch = torchRef.current;
+    if (!torch) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const handleMove = (e: MouseEvent) => {
+      torch.style.setProperty("--torch-x", `${e.clientX}px`);
+      torch.style.setProperty("--torch-y", `${e.clientY}px`);
+      torch.style.opacity = "1";
+    };
+    const handleLeave = () => {
+      torch.style.opacity = "0";
+    };
+
+    window.addEventListener("mousemove", handleMove);
+    window.addEventListener("mouseleave", handleLeave);
+    return () => {
+      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("mouseleave", handleLeave);
+    };
+  }, []);
+
   return (
     <div
       className="min-h-screen relative overflow-hidden flex items-center justify-center p-6"
@@ -176,6 +200,17 @@ export function Login() {
           />
         ))}
       </div>
+
+      {/* Torch/flashlight glow that follows the cursor, lighting up the dark background */}
+      <div
+        ref={torchRef}
+        className="absolute inset-0 pointer-events-none transition-opacity duration-500"
+        style={{
+          opacity: 0,
+          background:
+            "radial-gradient(circle 260px at var(--torch-x, 50%) var(--torch-y, 20%), rgba(255,198,39,0.22), rgba(255,198,39,0.08) 45%, transparent 75%)",
+        }}
+      />
 
       <div className="max-w-md w-full relative z-10">
         <div
@@ -285,13 +320,13 @@ export function Login() {
             <div>
               <label className="block mb-2 text-gray-800 font-black flex items-center gap-2">
                 <Lock size={18} className="text-[#8C1D40]" />
-                Secret Code
+                Password
               </label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your secret code"
+                placeholder="Enter your password"
                 className="w-full px-4 py-3 rounded-xl border-2 focus:outline-none transition-all font-semibold"
                 style={{ borderColor: "rgba(140, 29, 64, 0.3)" }}
                 onFocus={(e) => (e.target.style.borderColor = "#8C1D40")}
@@ -305,13 +340,13 @@ export function Login() {
               <div>
                 <label className="block mb-2 text-gray-800 font-black flex items-center gap-2">
                   <Lock size={18} className="text-[#8C1D40]" />
-                  Confirm Secret Code
+                  Confirm Password
                 </label>
                 <input
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => { setConfirmPassword(e.target.value); setPasswordError(""); }}
-                  placeholder="Confirm your secret code"
+                  placeholder="Confirm your password"
                   className={`w-full px-4 py-3 rounded-xl border-2 focus:outline-none transition-all font-semibold ${passwordError ? "border-red-400 bg-red-50" : ""}`}
                   style={!passwordError ? { borderColor: "rgba(140, 29, 64, 0.3)" } : {}}
                   onFocus={(e) => !passwordError && (e.target.style.borderColor = "#8C1D40")}
