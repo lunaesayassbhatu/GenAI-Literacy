@@ -5,11 +5,11 @@ import { CompletionModal } from "./CompletionModal";
 import { XPToast } from "./XPToast";
 import { CharacterMascot } from "../CharacterMascot";
 import { FloatingWave } from "../FloatingWave";
-import { ETHICS_PAIRS } from "../../data/gameData";
+import { BLACKBOX_PAIRS } from "../../data/gameData";
 import { addXP, awardBadge, saveHighScore, getUserData } from "../../utils/userData";
 import { getEquippedItemIds } from "../../utils/itemsSystem";
 
-const XP_REWARD = 50;
+const XP_REWARD = 60;
 
 interface Card {
   uid: string;
@@ -34,7 +34,7 @@ const PAIR_COLORS = [
 ];
 
 function pairColor(pairId: string) {
-  const idx = ETHICS_PAIRS.findIndex((p) => p.id === pairId);
+  const idx = BLACKBOX_PAIRS.findIndex((p) => p.id === pairId);
   return PAIR_COLORS[Math.max(0, idx) % PAIR_COLORS.length];
 }
 
@@ -44,7 +44,7 @@ function shuffle<T>(arr: T[]): T[] {
 
 function buildCards(): Card[] {
   const cards: Card[] = [];
-  for (const pair of ETHICS_PAIRS) {
+  for (const pair of BLACKBOX_PAIRS) {
     cards.push({
       uid: `${pair.id}-scenario`,
       pairId: pair.id,
@@ -65,7 +65,7 @@ function buildCards(): Card[] {
   return shuffle(cards);
 }
 
-export function EthicsMatchingGame() {
+export function BlackBoxMatchingGame() {
   const [phase, setPhase] = useState<"idle" | "playing">("idle");
   const [cards, setCards] = useState<Card[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
@@ -74,7 +74,7 @@ export function EthicsMatchingGame() {
   const [done, setDone] = useState(false);
   const [resultsHidden, setResultsHidden] = useState(false);
   const [showToast, setShowToast] = useState(false);
-  const [waveMessage, setWaveMessage] = useState("Match each scenario to its ethical concern.");
+  const [waveMessage, setWaveMessage] = useState("Match each situation to what it actually means for you.");
   const [waveExpression, setWaveExpression] = useState<"default" | "celebrate" | "hint">("default");
 
   function startGame() {
@@ -90,7 +90,7 @@ export function EthicsMatchingGame() {
     setDone(false);
     setResultsHidden(false);
     setShowToast(false);
-    setWaveMessage("Match each scenario to its ethical concern.");
+    setWaveMessage("Match each situation to what it actually means for you.");
     setWaveExpression("default");
   }
 
@@ -140,8 +140,8 @@ export function EthicsMatchingGame() {
           const allMatched = updatedPrev.every((c) => c.matched);
           if (allMatched) {
             addXP(XP_REWARD);
-            awardBadge("ethics-expert", "Ethics Expert", "Complete the Ethics Matching game", "⚖️");
-            saveHighScore("ethics", XP_REWARD);
+            awardBadge("black-box-skeptic", "Black Box Skeptic", "Complete the Black Box Matching game", "📦");
+            saveHighScore("black-box", XP_REWARD);
             setShowToast(true);
             setTimeout(() => setDone(true), 1200);
           }
@@ -168,46 +168,46 @@ export function EthicsMatchingGame() {
     );
     setPendingFlipBack(null);
     setLocked(false);
-    setWaveMessage("Match each scenario to its ethical concern.");
+    setWaveMessage("Match each situation to what it actually means for you.");
     setWaveExpression("default");
   }
 
   function cardBg(card: Card) {
     if (card.matched) return pairColor(card.pairId).bg;
-    if (card.flipped) return card.type === "scenario" ? "rgba(212,83,126,0.18)" : "rgba(251,191,36,0.15)";
+    if (card.flipped) return card.type === "scenario" ? "rgba(6,182,212,0.18)" : "rgba(251,191,36,0.15)";
     return "#1a1a2e";
   }
 
   function cardBorder(card: Card) {
     if (card.matched) return `2px solid ${pairColor(card.pairId).border}`;
-    if (card.flipped) return card.type === "scenario" ? "2px solid #d4537e" : "2px solid #fbbf24";
-    return "1px solid rgba(212,83,126,0.2)";
+    if (card.flipped) return card.type === "scenario" ? "2px solid #06b6d4" : "2px solid #fbbf24";
+    return "1px solid rgba(6,182,212,0.2)";
   }
 
   function cardTextColor(card: Card) {
     if (card.matched) return pairColor(card.pairId).text;
-    if (card.flipped) return card.type === "scenario" ? "#f472b6" : "#fbbf24";
+    if (card.flipped) return card.type === "scenario" ? "#22d3ee" : "#fbbf24";
     return "rgba(255,255,255,0.3)";
   }
 
   if (phase === "idle") {
     return (
       <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#0f0f12" }}>
-        <GameHeader title="AI Ethics Matching" />
+        <GameHeader title="Black Box Matching" />
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="w-full max-w-sm text-center">
-            <div className="text-7xl mb-6">⚖️</div>
+            <div className="text-7xl mb-6">📦</div>
             <h2 className="text-3xl font-bold mb-3" style={{ color: "#ffffff" }}>
-              AI Ethics Matching
+              Black Box Matching
             </h2>
             <p className="mb-8 text-base leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
-              Match each scenario to its ethical concern. Pay attention to each card as it
+              Match each situation to what it actually means for you. Pay attention to each card as it
               will flip back over after an incorrect match!
             </p>
             <button
               onClick={startGame}
               className="w-full py-4 rounded-2xl text-lg font-bold hover:opacity-90 transition-opacity"
-              style={{ backgroundColor: "#d4537e", color: "#ffffff" }}
+              style={{ backgroundColor: "#06b6d4", color: "#ffffff" }}
             >
               Let's Go! 🚀
             </button>
@@ -220,8 +220,8 @@ export function EthicsMatchingGame() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#0f0f12" }}>
       <GameHeader
-        title="AI Ethics Matching"
-        subtitle="Match each scenario to its ethical concern"
+        title="Black Box Matching"
+        subtitle="Match each situation to what it actually means"
       />
 
       <main className="max-w-2xl mx-auto px-4 pb-10">
@@ -229,15 +229,15 @@ export function EthicsMatchingGame() {
         <div className="flex gap-4 justify-center mb-6">
           <span
             className="px-3 py-1 rounded-full text-xs font-semibold"
-            style={{ backgroundColor: "rgba(212,83,126,0.18)", color: "#f472b6" }}
+            style={{ backgroundColor: "rgba(6,182,212,0.18)", color: "#22d3ee" }}
           >
-            Scenario
+            Situation
           </span>
           <span
             className="px-3 py-1 rounded-full text-xs font-semibold"
             style={{ backgroundColor: "rgba(251,191,36,0.15)", color: "#fbbf24" }}
           >
-            Ethical Concern
+            What It Means
           </span>
           <span
             className="px-3 py-1 rounded-full text-xs font-semibold"
@@ -287,7 +287,7 @@ export function EthicsMatchingGame() {
 
         {/* Progress */}
         <div className="mt-6 text-center text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>
-          {cards.filter((c) => c.matched).length / 2} / {ETHICS_PAIRS.length} pairs matched
+          {cards.filter((c) => c.matched).length / 2} / {BLACKBOX_PAIRS.length} pairs matched
         </div>
       </main>
 

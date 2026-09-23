@@ -5,8 +5,9 @@ import { MODULES } from "../utils/modulesData";
 import { useTheme } from "../utils/themeContext";
 import { motion } from "motion/react";
 import { Lock, Zap, Clock, CheckCircle2, ArrowRight, RotateCcw } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getUserData } from "../utils/userData";
+import { getEquippedItemIds } from "../utils/itemsSystem";
 import {
   getCompletedLessonCount,
   loadModuleProgress,
@@ -269,9 +270,13 @@ export function LearningLab() {
       </main>
 
       {/* Player's chosen character */}
-      <div className="fixed top-24 right-6 z-40">
-        <CharacterMascot character={getUserData()?.selectedCharacter} size={64} />
-      </div>
+      <Link
+        to="/choose-character"
+        className="fixed top-24 right-6 z-40 block hover:opacity-80 transition-opacity"
+        title="Change your character"
+      >
+        <CharacterMascot character={getUserData()?.selectedCharacter} size={64} equipped={getEquippedItemIds()} />
+      </Link>
     </div>
   );
 }

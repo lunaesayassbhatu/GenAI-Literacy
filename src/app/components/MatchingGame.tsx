@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Header } from "./Header";
 import { DolphinMascot } from "./DolphinMascot";
 import { FloatingWave } from "./FloatingWave";
 import { CharacterMascot } from "./CharacterMascot";
 import { CheckCircle2, XCircle, RotateCcw, Trophy } from "lucide-react";
 import { awardBadge, addXP, saveHighScore, getUserData } from "../utils/userData";
+import { getEquippedItemIds } from "../utils/itemsSystem";
 import { motion } from "motion/react";
 import confetti from "canvas-confetti";
 import { useTheme } from "../utils/themeContext";
@@ -381,9 +383,13 @@ export function MatchingGame() {
       <FloatingWave message={waveMessage} expression={waveExpression} />
 
       {/* Player's chosen character */}
-      <div className="fixed top-24 right-6 z-40">
-        <CharacterMascot character={getUserData()?.selectedCharacter} size={64} />
-      </div>
+      <Link
+        to="/choose-character"
+        className="fixed top-24 right-6 z-40 block hover:opacity-80 transition-opacity"
+        title="Change your character"
+      >
+        <CharacterMascot character={getUserData()?.selectedCharacter} size={64} equipped={getEquippedItemIds()} />
+      </Link>
     </div>
   );
 }

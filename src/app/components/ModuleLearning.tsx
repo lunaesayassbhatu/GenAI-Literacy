@@ -1,11 +1,12 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowLeft, Zap, ArrowRight, CheckCircle2 } from "lucide-react";
 import { WaveMascot } from "./WaveMascot";
 import { CharacterMascot } from "./CharacterMascot";
 import { useTheme } from "../utils/themeContext";
 import { getUserData, updateUserData, awardBadge } from "../utils/userData";
+import { getEquippedItemIds } from "../utils/itemsSystem";
 import { MODULES } from "../utils/modulesData";
 import { type Step, getStepsForModule, MODULE1_SECTION1_VARIANT_COUNT } from "../utils/moduleStepsData";
 import {
@@ -599,9 +600,13 @@ export function ModuleLearning() {
       </AnimatePresence>
 
       {/* Player's chosen character — accompanies the learner through every step */}
-      <div className="fixed top-24 right-6 z-40">
-        <CharacterMascot character={userData?.selectedCharacter} size={64} />
-      </div>
+      <Link
+        to="/choose-character"
+        className="fixed top-24 right-6 z-40 block hover:opacity-80 transition-opacity"
+        title="Change your character"
+      >
+        <CharacterMascot character={userData?.selectedCharacter} size={64} equipped={getEquippedItemIds()} />
+      </Link>
     </div>
   );
 }

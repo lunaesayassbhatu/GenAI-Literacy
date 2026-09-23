@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { GameHeader } from "./GameHeader";
 import { XPToast } from "./XPToast";
 import { CharacterMascot } from "../CharacterMascot";
-import { STATEMENTS, Statement } from "../../data/gameData";
+import { ENV_STATEMENTS, Statement } from "../../data/gameData";
 import { addXP, awardBadge, saveHighScore, getHighScore, getUserData } from "../../utils/userData";
 import { getEquippedItemIds } from "../../utils/itemsSystem";
 import { Link, useNavigate } from "react-router-dom";
@@ -35,7 +35,7 @@ function shuffle<T>(arr: T[]): T[] {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export function FactOrMythGame() {
+export function EnvironmentGame() {
   const navigate = useNavigate();
 
   // Mutable game logic — never causes re-renders
@@ -120,8 +120,8 @@ export function FactOrMythGame() {
     g.phase  = "over";
     const earned = Math.max(0, g.xp);
     addXP(earned);
-    awardBadge("fact-or-myth-master", "Fact or Myth Master", "Complete the Fact or Myth game", "🔍");
-    setIsNewHighScore(saveHighScore("fact-or-myth", earned));
+    awardBadge("eco-conscious", "Eco-Conscious User", "Complete the Environmental Impact game", "🌱");
+    setIsNewHighScore(saveHighScore("environment", earned));
     setGamePhase("over");
     setFeedback(null);
     setCardState("idle");
@@ -146,7 +146,7 @@ export function FactOrMythGame() {
 
     const g   = gRef.current;
     g.phase    = "playing";
-    g.queue    = shuffle(STATEMENTS);
+    g.queue    = shuffle(ENV_STATEMENTS);
     g.current  = g.queue.shift() ?? null;
     g.timeLeft = TOTAL_TIME;
     g.score    = 0;
@@ -297,12 +297,12 @@ export function FactOrMythGame() {
   if (gamePhase === "idle") {
     return (
       <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#0f0f12" }}>
-        <GameHeader title="Fact or Myth?" />
+        <GameHeader title="Environmental Impact" />
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="w-full max-w-sm text-center">
-            <div className="text-7xl mb-6">🤔</div>
+            <div className="text-7xl mb-6">🌱</div>
             <h2 className="text-3xl font-bold mb-3" style={{ color: "#ffffff" }}>
-              Fact or Myth?
+              Environmental Impact
             </h2>
             <p className="mb-8 text-base leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
               A statement appears. Swipe{" "}
@@ -316,7 +316,7 @@ export function FactOrMythGame() {
             <button
               onClick={startGame}
               className="w-full py-4 rounded-2xl text-lg font-bold hover:opacity-90 transition-opacity"
-              style={{ backgroundColor: "#d4537e", color: "#ffffff" }}
+              style={{ backgroundColor: "#22c55e", color: "#ffffff" }}
             >
               Let's Go! 🚀
             </button>
@@ -331,12 +331,12 @@ export function FactOrMythGame() {
   if (gamePhase === "over") {
     return (
       <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#0f0f12" }}>
-        <GameHeader title="Fact or Myth?" />
+        <GameHeader title="Environmental Impact" />
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="w-full max-w-sm">
             <div
               className="rounded-3xl p-8 text-center shadow-2xl"
-              style={{ backgroundColor: "#1a1a2e", border: "1px solid rgba(212,83,126,0.3)" }}
+              style={{ backgroundColor: "#1a1a2e", border: "1px solid rgba(34,197,94,0.3)" }}
             >
               <div className="text-6xl mb-4">{accuracyEmoji}</div>
               <h2 className="text-2xl font-bold mb-1" style={{ color: "#ffffff" }}>Time's Up!</h2>
@@ -345,9 +345,9 @@ export function FactOrMythGame() {
                 <div className="mb-4 px-4 py-2 rounded-xl text-sm font-bold" style={{ backgroundColor: "rgba(251,191,36,0.15)", color: "#fbbf24" }}>
                   🏆 New high score!
                 </div>
-              ) : getHighScore("fact-or-myth") > 0 && (
+              ) : getHighScore("environment") > 0 && (
                 <div className="mb-4 text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
-                  Best: {getHighScore("fact-or-myth")} XP
+                  Best: {getHighScore("environment")} XP
                 </div>
               )}
 
@@ -355,7 +355,7 @@ export function FactOrMythGame() {
                 {[
                   { value: finalXP,            label: "XP earned", color: "#fbbf24", bg: "rgba(251,191,36,0.12)" },
                   { value: `${score}/${total}`, label: "correct",   color: "#4ade80", bg: "rgba(74,222,128,0.1)"  },
-                  { value: `${accuracy}%`,      label: "accuracy",  color: "#f472b6", bg: "rgba(212,83,126,0.12)" },
+                  { value: `${accuracy}%`,      label: "accuracy",  color: "#22c55e", bg: "rgba(34,197,94,0.12)" },
                 ].map((s, i) => (
                   <div key={i} className="rounded-2xl p-3" style={{ backgroundColor: s.bg }}>
                     <div className="text-2xl font-bold" style={{ color: s.color }}>{s.value}</div>
@@ -372,7 +372,7 @@ export function FactOrMythGame() {
                 <button
                   onClick={startGame}
                   className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-bold hover:opacity-90"
-                  style={{ backgroundColor: "#d4537e", color: "#ffffff" }}
+                  style={{ backgroundColor: "#22c55e", color: "#ffffff" }}
                 >
                   <RotateCcw size={18} /> Play Again
                 </button>
@@ -396,7 +396,7 @@ export function FactOrMythGame() {
 
   return (
     <div className="min-h-screen flex flex-col select-none" style={{ backgroundColor: "#0f0f12" }}>
-      <GameHeader title="Fact or Myth?" xp={xp} showXP />
+      <GameHeader title="Environmental Impact" xp={xp} showXP />
 
       <main className="flex-1 flex flex-col items-center px-4 pb-6 max-w-sm mx-auto w-full">
 
@@ -422,10 +422,10 @@ export function FactOrMythGame() {
           {/* Depth cards behind */}
           <div className="absolute rounded-3xl"
             style={{ width: "88%", height: 230, backgroundColor: "#1a1a2e",
-              border: "1px solid rgba(212,83,126,0.08)", top: 14, opacity: 0.45, transform: "scale(0.95)" }} />
+              border: "1px solid rgba(34,197,94,0.08)", top: 14, opacity: 0.45, transform: "scale(0.95)" }} />
           <div className="absolute rounded-3xl"
             style={{ width: "92%", height: 230, backgroundColor: "#1a1a2e",
-              border: "1px solid rgba(212,83,126,0.14)", top: 7, opacity: 0.65, transform: "scale(0.975)" }} />
+              border: "1px solid rgba(34,197,94,0.14)", top: 7, opacity: 0.65, transform: "scale(0.975)" }} />
 
           {/* ── Main swipe card ── */}
           <div
@@ -434,7 +434,7 @@ export function FactOrMythGame() {
             style={{
               height: 230,
               backgroundColor: "#1a1a2e",
-              border: "1px solid rgba(212,83,126,0.3)",
+              border: "1px solid rgba(34,197,94,0.3)",
               transform:  cardTransform,
               transition: cardTransition,
               opacity:    cardOpacity,
@@ -477,7 +477,7 @@ export function FactOrMythGame() {
               </div>
             )}
 
-            <div className="text-4xl mb-4">🤔</div>
+            <div className="text-4xl mb-4">🌍</div>
             <p className="text-base font-semibold leading-snug" style={{ color: "#ffffff" }}>
               {cardText}
             </p>

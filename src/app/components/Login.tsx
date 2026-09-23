@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { DolphinMascot } from "./DolphinMascot";
 import { LogIn, Mail, Lock, Globe, User, UserPlus, Shield, Zap } from "lucide-react";
 import { supabase } from "../utils/supabase";
 import { hydrateLocalStorageFromSupabase } from "../utils/migrateToSupabase";
@@ -233,9 +232,6 @@ export function Login() {
 
           {/* Logo */}
           <div className="text-center mb-6 relative">
-            <div className="flex justify-center mb-4">
-              <DolphinMascot size={100} />
-            </div>
             <h1 className="text-4xl font-black mb-1" style={{ color: "#8C1D40" }}>
               ASU Sunwave
             </h1>

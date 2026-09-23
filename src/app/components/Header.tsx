@@ -1,6 +1,5 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { DolphinMascot } from "./DolphinMascot";
-import { Home, User, LogOut, BookOpen, Gamepad2 } from "lucide-react";
+import { Home, User, LogOut, BookOpen, Gamepad2, Map } from "lucide-react";
 import { getUserData, logout } from "../utils/userData";
 import { getCurrentLevel } from "../utils/xpSystem";
 import { useTheme } from "../utils/themeContext";
@@ -33,7 +32,6 @@ export function Header() {
         <div className="flex items-center justify-between">
           {/* Logo and Brand */}
           <Link to="/home" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-            <DolphinMascot size={50} animate={false} />
             <div>
               <h2 className="text-xl" style={{ color: colors.accentGold }}>ASU GenAI Lab</h2>
               <p className="text-xs" style={{ color: colors.textSecondary }}>Smart AI Learning</p>
@@ -53,6 +51,19 @@ export function Header() {
             >
               <Home size={18} />
               <span className="hidden sm:inline">Home</span>
+            </Link>
+
+            <Link
+              to="/map"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors hover:opacity-80"
+              style={
+                isActive('/map')
+                  ? { backgroundColor: colors.accentMaroon, color: theme === 'dark' ? '#F0E0E4' : '#FFFFFF' }
+                  : { color: colors.textSecondary }
+              }
+            >
+              <Map size={18} />
+              <span className="hidden sm:inline">Map</span>
             </Link>
 
             <Link

@@ -4,7 +4,8 @@ import { XPToast } from "./XPToast";
 import { CharacterMascot } from "../CharacterMascot";
 import { BUILD_SCENARIOS, BuildScenario, PromptPiece } from "../../data/gameData";
 import { addXP, awardBadge, saveHighScore, getHighScore, getUserData } from "../../utils/userData";
-import { useNavigate } from "react-router-dom";
+import { getEquippedItemIds } from "../../utils/itemsSystem";
+import { Link, useNavigate } from "react-router-dom";
 import { RotateCcw, ArrowLeft, XCircle } from "lucide-react";
 
 function randomScenario(): BuildScenario {
@@ -269,9 +270,13 @@ export function BuildAPromptGame() {
       </main>
 
       {/* Player's chosen character */}
-      <div className="fixed top-24 right-6 z-40">
-        <CharacterMascot character={getUserData()?.selectedCharacter} size={64} />
-      </div>
+      <Link
+        to="/choose-character"
+        className="fixed top-24 right-6 z-40 block hover:opacity-80 transition-opacity"
+        title="Change your character"
+      >
+        <CharacterMascot character={getUserData()?.selectedCharacter} size={64} equipped={getEquippedItemIds()} />
+      </Link>
     </div>
   );
 }

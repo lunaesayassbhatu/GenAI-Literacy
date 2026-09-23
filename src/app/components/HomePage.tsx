@@ -1,18 +1,11 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Header } from "./Header";
-import { CharacterMascot } from "./CharacterMascot";
-import { getUserData, updateUserData } from "../utils/userData";
-import { CHARACTERS } from "../data/charactersData";
 import { useTheme } from "../utils/themeContext";
 import { motion } from "motion/react";
-import { BookOpen, Gamepad2, Target, Lightbulb, Users, Award, ArrowRight } from "lucide-react";
+import { BookOpen, Gamepad2, Target, Lightbulb, Users, Award } from "lucide-react";
 
 export function HomePage() {
   const { colors } = useTheme();
-  const navigate = useNavigate();
-  const [, setVersion] = useState(0);
-  const userData = getUserData();
 
   return (
     <div
@@ -177,7 +170,7 @@ export function HomePage() {
                     whileHover={{ y: -5, scale: 1.02 }}
                     className="rounded-xl shadow-lg p-6 relative overflow-hidden cursor-pointer h-full"
                     style={{
-                      backgroundColor: '#FFFBEF',
+                      backgroundColor: colors.cardBackground,
                       border: `2px solid ${colors.accentPink}`
                     }}
                   >
@@ -188,11 +181,11 @@ export function HomePage() {
                       >
                         <BookOpen size={32} style={{ color: colors.accentPink }} />
                       </div>
-                      <h3 className="text-xl font-bold" style={{ color: '#111827' }}>
-                        Learn the Modules
+                      <h3 className="text-xl font-bold" style={{ color: colors.textPrimary }}>
+                        Understand How & When to Use AI
                       </h3>
                     </div>
-                    <p style={{ color: '#4B5563' }}>
+                    <p style={{ color: colors.textSecondary }}>
                       Complete interactive learning modules covering AI ethics, prompt engineering, and responsible use
                     </p>
                   </motion.div>
@@ -208,7 +201,7 @@ export function HomePage() {
                     whileHover={{ y: -5, scale: 1.02 }}
                     className="rounded-xl shadow-lg p-6 relative overflow-hidden cursor-pointer h-full"
                     style={{
-                      backgroundColor: '#FFFBEF',
+                      backgroundColor: colors.cardBackground,
                       border: `2px solid ${colors.accentGold}`
                     }}
                   >
@@ -219,11 +212,11 @@ export function HomePage() {
                       >
                         <Gamepad2 size={32} style={{ color: colors.accentGold }} />
                       </div>
-                      <h3 className="text-xl font-bold" style={{ color: '#111827' }}>
-                        Play Educational Games
+                      <h3 className="text-xl font-bold" style={{ color: colors.textPrimary }}>
+                        Practice with Educational Games
                       </h3>
                     </div>
-                    <p style={{ color: '#4B5563' }}>
+                    <p style={{ color: colors.textSecondary }}>
                       Reinforce your learning through fun, interactive games that test your knowledge
                     </p>
                   </motion.div>
@@ -239,7 +232,7 @@ export function HomePage() {
                     whileHover={{ y: -5, scale: 1.02 }}
                     className="rounded-xl shadow-lg p-6 relative overflow-hidden cursor-pointer h-full"
                     style={{
-                      backgroundColor: '#FFFBEF',
+                      backgroundColor: colors.cardBackground,
                       border: `2px solid ${colors.accentTeal}`
                     }}
                   >
@@ -250,11 +243,11 @@ export function HomePage() {
                       >
                         <Award size={32} style={{ color: colors.accentTeal }} />
                       </div>
-                      <h3 className="text-xl font-bold" style={{ color: '#111827' }}>
-                        Earn XP & Badges
+                      <h3 className="text-xl font-bold" style={{ color: colors.textPrimary }}>
+                        Unlock Features with XP
                       </h3>
                     </div>
-                    <p style={{ color: '#4B5563' }}>
+                    <p style={{ color: colors.textSecondary }}>
                       Level up, earn badges, and track your progress as you master GenAI tools
                     </p>
                   </motion.div>
@@ -264,59 +257,6 @@ export function HomePage() {
           </div>
         </motion.div>
 
-        {/* Character selection */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center"
-        >
-          <h2 className="text-3xl font-bold mb-2" style={{ color: colors.textPrimary }}>
-            Choose Your Character
-          </h2>
-          <p className="text-lg mb-8" style={{ color: colors.textSecondary }}>
-            Pick who you'll play as through the Learning Lab and Games
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
-            {CHARACTERS.map((c) => {
-              const isSelected = userData?.selectedCharacter === c.id;
-              return (
-                <button
-                  key={c.id}
-                  onClick={() => {
-                    updateUserData({ selectedCharacter: c.id });
-                    setVersion((v) => v + 1);
-                  }}
-                  className="flex flex-col items-center gap-3 p-6 rounded-2xl transition-all"
-                  style={{
-                    border: isSelected ? `3px solid ${c.color}` : `2px solid ${colors.cardBorder}`,
-                    boxShadow: isSelected ? `0 0 0 4px ${c.color}33` : undefined,
-                  }}
-                >
-                  <CharacterMascot character={c.id} size={100} animate={isSelected} />
-                  <div className="flex flex-col items-center text-center gap-1">
-                    <span className="text-lg font-bold" style={{ color: colors.textPrimary }}>
-                      {c.name}
-                    </span>
-                    <span className="text-sm" style={{ color: colors.textSecondary }}>
-                      {c.tagline}
-                    </span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          <button
-            onClick={() => navigate("/learning-lab")}
-            disabled={!userData?.selectedCharacter}
-            className="inline-flex items-center gap-2 px-8 py-3 rounded-xl font-bold transition-all hover:scale-105 disabled:opacity-40 disabled:cursor-not-allowed"
-            style={{ backgroundColor: colors.accentGold, color: '#0D0508' }}
-          >
-            <span>Next</span>
-            <ArrowRight size={20} />
-          </button>
-        </motion.section>
       </main>
 
       {/* Help & documentation footer */}
@@ -324,7 +264,7 @@ export function HomePage() {
         className="mt-16 border-t"
         style={{ borderColor: colors.cardBorder, backgroundColor: colors.cardBackground }}
       >
-        <div className="max-w-6xl mx-auto px-4 py-10 grid sm:grid-cols-3 gap-8 text-sm">
+        <div className="max-w-6xl mx-auto px-4 pt-10 pb-24 grid sm:grid-cols-3 gap-8 text-sm">
           <div>
             <h4 className="font-bold mb-2" style={{ color: colors.textPrimary }}>Need Help?</h4>
             <p style={{ color: colors.textSecondary }}>
@@ -339,7 +279,7 @@ export function HomePage() {
           <div>
             <h4 className="font-bold mb-2" style={{ color: colors.textPrimary }}>LEI Contact</h4>
             <p style={{ color: colors.textSecondary }}>
-              Questions about the Learning Experience Innovation team's involvement in this project:
+              For questions or concerns about the Learning Experience Institution team's involvement in this project:
             </p>
             {/* PLACEHOLDER — replace with the real LEI contact */}
             <a href="mailto:lei@example.asu.edu" className="underline" style={{ color: colors.accentTeal }}>
@@ -351,7 +291,7 @@ export function HomePage() {
             {/* PLACEHOLDER — replace with the real citation list once finalized */}
             <p style={{ color: colors.textSecondary }}>
               Learning module content draws on peer-reviewed GenAI literacy research and ASU curriculum
-              guidelines. Full citations available on request from the LEI team above.
+              guidelines. Full citations available on request from the LEI team.
             </p>
           </div>
         </div>

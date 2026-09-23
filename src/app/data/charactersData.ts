@@ -13,7 +13,7 @@ export const CHARACTERS: CharacterInfo[] = [
     id: "aisha",
     name: "Aisha",
     color: "#E8547A",
-    tagline: "Sophomore at ASU",
+    tagline: "Sophomore Psychology Student at ASU",
     story:
       "Aisha dives into GenAI headfirst, using it for everything from essays to exam prep. She's been burned by confident-sounding answers that turned out wrong, and now she's building the habit of verifying before she trusts.",
   },
@@ -29,7 +29,7 @@ export const CHARACTERS: CharacterInfo[] = [
     id: "jordan",
     name: "Jordan",
     color: "#FFC627",
-    tagline: "Computer Science Master's Student at ASU",
+    tagline: "Master's Computer Science Student at ASU",
     story:
       "Jordan doesn't settle for the first answer. When a response falls flat, he digs in, gets more specific, and iterates until the output actually matches what he needed.",
   },

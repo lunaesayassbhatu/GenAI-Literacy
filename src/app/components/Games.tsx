@@ -1,11 +1,26 @@
+import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { Header } from "./Header";
 import { useTheme } from "../utils/themeContext";
 import { getHighScore } from "../utils/userData";
 import { motion } from "motion/react";
-import { Gamepad2, Puzzle, Brain, Target, Zap, Wand2, Trophy } from "lucide-react";
+import { Gamepad2, Puzzle, Brain, Target, Zap, Wand2, Trophy, Scale, EyeOff, Leaf } from "lucide-react";
 
-const GAME_OPTIONS = [
+export interface GameOption {
+  id: string;
+  name: string;
+  description: string;
+  icon: ReactNode;
+  color: string;
+  xpReward: number;
+  path: string;
+  difficulty: string;
+  available: boolean;
+  /** Badge id awarded on completion — the source of truth for "is this game done". */
+  badgeId: string;
+}
+
+export const GAME_OPTIONS: GameOption[] = [
   {
     id: "ethics",
     name: "AI Ethics Matching",
@@ -16,6 +31,19 @@ const GAME_OPTIONS = [
     path: "/games/ethics",
     difficulty: "Easy",
     available: true,
+    badgeId: "ethics-expert",
+  },
+  {
+    id: "black-box",
+    name: "Black Box Matching",
+    description: "Match AI situations to what they actually mean for you, card-flip style",
+    icon: <EyeOff size={40} />,
+    color: "#06B6D4",
+    xpReward: 60,
+    path: "/games/black-box",
+    difficulty: "Easy",
+    available: true,
+    badgeId: "black-box-skeptic",
   },
   {
     id: "fact-or-myth",
@@ -27,6 +55,19 @@ const GAME_OPTIONS = [
     path: "/games/fact-or-myth",
     difficulty: "Medium",
     available: true,
+    badgeId: "fact-or-myth-master",
+  },
+  {
+    id: "bias",
+    name: "AI Bias Matching",
+    description: "Match real-world scenarios to the type of bias they reveal",
+    icon: <Scale size={40} />,
+    color: "#9D4EDD",
+    xpReward: 60,
+    path: "/games/bias",
+    difficulty: "Medium",
+    available: true,
+    badgeId: "bias-detective",
   },
   {
     id: "build-a-prompt",
@@ -38,6 +79,7 @@ const GAME_OPTIONS = [
     path: "/games/build-a-prompt",
     difficulty: "Hard",
     available: true,
+    badgeId: "prompt-builder",
   },
   {
     id: "sandbox",
@@ -49,6 +91,19 @@ const GAME_OPTIONS = [
     path: "/games/sandbox",
     difficulty: "Expert",
     available: true,
+    badgeId: "prompt-engineer",
+  },
+  {
+    id: "environment",
+    name: "Environmental Impact",
+    description: "Swipe right for facts, left for myths about AI's real energy and water cost",
+    icon: <Leaf size={40} />,
+    color: "#2E7D32",
+    xpReward: 75,
+    path: "/games/environment",
+    difficulty: "Medium",
+    available: true,
+    badgeId: "eco-conscious",
   },
 ];
 

@@ -10,10 +10,14 @@ import { MatchingGame } from "./components/MatchingGame";
 import { Profile } from "./components/Profile";
 import { ModuleLearning } from "./components/ModuleLearning";
 import { ChooseCharacter } from "./components/ChooseCharacter";
+import { JourneyMap } from "./components/JourneyMap";
 import { EthicsMatchingGame } from "./components/games/EthicsMatchingGame";
 import { FactOrMythGame } from "./components/games/FactOrMythGame";
 import { BuildAPromptGame } from "./components/games/BuildAPromptGame";
 import { PromptSandboxGame } from "./components/games/PromptSandboxGame";
+import { BiasMatchingGame } from "./components/games/BiasMatchingGame";
+import { BlackBoxMatchingGame } from "./components/games/BlackBoxMatchingGame";
+import { EnvironmentGame } from "./components/games/EnvironmentGame";
 import { ScrollToTop } from "./components/ScrollToTop";
 
 function RootLayout() {
@@ -68,6 +72,16 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <ChooseCharacter />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/map",
+    element: (
+      <ProtectedRoute>
+        <CharacterRequiredRoute>
+          <JourneyMap />
+        </CharacterRequiredRoute>
       </ProtectedRoute>
     )
   },
@@ -147,6 +161,36 @@ export const router = createBrowserRouter([
       <ProtectedRoute>
         <CharacterRequiredRoute>
           <PromptSandboxGame />
+        </CharacterRequiredRoute>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/games/bias",
+    element: (
+      <ProtectedRoute>
+        <CharacterRequiredRoute>
+          <BiasMatchingGame />
+        </CharacterRequiredRoute>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/games/black-box",
+    element: (
+      <ProtectedRoute>
+        <CharacterRequiredRoute>
+          <BlackBoxMatchingGame />
+        </CharacterRequiredRoute>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/games/environment",
+    element: (
+      <ProtectedRoute>
+        <CharacterRequiredRoute>
+          <EnvironmentGame />
         </CharacterRequiredRoute>
       </ProtectedRoute>
     )

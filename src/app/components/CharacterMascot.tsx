@@ -36,9 +36,46 @@ interface CharacterMascotProps {
   /** "full" renders the whole fish (body to tail); "portrait" crops to a
    *  head-on view for tight spaces like the nav bar. */
   variant?: "full" | "portrait";
+  /** Ids of currently-equipped cosmetic items (see data/itemsData.ts), layered on top of the fish art. */
+  equipped?: string[];
 }
 
-export function CharacterMascot({ character, size = 80, animate = true, variant = "full" }: CharacterMascotProps) {
+// Simple SVG gear layered over the base fish art, positioned relative to the
+// head (eye at ~30,40) on the left and the back/dorsal area (~x70-110) on the
+// right toward the tail. Capes render behind the body (drawn first); hats and
+// accessories render in front (drawn last), keyed by item id.
+const BACK_SLOT_ITEMS = new Set(["scholars-cape", "masters-cloak"]);
+
+function GearOverlay({ itemId }: { itemId: string }) {
+  switch (itemId) {
+    case "explorer-cap":
+      return <path d="M 14 26 L 30 6 L 46 26 Z" fill="#FFC627" stroke="#0D0508" strokeWidth="1.5" strokeLinejoin="round" />;
+    case "champions-crown":
+      return (
+        <path
+          d="M 10 26 L 16 8 L 24 20 L 30 4 L 36 20 L 44 8 L 50 26 Z"
+          fill="#FFC627"
+          stroke="#8B1A2E"
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+        />
+      );
+    case "scholars-cape":
+      return <path d="M 95 18 Q 128 38 108 70 Q 88 55 90 28 Z" fill="#8B1A2E" opacity="0.85" />;
+    case "masters-cloak":
+      return <path d="M 92 12 Q 135 32 112 78 Q 84 60 86 24 Z" fill="#FFC627" opacity="0.9" />;
+    case "insight-badge":
+      return <circle cx="62" cy="60" r="8" fill="#4AB7C4" stroke="#0D0508" strokeWidth="1.2" />;
+    case "game-medal":
+      return <circle cx="62" cy="60" r="8" fill="#E8547A" stroke="#0D0508" strokeWidth="1.2" />;
+    case "champion-sash":
+      return <path d="M 32 28 L 88 66 M 84 28 L 36 66" stroke="#FFC627" strokeWidth="6" strokeLinecap="round" opacity="0.85" />;
+    default:
+      return null;
+  }
+}
+
+export function CharacterMascot({ character, size = 80, animate = true, variant = "full", equipped = [] }: CharacterMascotProps) {
   const info = getCharacterInfo(character);
   const frames = character ? CHARACTER_ASSETS[character] : undefined;
   const { accent, tail } = APPEARANCE[info.id];
@@ -104,6 +141,11 @@ export function CharacterMascot({ character, size = 80, animate = true, variant 
           {tailShape}
         </motion.g>
 
+        {/* back-slot gear (e.g. capes) — drawn behind the body so it peeks out from the back */}
+        {equipped.filter((id) => BACK_SLOT_ITEMS.has(id)).map((id) => (
+          <GearOverlay key={id} itemId={id} />
+        ))}
+
         {/* dorsal fin */}
         <path d="M 62 22 Q 78 2 92 20 Q 80 24 62 22 Z" fill={accent} opacity="0.85" />
 
@@ -138,6 +180,11 @@ export function CharacterMascot({ character, size = 80, animate = true, variant 
 
         {/* mouth */}
         <path d="M 12 52 Q 18 58 26 55" stroke="#000" strokeOpacity="0.35" strokeWidth="2" strokeLinecap="round" fill="none" />
+
+        {/* front-slot gear (hats, accessories) — drawn on top of everything else */}
+        {equipped.filter((id) => !BACK_SLOT_ITEMS.has(id)).map((id) => (
+          <GearOverlay key={id} itemId={id} />
+        ))}
       </svg>
     </motion.div>
   );

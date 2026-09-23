@@ -132,6 +132,101 @@ export const STATEMENTS: Statement[] = [
   },
 ];
 
+// ─── Game 5: AI Bias Matching ────────────────────────────────────────────────
+
+export const BIAS_PAIRS: EthicsPair[] = [
+  {
+    id: "a",
+    scenario: "An AI writing tool defaults to male names for \"doctor\" and female names for \"nurse\"",
+    concern: "Gender bias baked into training data",
+  },
+  {
+    id: "b",
+    scenario: "A resume-screening AI ranks candidates differently based on names that sound a certain ethnicity",
+    concern: "Racial bias in training data",
+  },
+  {
+    id: "c",
+    scenario: "An AI tutor gives shorter, less detailed answers to messages written in non-standard English",
+    concern: "Language and dialect bias",
+  },
+  {
+    id: "d",
+    scenario: "An AI image generator shows mostly Western clothing and settings for \"a typical wedding\"",
+    concern: "Cultural representation bias",
+  },
+];
+
+// ─── Game 6: Black Box Matching ──────────────────────────────────────────────
+
+export const BLACKBOX_PAIRS: EthicsPair[] = [
+  {
+    id: "a",
+    scenario: "AI cites a study with a specific author, journal, and year",
+    concern: "Could be a fabricated citation — verify independently",
+  },
+  {
+    id: "b",
+    scenario: "You ask AI to explain why it gave that particular answer",
+    concern: "Not fully possible — the reasoning is a black box",
+  },
+  {
+    id: "c",
+    scenario: "AI answers a question about an event from last week",
+    concern: "May be unreliable — check its training data cutoff",
+  },
+  {
+    id: "d",
+    scenario: "AI gives a long, confident, fluent answer",
+    concern: "Confidence and fluency are not proof of accuracy",
+  },
+];
+
+// ─── Game 7: Environmental Impact: Fact or Myth ─────────────────────────────
+
+export const ENV_STATEMENTS: Statement[] = [
+  {
+    text: "Training a large AI model can emit as much carbon as several transatlantic flights",
+    isFact: true,
+    why: "Large-scale training runs consume massive amounts of compute and energy.",
+  },
+  {
+    text: "Data centers use water to cool the servers that run GenAI tools",
+    isFact: true,
+    why: "Cooling systems for AI infrastructure require significant water resources.",
+  },
+  {
+    text: "Every single AI query adds a small amount to ongoing energy use",
+    isFact: true,
+    why: "Usage at scale — not just training — is a real, ongoing cost.",
+  },
+  {
+    text: "Environmental impact scales with how many people use a tool, not just how it was built",
+    isFact: true,
+    why: "Millions of everyday queries add up on top of the initial training cost.",
+  },
+  {
+    text: "Typing into a chatbox has basically zero environmental impact",
+    isFact: false,
+    why: "It feels weightless, but it's backed by real energy and water use at a data center.",
+  },
+  {
+    text: "Only training a model has an environmental cost — everyday use afterward is free",
+    isFact: false,
+    why: "Ongoing use at scale adds up just as much as training, if not more.",
+  },
+  {
+    text: "AI companies have fully solved the energy and water cost of running these tools",
+    isFact: false,
+    why: "The cost is real, growing with adoption, and not yet fully solved.",
+  },
+  {
+    text: "The environmental cost is the same no matter how many people use a tool",
+    isFact: false,
+    why: "Impact scales with usage — more queries means more energy and water used.",
+  },
+];
+
 // ─── Game 3: Build-a-Prompt ──────────────────────────────────────────────────
 
 export interface PromptPiece {

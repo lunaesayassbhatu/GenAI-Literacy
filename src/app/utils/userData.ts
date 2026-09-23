@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import type { ItemSlot } from '../data/itemsData';
 
 export interface Badge {
   id: string;
@@ -27,6 +28,7 @@ export interface UserData {
   isReturningUser?: boolean;
   language?: string;
   selectedCharacter?: CharacterId;
+  equippedItems?: Partial<Record<ItemSlot, string>>;
 }
 
 export function getUserData(): UserData | null {

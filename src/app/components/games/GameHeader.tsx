@@ -1,6 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Zap } from "lucide-react";
-import { DolphinMascot } from "../DolphinMascot";
 
 interface GameHeaderProps {
   title: string;
@@ -18,7 +17,6 @@ export function GameHeader({ title, subtitle, xp = 0, showXP = false }: GameHead
       style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}
     >
       <Link to="/home" className="flex items-center gap-2 hover:opacity-80 transition-opacity flex-shrink-0">
-        <DolphinMascot size={34} animate={false} />
         <span className="hidden sm:inline text-sm font-bold" style={{ color: "#FFC627" }}>
           ASU GenAI Lab
         </span>

@@ -21,6 +21,9 @@ const WELCOME_MESSAGE: ChatMessage = {
   content: "Hi, I'm Wave! Ask me anything about generative AI — how it works, prompt engineering, AI ethics, or academic integrity.",
 };
 
+const POSITION_KEY = "asu_genai_ask_wave_pos";
+const DRAG_THRESHOLD = 5; // px of movement before a press counts as a drag, not a click
+
 export function AskWaveChat() {
   const { colors } = useTheme();
   const [open, setOpen] = useState(false);
@@ -29,6 +32,64 @@ export function AskWaveChat() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Draggable position — null means "use the default bottom-8 left-8 CSS position".
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(() => {
+    try {
+      const raw = localStorage.getItem(POSITION_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  });
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const dragState = useRef<{ startX: number; startY: number; originX: number; originY: number; dragged: boolean } | null>(null);
+  const justDraggedRef = useRef(false);
+
+  function handlePointerDown(e: React.PointerEvent<HTMLButtonElement>) {
+    const rect = buttonRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    dragState.current = { startX: e.clientX, startY: e.clientY, originX: rect.left, originY: rect.top, dragged: false };
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  }
+
+  function handlePointerMove(e: React.PointerEvent<HTMLButtonElement>) {
+    const drag = dragState.current;
+    if (!drag) return;
+    const dx = e.clientX - drag.startX;
+    const dy = e.clientY - drag.startY;
+    if (!drag.dragged && Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
+    drag.dragged = true;
+
+    const rect = buttonRef.current?.getBoundingClientRect();
+    const width = rect?.width ?? 150;
+    const height = rect?.height ?? 48;
+    const nextX = Math.min(Math.max(drag.originX + dx, 8), window.innerWidth - width - 8);
+    const nextY = Math.min(Math.max(drag.originY + dy, 8), window.innerHeight - height - 8);
+    setPos({ x: nextX, y: nextY });
+  }
+
+  function handlePointerUp() {
+    const drag = dragState.current;
+    if (drag?.dragged) {
+      justDraggedRef.current = true;
+      setPos((current) => {
+        if (current) {
+          try { localStorage.setItem(POSITION_KEY, JSON.stringify(current)); } catch { /* ignore */ }
+        }
+        return current;
+      });
+    }
+    dragState.current = null;
+  }
+
+  function handleButtonClick() {
+    if (justDraggedRef.current) {
+      justDraggedRef.current = false;
+      return;
+    }
+    setOpen(true);
+  }
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -72,17 +133,25 @@ export function AskWaveChat() {
   return (
     <>
       <motion.button
+        ref={buttonRef}
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={handleButtonClick}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         whileHover={{ scale: 1.05 }}
-        className="fixed bottom-8 left-8 z-50 flex items-center gap-2 rounded-full pl-2 pr-4 py-2 shadow-lg"
+        className={pos ? "fixed z-50 flex items-center gap-2 rounded-full pl-2 pr-4 py-2 shadow-lg" : "fixed bottom-8 left-8 z-50 flex items-center gap-2 rounded-full pl-2 pr-4 py-2 shadow-lg"}
         style={{
           backgroundColor: colors.cardBackground,
           border: `2px solid ${colors.accentGold}`,
+          touchAction: "none",
+          cursor: "grab",
+          ...(pos ? { left: pos.x, top: pos.y, bottom: "auto" } : {}),
         }}
-        aria-label="Ask Wave"
+        aria-label="Ask Wave — click to open, drag to move"
+        title="Click to open — drag to move"
       >
         <DolphinMascot size={40} animate={false} />
         <span className="text-sm font-semibold flex items-center gap-1" style={{ color: colors.textPrimary }}>
