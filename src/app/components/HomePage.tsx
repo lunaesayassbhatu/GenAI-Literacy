@@ -34,10 +34,10 @@ export function HomePage() {
               background: '#6B1530'
             }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-3" style={{ color: '#FFC627' }}>
+            <h1 className="text-4xl md:text-5xl font-bold mb-3" style={{ color: '#FFC627' }}>
               ASU GenAI Lab
-            </h2>
-            <p className="text-lg max-w-2xl mx-auto" style={{ color: '#F0E0E4' }}>
+            </h1>
+            <p className="text-xl font-medium max-w-2xl mx-auto" style={{ color: '#F0E0E4' }}>
               Master the art of using GenAI tools responsibly and effectively
             </p>
           </motion.div>
@@ -59,10 +59,10 @@ export function HomePage() {
           >
             {/* Built With Purpose */}
             <div className="mb-10">
-              <h3 className="text-xl font-bold mb-3 text-center" style={{ color: colors.textPrimary }}>
+              <h2 className="text-3xl font-bold mb-3 text-center" style={{ color: colors.textPrimary }}>
                 Built With Purpose
-              </h3>
-              <p className="text-center max-w-3xl mx-auto" style={{ color: colors.textSecondary }}>
+              </h2>
+              <p className="text-lg text-center max-w-3xl mx-auto" style={{ color: colors.textPrimary }}>
                 Generative AI is now part of everyday academic life, but many people hold real misconceptions
                 about how it works, where it gets things wrong, and how to use it responsibly. ASU GenAI Lab
                 was built to close that gap. Through short, interactive lessons and games, we help ASU
@@ -158,7 +158,7 @@ export function HomePage() {
             {/* How It Works */}
             <div>
               <div className="text-center mb-8">
-                <h2 className="text-4xl font-bold mb-3" style={{ color: colors.textPrimary }}>
+                <h2 className="text-3xl font-bold mb-3" style={{ color: colors.textPrimary }}>
                   How It Works
                 </h2>
                 <p className="text-lg" style={{ color: colors.textSecondary }}>
