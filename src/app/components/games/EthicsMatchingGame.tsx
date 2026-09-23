@@ -240,10 +240,15 @@ export function EthicsMatchingGame() {
             Ethical Concern
           </span>
           <span
-            className="px-3 py-1 rounded-full text-xs font-semibold"
-            style={{ backgroundColor: "rgba(74,222,128,0.12)", color: "#4ade80" }}
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
+            style={{ backgroundColor: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.7)" }}
           >
-            Matched
+            <span className="flex gap-0.5">
+              {PAIR_COLORS.slice(0, 4).map((c, i) => (
+                <span key={i} className="w-2 h-2 rounded-full" style={{ backgroundColor: c.border }} />
+              ))}
+            </span>
+            Matched pairs share a color
           </span>
         </div>
 

@@ -171,7 +171,7 @@ export function HomePage() {
                     className="rounded-xl shadow-lg p-6 relative overflow-hidden cursor-pointer h-full"
                     style={{
                       backgroundColor: colors.cardBackground,
-                      border: `2px solid ${colors.accentPink}`
+                      border: `1px solid ${colors.cardBorder}`
                     }}
                   >
                     <div className="flex items-center gap-3 mb-3">
@@ -202,7 +202,7 @@ export function HomePage() {
                     className="rounded-xl shadow-lg p-6 relative overflow-hidden cursor-pointer h-full"
                     style={{
                       backgroundColor: colors.cardBackground,
-                      border: `2px solid ${colors.accentGold}`
+                      border: `1px solid ${colors.cardBorder}`
                     }}
                   >
                     <div className="flex items-center gap-3 mb-3">
@@ -233,7 +233,7 @@ export function HomePage() {
                     className="rounded-xl shadow-lg p-6 relative overflow-hidden cursor-pointer h-full"
                     style={{
                       backgroundColor: colors.cardBackground,
-                      border: `2px solid ${colors.accentTeal}`
+                      border: `1px solid ${colors.cardBorder}`
                     }}
                   >
                     <div className="flex items-center gap-3 mb-3">
