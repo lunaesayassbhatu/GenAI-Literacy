@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { GameHeader } from "./GameHeader";
 import { XPToast } from "./XPToast";
 import { CharacterMascot } from "../CharacterMascot";
+import { FloatingWave } from "../FloatingWave";
 import { STATEMENTS, Statement } from "../../data/gameData";
 import { addXP, awardBadge, saveHighScore, getHighScore, getUserData } from "../../utils/userData";
 import { getEquippedItemIds } from "../../utils/itemsSystem";
@@ -78,6 +79,8 @@ export function FactOrMythGame() {
   const dragging     = useRef(false);
 
   const [showToast,  setShowToast]  = useState(false);
+  const [waveMessage, setWaveMessage] = useState("Swipe right for FACT, left for MYTH. Let's see how sharp you are!");
+  const [waveExpression, setWaveExpression] = useState<"default" | "celebrate" | "hint">("default");
 
   // ─── Entry animation via transition (no CSS keyframes) ────────────────────
   // When cardKey changes the element remounts. We briefly set "entering"
@@ -126,6 +129,8 @@ export function FactOrMythGame() {
     setFeedback(null);
     setCardState("idle");
     setShowToast(true);
+    setWaveMessage(earned > 0 ? "Nice run! Check out how you did." : "Time's up! Give it another shot.");
+    setWaveExpression("celebrate");
   }
 
   // ─── Countdown ────────────────────────────────────────────────────────────
@@ -165,6 +170,8 @@ export function FactOrMythGame() {
     setFeedback(null);
     setDragX(0);
     setShowToast(false);
+    setWaveMessage("Swipe right for FACT, left for MYTH. Let's see how sharp you are!");
+    setWaveExpression("default");
 
     startCountdown();
   }
@@ -193,6 +200,8 @@ export function FactOrMythGame() {
     // 2. Show feedback after card has flown
     t1.current = setTimeout(() => {
       setFeedback({ correct, why: card.why, isFact: card.isFact });
+      setWaveMessage(correct ? "Nice! You caught that one." : "Not quite — check the explanation below.");
+      setWaveExpression(correct ? "celebrate" : "hint");
     }, FLY_MS + 30);
 
     // 3. Load next card after feedback
@@ -553,6 +562,8 @@ export function FactOrMythGame() {
       >
         <CharacterMascot character={getUserData()?.selectedCharacter} size={64} equipped={getEquippedItemIds()} />
       </Link>
+
+      <FloatingWave message={waveMessage} expression={waveExpression} />
     </div>
   );
 }

@@ -21,7 +21,7 @@ export const CHARACTERS: CharacterInfo[] = [
     id: "dev",
     name: "Dev",
     color: "#4AB7C4",
-    tagline: "2nd-Year Data Science Student at ASU",
+    tagline: "Senior Data Science Student at ASU",
     story:
       "Dev thinks before he prompts. He's the one asking what data a tool was trained on, who might be left out, and what the real cost of using it is — before he ever hits enter.",
   },

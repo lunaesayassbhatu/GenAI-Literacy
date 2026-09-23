@@ -269,6 +269,41 @@ export function LearningLab() {
         </div>
       </main>
 
+      {/* Help & documentation footer */}
+      <footer
+        className="mt-16 border-t"
+        style={{ borderColor: colors.cardBorder, backgroundColor: colors.cardBackground }}
+      >
+        <div className="max-w-6xl mx-auto px-4 py-10 grid sm:grid-cols-3 gap-8 text-sm">
+          <div>
+            <h4 className="font-bold mb-2" style={{ color: colors.textPrimary }}>Need Help?</h4>
+            <p style={{ color: colors.textSecondary }}>
+              Click <strong>Ask Wave</strong> in the bottom-left corner of any page for instant answers
+              about GenAI concepts, or reach the support team directly:
+            </p>
+            <a href="mailto:help@example.asu.edu" className="underline" style={{ color: colors.accentTeal }}>
+              help@example.asu.edu
+            </a>
+          </div>
+          <div>
+            <h4 className="font-bold mb-2" style={{ color: colors.textPrimary }}>LEI Contact</h4>
+            <p style={{ color: colors.textSecondary }}>
+              For questions or concerns about the Learning Experience Institution team's involvement in this project:
+            </p>
+            <a href="mailto:lei@example.asu.edu" className="underline" style={{ color: colors.accentTeal }}>
+              lei@example.asu.edu
+            </a>
+          </div>
+          <div>
+            <h4 className="font-bold mb-2" style={{ color: colors.textPrimary }}>Module Citations</h4>
+            <p style={{ color: colors.textSecondary }}>
+              Learning module content draws on peer-reviewed GenAI literacy research and ASU curriculum
+              guidelines. Full citations are available on request from the LEI team.
+            </p>
+          </div>
+        </div>
+      </footer>
+
       {/* Player's chosen character */}
       <Link
         to="/choose-character"

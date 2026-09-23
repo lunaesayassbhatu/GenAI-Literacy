@@ -291,7 +291,7 @@ export function HomePage() {
             {/* PLACEHOLDER — replace with the real citation list once finalized */}
             <p style={{ color: colors.textSecondary }}>
               Learning module content draws on peer-reviewed GenAI literacy research and ASU curriculum
-              guidelines. Full citations available on request from the LEI team.
+              guidelines. Full citations are available on request from the LEI team.
             </p>
           </div>
         </div>
