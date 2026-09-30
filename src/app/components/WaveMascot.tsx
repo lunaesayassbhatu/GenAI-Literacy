@@ -13,6 +13,9 @@ interface WaveMascotProps {
   actionLabel?: string;
   onActionClick?: () => void;
   compactHintMode?: boolean;
+  /** Incremented by the caller each time XP is awarded, so the message
+   *  bubble can force itself open even in compact hint mode. */
+  xpAwardTick?: number;
 }
 
 export function WaveMascot({
@@ -21,7 +24,8 @@ export function WaveMascot({
   onAnimationComplete,
   actionLabel,
   onActionClick,
-  compactHintMode = false
+  compactHintMode = false,
+  xpAwardTick
 }: WaveMascotProps) {
   const { colors } = useTheme();
   const [currentMood, setCurrentMood] = useState<MoodType>(mood);
@@ -30,7 +34,7 @@ export function WaveMascot({
 
   useEffect(() => {
     setCurrentMood(mood);
-    
+
     if (mood === "celebrate") {
       setShowSparkles(true);
       setTimeout(() => setShowSparkles(false), 1000);
@@ -40,6 +44,18 @@ export function WaveMascot({
   useEffect(() => {
     setIsBubbleOpen(!compactHintMode);
   }, [compactHintMode]);
+
+  // Even on steps with hints (which collapse the bubble to a "Need a hint?"
+  // pill), pop the message open whenever XP is awarded so the amount is
+  // actually visible, then let it collapse back down.
+  useEffect(() => {
+    if (!xpAwardTick) return;
+    setIsBubbleOpen(true);
+    if (compactHintMode) {
+      const timer = setTimeout(() => setIsBubbleOpen(false), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [xpAwardTick]);
 
   // Animation variants based on mood
   const getMoodAnimation = () => {

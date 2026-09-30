@@ -184,6 +184,7 @@ export function ModuleLearning() {
   const [hintClickCount, setHintClickCount] = useState(0);
   const [showXpPopup, setShowXpPopup] = useState(false);
   const [xpPopupAmount, setXpPopupAmount] = useState(0);
+  const [xpAwardTick, setXpAwardTick] = useState(0);
   const waveMessageTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 
@@ -334,6 +335,14 @@ export function ModuleLearning() {
     setXpPopupAmount(amount);
     setShowXpPopup(true);
     setTimeout(() => setShowXpPopup(false), 2000);
+
+    // State the exact amount in Wave's own message, not just the floating badge.
+    if (waveMessageTimerRef.current) {
+      clearTimeout(waveMessageTimerRef.current);
+      waveMessageTimerRef.current = null;
+    }
+    setWaveMessage(`Nice! That's +${amount} XP.`);
+    setXpAwardTick((prev) => prev + 1);
   };
 
   if (!module) {
@@ -578,6 +587,7 @@ export function ModuleLearning() {
           actionLabel={hintActionLabel}
           onActionClick={stepHints.length > 0 ? handleHintRequest : undefined}
           compactHintMode={stepHints.length > 0}
+          xpAwardTick={xpAwardTick}
         />
       )}
 
@@ -588,7 +598,7 @@ export function ModuleLearning() {
             initial={{ opacity: 0, y: 20, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            className="fixed bottom-32 right-8 px-6 py-3 rounded-full font-bold text-lg shadow-lg z-50"
+            className="fixed bottom-32 left-8 px-6 py-3 rounded-full font-bold text-lg shadow-lg z-50"
             style={{
               backgroundColor: colors.accentGold,
               color: '#0D0508'
