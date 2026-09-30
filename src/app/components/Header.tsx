@@ -63,7 +63,7 @@ export function Header() {
               }
             >
               <Map size={18} />
-              <span className="hidden sm:inline">Map</span>
+              <span className="hidden sm:inline">Your Path</span>
             </Link>
 
             <Link

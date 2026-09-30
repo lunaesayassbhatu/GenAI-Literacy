@@ -29,6 +29,8 @@ export interface UserData {
   language?: string;
   selectedCharacter?: CharacterId;
   equippedItems?: Partial<Record<ItemSlot, string>>;
+  /** Id of the chosen profile banner color preset — see BANNER_PRESETS in Profile.tsx. */
+  bannerColor?: string;
 }
 
 export function getUserData(): UserData | null {

@@ -1,11 +1,15 @@
 import { Link } from "react-router-dom";
 import { Header } from "./Header";
 import { useTheme } from "../utils/themeContext";
+import { getUserData } from "../utils/userData";
+import { getCharacterInfo } from "../data/charactersData";
 import { motion } from "motion/react";
 import { BookOpen, Gamepad2, Target, Lightbulb, Users, Award } from "lucide-react";
 
 export function HomePage() {
   const { colors } = useTheme();
+  const selectedCharacter = getUserData()?.selectedCharacter;
+  const characterName = selectedCharacter ? getCharacterInfo(selectedCharacter).name : null;
 
   return (
     <div
@@ -66,84 +70,39 @@ export function HomePage() {
 
             <hr className="mb-10" style={{ borderColor: colors.cardBorder }} />
 
-            {/* Why Learn */}
-            <div className="mb-10">
-              <h2 className="text-3xl font-bold text-center mb-3" style={{ color: colors.textPrimary }}>
-                Why Learn with ASU GenAI Lab?
-              </h2>
-              <p className="text-center mb-8" style={{ color: colors.textSecondary }}>
-                Built specifically for the ASU community
-              </p>
+            {/* Primary CTAs — direct entry points into modules and games */}
+            <div className="mb-10 grid md:grid-cols-2 gap-6">
+              <Link to="/learning-lab" style={{ textDecoration: "none", display: "block" }}>
+                <motion.div
+                  whileHover={{ y: -4, scale: 1.01 }}
+                  className="rounded-2xl p-8 text-center h-full"
+                  style={{ backgroundColor: colors.accentGold, color: '#0D0508' }}
+                >
+                  <BookOpen size={36} className="mx-auto mb-3" />
+                  <h3 className="text-2xl font-bold mb-2">Start Learning!</h3>
+                  <p className="text-sm font-medium opacity-80">
+                    Dive into short, interactive modules that clear up things people are often wrong or
+                    unsure about when it comes to GenAI.
+                  </p>
+                </motion.div>
+              </Link>
 
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="flex items-start gap-4">
-                  <div
-                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: 'rgba(255,198,39,0.2)' }}
-                  >
-                    <Target size={24} style={{ color: colors.accentGold }} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold mb-1" style={{ color: colors.textPrimary }}>
-                      Practical Skills
-                    </h3>
-                    <p className="text-sm" style={{ color: colors.textSecondary }}>
-                      Learn skills you can apply immediately in your coursework and research
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div
-                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: 'rgba(232,84,122,0.2)' }}
-                  >
-                    <Lightbulb size={24} style={{ color: colors.accentPink }} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold mb-1" style={{ color: colors.textPrimary }}>
-                      Interactive Learning
-                    </h3>
-                    <p className="text-sm" style={{ color: colors.textSecondary }}>
-                      Engage with content through games, quizzes, and hands-on activities
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div
-                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: 'rgba(75,183,196,0.2)' }}
-                  >
-                    <Users size={24} style={{ color: colors.accentTeal }} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold mb-1" style={{ color: colors.textPrimary }}>
-                      Built for ASU
-                    </h3>
-                    <p className="text-sm" style={{ color: colors.textSecondary }}>
-                      Designed specifically for ASU students, faculty, and staff
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div
-                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: 'rgba(255,138,80,0.2)' }}
-                  >
-                    <Award size={24} style={{ color: colors.accentOrange }} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold mb-1" style={{ color: colors.textPrimary }}>
-                      Track Progress
-                    </h3>
-                    <p className="text-sm" style={{ color: colors.textSecondary }}>
-                      Monitor your growth with XP, levels, and achievement badges
-                    </p>
-                  </div>
-                </div>
-              </div>
+              <Link to="/games" style={{ textDecoration: "none", display: "block" }}>
+                <motion.div
+                  whileHover={{ y: -4, scale: 1.01 }}
+                  className="rounded-2xl p-8 text-center h-full"
+                  style={{ backgroundColor: colors.cardBackground, border: `2px solid ${colors.accentGold}`, color: colors.textPrimary }}
+                >
+                  <Gamepad2 size={36} className="mx-auto mb-3" style={{ color: colors.accentGold }} />
+                  <h3 className="text-2xl font-bold mb-2">Play to Reinforce Learning!</h3>
+                  <p className="text-sm" style={{ color: colors.textSecondary }}>
+                    {/* TEMP placeholder names ("Lumina" the world, "the Beacon" the tech) — swap once the real names are decided */}
+                    {characterName
+                      ? `Go on adventures with ${characterName} to help the world of Lumina learn more about the Beacon.`
+                      : "Choose a character, then go on adventures to help the world of Lumina learn more about the Beacon."}
+                  </p>
+                </motion.div>
+              </Link>
             </div>
 
             <hr className="mb-10" style={{ borderColor: colors.cardBorder }} />
@@ -252,6 +211,88 @@ export function HomePage() {
                     </p>
                   </motion.div>
                 </Link>
+              </div>
+            </div>
+
+            <hr className="my-10" style={{ borderColor: colors.cardBorder }} />
+
+            {/* Why Learn */}
+            <div>
+              <h2 className="text-3xl font-bold text-center mb-3" style={{ color: colors.textPrimary }}>
+                Why Learn with ASU GenAI Lab?
+              </h2>
+              <p className="text-center mb-8" style={{ color: colors.textSecondary }}>
+                Built specifically for the ASU community
+              </p>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="flex items-start gap-4">
+                  <div
+                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: 'rgba(255,198,39,0.2)' }}
+                  >
+                    <Target size={24} style={{ color: colors.accentGold }} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold mb-1" style={{ color: colors.textPrimary }}>
+                      Practical Skills
+                    </h3>
+                    <p className="text-sm" style={{ color: colors.textSecondary }}>
+                      Learn skills you can apply immediately in your coursework and research
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div
+                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: 'rgba(232,84,122,0.2)' }}
+                  >
+                    <Lightbulb size={24} style={{ color: colors.accentPink }} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold mb-1" style={{ color: colors.textPrimary }}>
+                      Interactive Learning
+                    </h3>
+                    <p className="text-sm" style={{ color: colors.textSecondary }}>
+                      Engage with content through games, quizzes, and hands-on activities
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div
+                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: 'rgba(75,183,196,0.2)' }}
+                  >
+                    <Users size={24} style={{ color: colors.accentTeal }} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold mb-1" style={{ color: colors.textPrimary }}>
+                      Built for ASU
+                    </h3>
+                    <p className="text-sm" style={{ color: colors.textSecondary }}>
+                      Designed specifically for ASU students, faculty, and staff
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div
+                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: 'rgba(255,138,80,0.2)' }}
+                  >
+                    <Award size={24} style={{ color: colors.accentOrange }} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold mb-1" style={{ color: colors.textPrimary }}>
+                      Track Progress
+                    </h3>
+                    <p className="text-sm" style={{ color: colors.textSecondary }}>
+                      Monitor your growth with XP, levels, and achievement badges
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

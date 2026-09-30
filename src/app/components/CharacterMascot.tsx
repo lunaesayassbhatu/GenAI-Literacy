@@ -70,6 +70,20 @@ function GearOverlay({ itemId }: { itemId: string }) {
       return <circle cx="62" cy="60" r="8" fill="#E8547A" stroke="#0D0508" strokeWidth="1.2" />;
     case "champion-sash":
       return <path d="M 32 28 L 88 66 M 84 28 L 36 66" stroke="#FFC627" strokeWidth="6" strokeLinecap="round" opacity="0.85" />;
+    case "cool-shades":
+      return (
+        <>
+          <ellipse cx="28" cy="40" rx="14" ry="11" fill="#1a1a2e" stroke="#0D0508" strokeWidth="2" opacity="0.9" />
+          <path d="M 42 38 L 52 34" stroke="#0D0508" strokeWidth="2.5" strokeLinecap="round" />
+        </>
+      );
+    case "scholars-mustache":
+      return (
+        <path
+          d="M 6 50 Q 14 44 20 50 Q 26 44 34 50 Q 26 54 20 50 Q 14 54 6 50 Z"
+          fill="#4a3728"
+        />
+      );
     default:
       return null;
   }

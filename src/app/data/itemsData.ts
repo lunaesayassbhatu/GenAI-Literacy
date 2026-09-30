@@ -1,4 +1,4 @@
-export type ItemSlot = "hat" | "cape" | "accessory";
+export type ItemSlot = "hat" | "cape" | "accessory" | "face" | "frame";
 
 export type UnlockCondition =
   | { type: "level"; level: number }
@@ -62,6 +62,41 @@ export const ITEMS: CosmeticItem[] = [
     name: "Champion's Sash",
     description: "Complete all 7 games",
     unlock: { type: "gamesCompleted", count: 7 },
+  },
+  {
+    id: "cool-shades",
+    slot: "face",
+    name: "Cool Shades",
+    description: "Reach Level 3",
+    unlock: { type: "level", level: 3 },
+  },
+  {
+    id: "scholars-mustache",
+    slot: "face",
+    name: "Scholar's Mustache",
+    description: "Complete 2 learning modules",
+    unlock: { type: "modulesCompleted", count: 2 },
+  },
+  {
+    id: "bronze-frame",
+    slot: "frame",
+    name: "Bronze Frame",
+    description: "Reach Level 1",
+    unlock: { type: "level", level: 1 },
+  },
+  {
+    id: "silver-frame",
+    slot: "frame",
+    name: "Silver Frame",
+    description: "Complete 2 games",
+    unlock: { type: "gamesCompleted", count: 2 },
+  },
+  {
+    id: "gold-frame",
+    slot: "frame",
+    name: "Gold Frame",
+    description: "Reach Level 7 (max level)",
+    unlock: { type: "level", level: 7 },
   },
 ];
 

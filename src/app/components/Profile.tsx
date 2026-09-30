@@ -20,7 +20,40 @@ const SLOT_LABELS: Record<ItemSlot, string> = {
   hat: "Hat",
   cape: "Cape",
   accessory: "Accessory",
+  face: "Face",
+  frame: "Frame",
 };
+
+// Frames aren't drawn onto the character SVG like hats/capes — they're a
+// border around the avatar bubble itself, so each one just needs a color.
+const FRAME_BORDER_COLORS: Record<string, string> = {
+  "bronze-frame": "#CD7F32",
+  "silver-frame": "#C0C0C0",
+  "gold-frame": "#FFC627",
+};
+
+interface BannerPreset {
+  id: string;
+  label: string;
+  gradient: string;
+}
+
+// Alternatives to the default ASU maroon banner, drawn from the same accent
+// colors already used across modules/games so a chosen banner still feels
+// like part of the app's palette.
+const BANNER_PRESETS: BannerPreset[] = [
+  { id: "maroon", label: "ASU Maroon", gradient: "linear-gradient(135deg, #8B1A2E 0%, #6B1530 100%)" },
+  { id: "sunset", label: "Sunset Orange", gradient: "linear-gradient(135deg, #FF8A50 0%, #B84A1F 100%)" },
+  { id: "teal", label: "Teal Wave", gradient: "linear-gradient(135deg, #4AB7C4 0%, #1F6E77 100%)" },
+  { id: "rose", label: "Rose Pink", gradient: "linear-gradient(135deg, #E8547A 0%, #A83358 100%)" },
+  { id: "violet", label: "Violet", gradient: "linear-gradient(135deg, #9D4EDD 0%, #6A2C91 100%)" },
+  { id: "forest", label: "Forest Green", gradient: "linear-gradient(135deg, #2E7D32 0%, #1B4D1E 100%)" },
+  { id: "midnight", label: "Midnight Blue", gradient: "linear-gradient(135deg, #06B6D4 0%, #164E63 100%)" },
+];
+
+function getBannerGradient(bannerColor?: string): string {
+  return BANNER_PRESETS.find((b) => b.id === bannerColor)?.gradient ?? BANNER_PRESETS[0].gradient;
+}
 
 function getRealCurrentModule(): Module | null {
   for (const mod of MODULES) {
@@ -108,6 +141,11 @@ export function Profile() {
     }
     setUserData(getUserData());
   };
+
+  const handleSelectBanner = (presetId: string) => {
+    updateUserData({ bannerColor: presetId });
+    setUserData(getUserData());
+  };
   const currentModule = getRealCurrentModule();
   const currentLesson = currentModule ? getCurrentLesson(currentModule) : null;
 
@@ -164,13 +202,19 @@ export function Profile() {
 
         {/* ── Profile Header ───────────────────────────────────── */}
         <div className="rounded-2xl shadow-lg p-8"
-          style={{ background: "linear-gradient(135deg, #8B1A2E 0%, #6B1530 100%)" }}>
+          style={{ background: getBannerGradient(userData.bannerColor) }}>
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div className="flex items-center gap-6 flex-wrap">
               <Link
                 to="/choose-character"
                 className="w-24 h-24 rounded-full flex items-end justify-center overflow-hidden transition-transform hover:scale-105"
-                style={{ backgroundColor: "rgba(255,255,255,0.2)" }}
+                style={{
+                  backgroundColor: "rgba(255,255,255,0.2)",
+                  border: equippedMap.frame
+                    ? `4px solid ${FRAME_BORDER_COLORS[equippedMap.frame]}`
+                    : "4px solid transparent",
+                  boxShadow: equippedMap.frame === "gold-frame" ? "0 0 12px rgba(255,198,39,0.6)" : "none",
+                }}
                 title="Change your character"
               >
                 {userData.selectedCharacter ? (
@@ -665,7 +709,7 @@ export function Profile() {
             <h2 className="text-xl font-black" style={{ color: "#8C1D40" }}>Avatar Locker</h2>
           </div>
 
-          {(["hat", "cape", "accessory"] as ItemSlot[]).map((slot) => (
+          {(["hat", "face", "cape", "accessory", "frame"] as ItemSlot[]).map((slot) => (
             <div key={slot} className="mb-6 last:mb-0">
               <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: colors.textSecondary }}>
                 {SLOT_LABELS[slot]}
@@ -687,10 +731,15 @@ export function Profile() {
                       }}
                     >
                       <div className="mb-2 flex items-center justify-center" style={{ height: 24 }}>
-                        {unlocked ? (
-                          <span className="text-xl" style={{ color: colors.accentGold }}>✦</span>
-                        ) : (
+                        {!unlocked ? (
                           <Lock size={18} style={{ color: colors.textSecondary }} />
+                        ) : item.slot === "frame" ? (
+                          <span
+                            className="inline-block w-5 h-5 rounded-full"
+                            style={{ border: `3px solid ${FRAME_BORDER_COLORS[item.id]}` }}
+                          />
+                        ) : (
+                          <span className="text-xl" style={{ color: colors.accentGold }}>✦</span>
                         )}
                       </div>
                       <p className="text-sm font-bold" style={{ color: colors.textPrimary }}>{item.name}</p>
@@ -739,6 +788,32 @@ export function Profile() {
                 }}
               />
             </button>
+          </div>
+
+          <div className="mt-6 pt-6" style={{ borderTop: `1px solid ${colors.cardBorder}` }}>
+            <p className="font-bold mb-1" style={{ color: colors.textPrimary }}>Profile Banner Color</p>
+            <p className="text-sm mb-4" style={{ color: colors.textSecondary }}>
+              Pick the color of the banner behind your name and "Edit Profile"
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {BANNER_PRESETS.map((preset) => {
+                const isSelected = (userData.bannerColor ?? BANNER_PRESETS[0].id) === preset.id;
+                return (
+                  <button
+                    key={preset.id}
+                    onClick={() => handleSelectBanner(preset.id)}
+                    title={preset.label}
+                    aria-label={preset.label}
+                    className="w-10 h-10 rounded-full transition-transform hover:scale-110"
+                    style={{
+                      background: preset.gradient,
+                      border: isSelected ? `3px solid ${colors.accentGold}` : `1px solid ${colors.cardBorder}`,
+                      boxShadow: isSelected ? "0 0 0 2px rgba(255,198,39,0.25)" : "none",
+                    }}
+                  />
+                );
+              })}
+            </div>
           </div>
         </div>
 
