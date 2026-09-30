@@ -11,7 +11,7 @@ import { useTheme } from "../utils/themeContext";
 import { motion } from "motion/react";
 import {
   Edit2, Save, X, ArrowRight, Calendar, Award, Target,
-  Trophy, Users, Crown, TrendingUp, Sparkles, Sun, Moon, Lock, Shirt
+  Trophy, Users, Crown, TrendingUp, Sparkles, Sun, Moon, Lock, Shirt, Palette
 } from "lucide-react";
 import { ITEMS, describeUnlock, type CosmeticItem, type ItemSlot } from "../data/itemsData";
 import { isItemUnlocked, equipItem, unequipSlot, getEquippedMap, getEquippedItemIds } from "../utils/itemsSystem";
@@ -89,6 +89,7 @@ export function Profile() {
   const [addingFriend, setAddingFriend] = useState(false);
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
   const [selectedBadge, setSelectedBadge] = useState<{ name: string; icon: string; description: string; earnedDate?: string } | null>(null);
+  const [showBannerPicker, setShowBannerPicker] = useState(false);
 
   useEffect(() => {
     getFriends().then(setFriends);
@@ -145,6 +146,7 @@ export function Profile() {
   const handleSelectBanner = (presetId: string) => {
     updateUserData({ bannerColor: presetId });
     setUserData(getUserData());
+    setShowBannerPicker(false);
   };
   const currentModule = getRealCurrentModule();
   const currentLesson = currentModule ? getCurrentLesson(currentModule) : null;
@@ -201,7 +203,7 @@ export function Profile() {
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-6">
 
         {/* ── Profile Header ───────────────────────────────────── */}
-        <div className="rounded-2xl shadow-lg p-8"
+        <div className="rounded-2xl shadow-lg p-8 relative"
           style={{ background: getBannerGradient(userData.bannerColor) }}>
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div className="flex items-center gap-6 flex-wrap">
@@ -297,6 +299,46 @@ export function Profile() {
                 </button>
               </div>
             </motion.div>
+          )}
+
+          <button
+            onClick={() => setShowBannerPicker((v) => !v)}
+            title="Change banner color"
+            aria-label="Change banner color"
+            className="absolute bottom-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-transform hover:scale-110"
+            style={{ backgroundColor: "rgba(0,0,0,0.35)", border: "1px solid rgba(255,255,255,0.4)" }}
+          >
+            <Palette size={18} color="#F0E0E4" />
+          </button>
+
+          {showBannerPicker && (
+            <div
+              className="absolute bottom-16 right-4 rounded-2xl shadow-lg p-4 z-10"
+              style={{ backgroundColor: colors.cardBackground, border: `1px solid ${colors.cardBorder}` }}
+            >
+              <p className="text-xs font-bold mb-3 whitespace-nowrap" style={{ color: colors.textPrimary }}>
+                Banner Color
+              </p>
+              <div className="flex flex-wrap gap-2" style={{ maxWidth: 180 }}>
+                {BANNER_PRESETS.map((preset) => {
+                  const isSelected = (userData.bannerColor ?? BANNER_PRESETS[0].id) === preset.id;
+                  return (
+                    <button
+                      key={preset.id}
+                      onClick={() => handleSelectBanner(preset.id)}
+                      title={preset.label}
+                      aria-label={preset.label}
+                      className="w-8 h-8 rounded-full transition-transform hover:scale-110"
+                      style={{
+                        background: preset.gradient,
+                        border: isSelected ? `3px solid ${colors.accentGold}` : `1px solid ${colors.cardBorder}`,
+                        boxShadow: isSelected ? "0 0 0 2px rgba(255,198,39,0.25)" : "none",
+                      }}
+                    />
+                  );
+                })}
+              </div>
+            </div>
           )}
         </div>
 
@@ -788,32 +830,6 @@ export function Profile() {
                 }}
               />
             </button>
-          </div>
-
-          <div className="mt-6 pt-6" style={{ borderTop: `1px solid ${colors.cardBorder}` }}>
-            <p className="font-bold mb-1" style={{ color: colors.textPrimary }}>Profile Banner Color</p>
-            <p className="text-sm mb-4" style={{ color: colors.textSecondary }}>
-              Pick the color of the banner behind your name and "Edit Profile"
-            </p>
-            <div className="flex flex-wrap gap-3">
-              {BANNER_PRESETS.map((preset) => {
-                const isSelected = (userData.bannerColor ?? BANNER_PRESETS[0].id) === preset.id;
-                return (
-                  <button
-                    key={preset.id}
-                    onClick={() => handleSelectBanner(preset.id)}
-                    title={preset.label}
-                    aria-label={preset.label}
-                    className="w-10 h-10 rounded-full transition-transform hover:scale-110"
-                    style={{
-                      background: preset.gradient,
-                      border: isSelected ? `3px solid ${colors.accentGold}` : `1px solid ${colors.cardBorder}`,
-                      boxShadow: isSelected ? "0 0 0 2px rgba(255,198,39,0.25)" : "none",
-                    }}
-                  />
-                );
-              })}
-            </div>
           </div>
         </div>
 
