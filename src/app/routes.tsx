@@ -18,6 +18,9 @@ import { PromptSandboxGame } from "./components/games/PromptSandboxGame";
 import { BiasMatchingGame } from "./components/games/BiasMatchingGame";
 import { BlackBoxMatchingGame } from "./components/games/BlackBoxMatchingGame";
 import { EnvironmentGame } from "./components/games/EnvironmentGame";
+import { BankPortalGame } from "./components/games/BankPortalGame";
+import { KingsNotebookGame } from "./components/games/KingsNotebookGame";
+import { DungeonCrawlGame } from "./components/games/DungeonCrawlGame";
 import { ScrollToTop } from "./components/ScrollToTop";
 
 function RootLayout() {
@@ -200,6 +203,39 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <Profile />
+      </ProtectedRoute>
+    )
+  },
+  // SHOWCASE ONLY — narrative-world game concepts (see World & Brainstorm doc).
+  // Reachable directly for demo purposes; deliberately not added to the Games
+  // hub or Journey Map since no world has been chosen yet.
+  {
+    path: "/showcase/bank-portal",
+    element: (
+      <ProtectedRoute>
+        <CharacterRequiredRoute>
+          <BankPortalGame />
+        </CharacterRequiredRoute>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/showcase/kings-notebook",
+    element: (
+      <ProtectedRoute>
+        <CharacterRequiredRoute>
+          <KingsNotebookGame />
+        </CharacterRequiredRoute>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/showcase/dungeon-crawl",
+    element: (
+      <ProtectedRoute>
+        <CharacterRequiredRoute>
+          <DungeonCrawlGame />
+        </CharacterRequiredRoute>
       </ProtectedRoute>
     )
   },

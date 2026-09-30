@@ -378,3 +378,85 @@ export const MISSIONS: Mission[] = [
     why: "Giving AI context about purpose and asking for an example output gets you much more specific help.",
   },
 ];
+
+// ─── SHOWCASE ONLY — narrative-world concepts, not a decided direction ─────
+// Two candidate framings from the World & Brainstorm doc, reusing the same
+// "swipe to judge the AI's answer" mechanic as Fact or Myth. isFact here
+// means "this response deserves your trust" — same lesson, different skin.
+// Delete or keep once a world is actually chosen.
+
+export const BANK_PORTAL_STATEMENTS: Statement[] = [
+  {
+    text: "\"How do you say thank you in Spanish?\" — the portal answers: \"Gracias.\"",
+    isFact: true,
+    why: "Simple, well-known facts like this are usually safe to take at face value.",
+  },
+  {
+    text: "\"What's the population of Tokyo right now?\" — the portal gives an exact number, no hesitation.",
+    isFact: false,
+    why: "It can sound completely sure of itself even when its information is outdated or invented.",
+  },
+  {
+    text: "\"What's 15% of 60?\" — the portal answers: \"9.\"",
+    isFact: true,
+    why: "Straightforward math like this is something it's genuinely reliable at.",
+  },
+  {
+    text: "\"Will it rain in town tomorrow?\" — the portal gives a confident yes or no.",
+    isFact: false,
+    why: "Without a live weather connection, a confident-sounding answer here is a guess dressed up as fact.",
+  },
+  {
+    text: "\"Did my great-grandmother invent the sewing machine?\" — the portal says yes, with vivid made-up detail.",
+    isFact: false,
+    why: "It can invent convincing details about things it has no real way of knowing. Always verify personal or obscure claims.",
+  },
+  {
+    text: "\"When did the town bank open?\" — the portal cites the exact date from the bank's own records.",
+    isFact: true,
+    why: "When it's working from real, provided records, it can be a solid quick reference.",
+  },
+  {
+    text: "\"What's the best career to pick?\" — the portal gives one single definite answer.",
+    isFact: false,
+    why: "For questions with no single right answer, its response is one perspective — not the final word.",
+  },
+];
+
+export const KINGS_NOTEBOOK_STATEMENTS: Statement[] = [
+  {
+    text: "\"How far is the north tower from the throne room?\" — the notebook answers: \"Exactly 214 steps.\"",
+    isFact: false,
+    why: "A suspiciously precise number can be a sign it's inventing detail just to sound certain.",
+  },
+  {
+    text: "\"When did the king last appear in court?\" — the notebook cites the exact date from the court ledger.",
+    isFact: true,
+    why: "Grounded in a real, checkable record — worth trusting, though always still worth double-checking.",
+  },
+  {
+    text: "\"Who is loyal to the king?\" — the notebook answers: \"Everyone in the castle, without exception.\"",
+    isFact: false,
+    why: "Answers with no nuance or exceptions are often oversimplified — real situations are rarely 'everyone' or 'no one.'",
+  },
+  {
+    text: "\"What is the fastest route to the neighboring village?\" — the notebook's answer matches the kingdom's own maps.",
+    isFact: true,
+    why: "When it lines up with an actual, verifiable source, it's reasonable to rely on.",
+  },
+  {
+    text: "\"Did the queen ever leave the castle at night?\" — the notebook describes a vivid, detailed scene no one witnessed.",
+    isFact: false,
+    why: "It invents specific, vivid detail it has no way to actually know. Treat it as a guess, not a fact.",
+  },
+  {
+    text: "\"Is the missing king still alive?\" — the notebook gives one definite yes or no.",
+    isFact: false,
+    why: "For the very mystery you're trying to solve, a single confident answer isn't enough — that's exactly what you still need to verify yourself.",
+  },
+  {
+    text: "\"What herbs treat a fever?\" — the notebook gives the same answer the royal physician would.",
+    isFact: true,
+    why: "For common, well-established knowledge, it holds up well.",
+  },
+];

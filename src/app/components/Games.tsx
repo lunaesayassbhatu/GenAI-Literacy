@@ -107,6 +107,45 @@ export const GAME_OPTIONS: GameOption[] = [
   },
 ];
 
+// Narrative-world concept demos — not part of GAME_OPTIONS since no world has
+// been chosen yet. Shown in their own section so they stay out of progression,
+// badges, and the Journey Map.
+interface ShowcaseOption {
+  id: string;
+  name: string;
+  world: string;
+  description: string;
+  color: string;
+  path: string;
+}
+
+const SHOWCASE_GAMES: ShowcaseOption[] = [
+  {
+    id: "bank-portal",
+    name: "The Bank Portal",
+    world: "Grand Globe",
+    description: "Swipe to decide if the portal's answer is trustworthy or a risky guess to verify.",
+    color: "#d97706",
+    path: "/showcase/bank-portal",
+  },
+  {
+    id: "kings-notebook",
+    name: "The King's Notebook",
+    world: "Argonia",
+    description: "Swipe to decide if the notebook's entry is reliable or needs verifying first.",
+    color: "#7c3aed",
+    path: "/showcase/kings-notebook",
+  },
+  {
+    id: "dungeon-crawl",
+    name: "Dungeon Crawl",
+    world: "Mechanic Demo",
+    description: "Walk around a dungeon with arrow keys/WASD — fight through creatures with FACT-or-MYTH claims.",
+    color: "#eab308",
+    path: "/showcase/dungeon-crawl",
+  },
+];
+
 export function Games() {
   const { colors } = useTheme();
 
@@ -238,6 +277,49 @@ export function Games() {
               )}
             </motion.div>
           ))}
+        </div>
+
+        {/* Showcase — narrative-world concept demos, not decided/final */}
+        <div className="mt-12">
+          <h2 className="text-xl font-semibold mb-1" style={{ color: colors.textPrimary }}>
+            Showcase Concepts
+          </h2>
+          <p className="text-sm mb-4" style={{ color: colors.textSecondary }}>
+            Early demos exploring possible game worlds — not final, no world has been chosen yet.
+          </p>
+          <div className="grid md:grid-cols-2 gap-6">
+            {SHOWCASE_GAMES.map((game, idx) => (
+              <motion.div
+                key={game.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                whileHover={{ scale: 1.02 }}
+              >
+                <Link
+                  to={game.path}
+                  className="block rounded-xl shadow-lg p-6 transition-all hover:shadow-2xl"
+                  style={{
+                    backgroundColor: colors.cardBackground,
+                    border: `2px dashed ${game.color}`,
+                  }}
+                >
+                  <div className="flex items-start justify-between gap-4 mb-2">
+                    <h3 className="text-xl font-semibold" style={{ color: colors.textPrimary }}>
+                      {game.name}
+                    </h3>
+                    <span
+                      className="px-3 py-1 rounded-full text-xs uppercase tracking-wider font-semibold flex-shrink-0"
+                      style={{ backgroundColor: `${game.color}20`, color: game.color }}
+                    >
+                      {game.world}
+                    </span>
+                  </div>
+                  <p style={{ color: colors.textSecondary }}>{game.description}</p>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
         </div>
 
         {/* Info Box */}
