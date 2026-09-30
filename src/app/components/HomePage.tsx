@@ -34,8 +34,8 @@ export function HomePage() {
             <h1 className="text-4xl md:text-5xl font-bold mb-3" style={{ color: '#FFC627' }}>
               ASU GenAI Lab
             </h1>
-            <p className="text-xl font-medium max-w-2xl mx-auto" style={{ color: '#F0E0E4' }}>
-              Master the art of using GenAI tools responsibly and effectively
+            <p className="text-2xl font-semibold max-w-2xl mx-auto" style={{ color: '#F0E0E4' }}>
+              An interactive learning platform helping the ASU community use Generative AI responsibly and effectively.
             </p>
           </motion.div>
         </section>
