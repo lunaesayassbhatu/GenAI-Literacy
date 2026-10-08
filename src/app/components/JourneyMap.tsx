@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import { Lock, CheckCircle2 } from "lucide-react";
@@ -81,47 +80,6 @@ function nodeKey(node: MapNode) {
   return `${node.kind}-${node.id}`;
 }
 
-// Small decorative accents scattered on each floating-island platform,
-// cycling for a bit of variety from stop to stop.
-const ISLAND_DECOR: Array<[string, string]> = [
-  ["🌳", "🌸"],
-  ["🌲", "🌼"],
-  ["🌳", "🌺"],
-];
-
-interface Point {
-  x: number;
-  y: number;
-}
-
-interface Footprint {
-  x: number;
-  y: number;
-  angle: number;
-}
-
-// Smooth curve through every module's actual on-screen position, so the
-// trail genuinely winds from stop to stop instead of running straight.
-function smoothPathD(points: Point[]): string {
-  if (points.length < 2) return "";
-  if (points.length === 2) {
-    return `M ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y}`;
-  }
-  let d = `M ${points[0].x} ${points[0].y}`;
-  for (let i = 0; i < points.length - 1; i++) {
-    const p0 = points[i - 1] ?? points[i];
-    const p1 = points[i];
-    const p2 = points[i + 1];
-    const p3 = points[i + 2] ?? p2;
-    const cp1x = p1.x + (p2.x - p0.x) / 6;
-    const cp1y = p1.y + (p2.y - p0.y) / 6;
-    const cp2x = p2.x - (p3.x - p1.x) / 6;
-    const cp2y = p2.y - (p3.y - p1.y) / 6;
-    d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
-  }
-  return d;
-}
-
 export function JourneyMap() {
   const { colors } = useTheme();
   const navigate = useNavigate();
@@ -135,71 +93,6 @@ export function JourneyMap() {
   const hasAnyProgress = completedFlags.some(Boolean);
   const youAreHereLabel = hasAnyProgress ? "You are here" : "Start here";
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const nodeRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const basePathRef = useRef<SVGPathElement>(null);
-  const [trailD, setTrailD] = useState("");
-  const [svgSize, setSvgSize] = useState({ width: 0, height: 0 });
-  const [footprints, setFootprints] = useState<Footprint[]>([]);
-
-  useEffect(() => {
-    function measure() {
-      const container = containerRef.current;
-      if (!container) return;
-      const containerRect = container.getBoundingClientRect();
-      const points: Point[] = nodeRefs.current
-        .filter((el): el is HTMLDivElement => Boolean(el))
-        .map((el) => {
-          const rect = el.getBoundingClientRect();
-          return {
-            x: rect.left - containerRect.left + rect.width / 2,
-            y: rect.top - containerRect.top + rect.height / 2,
-          };
-        });
-      setSvgSize({ width: containerRect.width, height: containerRect.height });
-      setTrailD(smoothPathD(points));
-    }
-
-    // Delay past the entrance animation (levels stagger in with a y-offset)
-    // so the measured positions are the final, settled ones.
-    const timer = window.setTimeout(measure, 700);
-    const observer = new ResizeObserver(measure);
-    if (containerRef.current) observer.observe(containerRef.current);
-    window.addEventListener("resize", measure);
-    return () => {
-      window.clearTimeout(timer);
-      observer.disconnect();
-      window.removeEventListener("resize", measure);
-    };
-  }, [levels.length]);
-
-  // Walk stepping-length increments along the real rendered curve (not the
-  // straight-line points) so footprints actually sit on the path and turn
-  // to face the direction of travel.
-  useEffect(() => {
-    if (!trailD) {
-      setFootprints([]);
-      return;
-    }
-    const raf = requestAnimationFrame(() => {
-      const pathEl = basePathRef.current;
-      if (!pathEl) return;
-      const total = pathEl.getTotalLength();
-      const spacing = 32;
-      const steps = Math.floor(total / spacing);
-      const pts: Footprint[] = [];
-      for (let i = 1; i < steps; i++) {
-        const len = i * spacing;
-        const p = pathEl.getPointAtLength(len);
-        const p2 = pathEl.getPointAtLength(Math.min(len + 1, total));
-        const angle = Math.atan2(p2.y - p.y, p2.x - p.x) * (180 / Math.PI);
-        pts.push({ x: p.x, y: p.y, angle });
-      }
-      setFootprints(pts);
-    });
-    return () => cancelAnimationFrame(raf);
-  }, [trailD]);
-
   const flagsByKey = new Map(
     flat.map((node, idx) => [
       nodeKey(node),
@@ -211,17 +104,12 @@ export function JourneyMap() {
     ])
   );
 
-  function renderNode(node: MapNode, size: number, setRef?: (el: HTMLDivElement | null) => void) {
+  function renderNode(node: MapNode, size: number) {
     const flags = flagsByKey.get(nodeKey(node))!;
     const roleColor = node.kind === "module" ? colors.accentTeal : colors.accentPink;
 
     return (
-      <div
-        key={nodeKey(node)}
-        ref={setRef}
-        className="relative flex flex-col items-center text-center"
-        style={{ width: size + 24 }}
-      >
+      <div key={nodeKey(node)} className="relative flex flex-col items-center text-center" style={{ width: size + 24 }}>
         {flags.isYouAreHere && (
           <div className="absolute -top-16 left-1/2 -translate-x-1/2 z-10">
             <CharacterMascot
@@ -298,35 +186,16 @@ export function JourneyMap() {
           </p>
         </div>
 
-        <div ref={containerRef} className="relative">
-          {/* Rope bridges between floating islands — a smooth curve through
-              every module's actual position (so it bends with the zigzag),
-              styled as a rope with wooden planks crossing it. */}
-          {trailD && (
-            <svg
-              className="absolute top-0 left-0 pointer-events-none"
-              width={svgSize.width}
-              height={svgSize.height}
-              style={{ zIndex: 0 }}
-            >
-              <path ref={basePathRef} d={trailD} fill="none" stroke="#8B6F47" strokeWidth={4} strokeLinecap="round" opacity={0.7} />
-              {footprints.map((f, i) => (
-                <rect
-                  key={i}
-                  x={-9}
-                  y={-2.5}
-                  width={18}
-                  height={5}
-                  rx={1.5}
-                  fill="#6B4A2B"
-                  opacity={0.85}
-                  transform={`translate(${f.x} ${f.y}) rotate(${f.angle + 90})`}
-                />
-              ))}
-            </svg>
-          )}
+        <div className="relative">
+          {/* Center connecting line — the trail the level clusters wind along */}
+          <div
+            className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-1"
+            style={{
+              backgroundImage: `repeating-linear-gradient(to bottom, ${colors.cardBorder} 0 10px, transparent 10px 20px)`,
+            }}
+          />
 
-          <div className="relative flex flex-col gap-16" style={{ zIndex: 1 }}>
+          <div className="relative flex flex-col gap-16">
             {levels.map((level, idx) => {
               const justify = WAVE_POSITIONS[idx % WAVE_POSITIONS.length];
               // Levels sitting at the left edge need clearance from the fixed,
@@ -342,37 +211,21 @@ export function JourneyMap() {
                   className="relative flex"
                   style={{ justifyContent: justify }}
                 >
-                  <div className="relative" style={{ marginLeft: needsClearance ? 100 : 0, marginTop: 14 }}>
-                    {/* Grassy cap peeking over the top edge of the platform */}
-                    <div
-                      className="absolute -top-2 left-3 right-3 rounded-full"
-                      style={{ height: 14, background: "linear-gradient(180deg, #6ee089 0%, #2f9e4f 100%)", zIndex: 1 }}
-                    />
-                    <span className="absolute -top-4 left-1 text-base" style={{ zIndex: 2 }}>
-                      {ISLAND_DECOR[idx % ISLAND_DECOR.length][0]}
-                    </span>
-                    <span className="absolute -top-4 right-1 text-base" style={{ zIndex: 2 }}>
-                      {ISLAND_DECOR[idx % ISLAND_DECOR.length][1]}
-                    </span>
+                  <div
+                    className="flex flex-col sm:flex-row items-center gap-x-6 gap-y-4 rounded-3xl p-4"
+                    style={{
+                      marginLeft: needsClearance ? 100 : 0,
+                      border: level.games.length > 0 ? `1px dashed ${colors.cardBorder}` : "none",
+                      backgroundColor: level.games.length > 0 ? colors.cardBackground : "transparent",
+                    }}
+                  >
+                    {renderNode(level.module, 64)}
 
-                    {/* The floating platform itself — a rock/earth body under the grass cap */}
-                    <div
-                      className="relative flex flex-col sm:flex-row items-center gap-x-6 gap-y-4 rounded-3xl p-4 shadow-lg"
-                      style={{
-                        background: "linear-gradient(180deg, #5a4632 0%, #3d2f1f 100%)",
-                        border: "2px solid rgba(255,255,255,0.08)",
-                      }}
-                    >
-                      {renderNode(level.module, 64, (el) => {
-                        nodeRefs.current[idx] = el;
-                      })}
-
-                      {level.games.length > 0 && (
-                        <div className="flex flex-wrap justify-center gap-4">
-                          {level.games.map((game) => renderNode(game, 52))}
-                        </div>
-                      )}
-                    </div>
+                    {level.games.length > 0 && (
+                      <div className="flex flex-wrap justify-center gap-4">
+                        {level.games.map((game) => renderNode(game, 52))}
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               );
