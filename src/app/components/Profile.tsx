@@ -90,7 +90,7 @@ export function Profile() {
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
   const [selectedBadge, setSelectedBadge] = useState<{ name: string; icon: string; description: string; earnedDate?: string } | null>(null);
   const [showBannerPicker, setShowBannerPicker] = useState(false);
-  const [avatarSectionOpen, setAvatarSectionOpen] = useState(true);
+  const [avatarSectionOpen, setAvatarSectionOpen] = useState(false);
 
   useEffect(() => {
     getFriends().then(setFriends);
