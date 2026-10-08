@@ -615,6 +615,7 @@ export function ModuleLearning() {
           onActionClick={stepHints.length > 0 ? handleHintRequest : undefined}
           compactHintMode={stepHints.length > 0}
           xpAwardTick={xpAwardTick}
+          stepKey={currentStepIndex}
         />
       )}
 

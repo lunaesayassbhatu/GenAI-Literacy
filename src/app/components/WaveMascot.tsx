@@ -16,6 +16,12 @@ interface WaveMascotProps {
   /** Incremented by the caller each time XP is awarded, so the message
    *  bubble can force itself open even in compact hint mode. */
   xpAwardTick?: number;
+  /** Identifies the current step/question. Passed so the bubble resets to
+   *  its default open/collapsed state on every step change — otherwise a
+   *  bubble the user manually opened stays open into the next step if that
+   *  step also has hints (compactHintMode never flips, so it never re-syncs),
+   *  overlapping that step's content. */
+  stepKey?: string | number;
 }
 
 export function WaveMascot({
@@ -25,7 +31,8 @@ export function WaveMascot({
   actionLabel,
   onActionClick,
   compactHintMode = false,
-  xpAwardTick
+  xpAwardTick,
+  stepKey
 }: WaveMascotProps) {
   const { colors } = useTheme();
   const [currentMood, setCurrentMood] = useState<MoodType>(mood);
@@ -43,7 +50,7 @@ export function WaveMascot({
 
   useEffect(() => {
     setIsBubbleOpen(!compactHintMode);
-  }, [compactHintMode]);
+  }, [compactHintMode, stepKey]);
 
   // Even on steps with hints (which collapse the bubble to a "Need a hint?"
   // pill), pop the message open whenever XP is awarded so the amount is
