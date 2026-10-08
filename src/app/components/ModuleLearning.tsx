@@ -137,7 +137,17 @@ function buildStepHints(step: Step): string[] {
   }
 }
 
+// React Router keeps the same ModuleLearning instance alive when only the
+// :moduleId param changes (e.g. "Continue to next module"), so every
+// useState initializer below — step index, variant, XP — would otherwise
+// carry over from the previous module instead of resetting. Keying on
+// moduleId forces a full remount on every module switch.
 export function ModuleLearning() {
+  const { moduleId } = useParams();
+  return <ModuleLearningInner key={moduleId} />;
+}
+
+function ModuleLearningInner() {
   const { moduleId } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
