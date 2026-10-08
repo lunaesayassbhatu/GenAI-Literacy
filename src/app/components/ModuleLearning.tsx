@@ -267,6 +267,12 @@ export function ModuleLearning() {
         case "drag-drop":
           setWaveMessage("Sort these carefully. Think about which tasks AI handles well!");
           break;
+        case "ranking-check":
+          setWaveMessage("Rank each one — there's no shortcut, think through what each task actually needs!");
+          break;
+        case "pros-cons":
+          setWaveMessage("Here's a quick look at where GenAI shines, and where it doesn't.");
+          break;
         case "completion":
           setWaveMessage("Amazing work! You've learned so much!");
           setWaveMood("spin");
