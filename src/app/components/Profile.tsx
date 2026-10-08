@@ -11,7 +11,7 @@ import { useTheme } from "../utils/themeContext";
 import { motion } from "motion/react";
 import {
   Edit2, Save, X, ArrowRight, Calendar, Award, Target,
-  Trophy, Users, Crown, TrendingUp, Sparkles, Sun, Moon, Lock, Shirt, Palette
+  Trophy, Users, Crown, TrendingUp, Sparkles, Sun, Moon, Lock, Shirt, Palette, ChevronDown, ChevronUp
 } from "lucide-react";
 import { ITEMS, describeUnlock, type CosmeticItem, type ItemSlot } from "../data/itemsData";
 import { isItemUnlocked, equipItem, unequipSlot, getEquippedMap, getEquippedItemIds } from "../utils/itemsSystem";
@@ -90,6 +90,7 @@ export function Profile() {
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
   const [selectedBadge, setSelectedBadge] = useState<{ name: string; icon: string; description: string; earnedDate?: string } | null>(null);
   const [showBannerPicker, setShowBannerPicker] = useState(false);
+  const [avatarSectionOpen, setAvatarSectionOpen] = useState(true);
 
   useEffect(() => {
     getFriends().then(setFriends);
@@ -741,59 +742,87 @@ export function Profile() {
           </div>
         </div>
 
-        {/* ── Avatar Locker ────────────────────────────────────── */}
+        {/* ── Avatar Accessories ───────────────────────────────── */}
         <div className="rounded-2xl shadow-lg p-6"
           style={{ backgroundColor: colors.cardBackground, border: `1px solid ${colors.cardBorder}` }}>
-          <div className="flex items-center gap-2 mb-5">
-            <div className="rounded-full p-2 shadow-md" style={{ background: "linear-gradient(135deg, #E8547A, #8B1A2E)" }}>
-              <Shirt className="text-white" size={22} />
-            </div>
-            <h2 className="text-xl font-black" style={{ color: "#8C1D40" }}>Avatar Locker</h2>
-          </div>
-
-          {(["hat", "face", "cape", "accessory", "frame"] as ItemSlot[]).map((slot) => (
-            <div key={slot} className="mb-6 last:mb-0">
-              <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: colors.textSecondary }}>
-                {SLOT_LABELS[slot]}
-              </p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {ITEMS.filter((item) => item.slot === slot).map((item) => {
-                  const unlocked = isItemUnlocked(item);
-                  const isEquipped = equippedMap[slot] === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => unlocked && handleToggleEquip(item)}
-                      disabled={!unlocked}
-                      className="p-4 rounded-xl text-center border-2 transition-all hover:scale-[1.02] disabled:hover:scale-100 disabled:cursor-not-allowed"
-                      style={{
-                        borderColor: isEquipped ? colors.accentGold : unlocked ? colors.cardBorder : "transparent",
-                        background: isEquipped ? "rgba(255,198,39,0.12)" : "rgba(128,128,128,0.04)",
-                        opacity: unlocked ? 1 : 0.5,
-                      }}
-                    >
-                      <div className="mb-2 flex items-center justify-center" style={{ height: 24 }}>
-                        {!unlocked ? (
-                          <Lock size={18} style={{ color: colors.textSecondary }} />
-                        ) : item.slot === "frame" ? (
-                          <span
-                            className="inline-block w-5 h-5 rounded-full"
-                            style={{ border: `3px solid ${FRAME_BORDER_COLORS[item.id]}` }}
-                          />
-                        ) : (
-                          <span className="text-xl" style={{ color: colors.accentGold }}>✦</span>
-                        )}
-                      </div>
-                      <p className="text-sm font-bold" style={{ color: colors.textPrimary }}>{item.name}</p>
-                      <p className="text-xs mt-1" style={{ color: colors.textSecondary }}>
-                        {unlocked ? (isEquipped ? "Equipped — tap to remove" : "Tap to equip") : describeUnlock(item.unlock)}
-                      </p>
-                    </button>
-                  );
-                })}
+          <button
+            onClick={() => setAvatarSectionOpen((v) => !v)}
+            className="flex items-center justify-between w-full"
+          >
+            <div className="flex items-center gap-2">
+              <div className="rounded-full p-2 shadow-md" style={{ background: "linear-gradient(135deg, #E8547A, #8B1A2E)" }}>
+                <Shirt className="text-white" size={22} />
               </div>
+              <h2 className="text-xl font-black" style={{ color: "#8C1D40" }}>Avatar Accessories</h2>
             </div>
-          ))}
+            {avatarSectionOpen ? (
+              <ChevronUp size={22} style={{ color: colors.textSecondary }} />
+            ) : (
+              <ChevronDown size={22} style={{ color: colors.textSecondary }} />
+            )}
+          </button>
+
+          {avatarSectionOpen && (
+            <div className="mt-5">
+              {(["hat", "face", "cape", "accessory", "frame"] as ItemSlot[]).map((slot) => (
+                <div key={slot} className="mb-6 last:mb-0">
+                  <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: colors.textSecondary }}>
+                    {SLOT_LABELS[slot]}
+                  </p>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {ITEMS.filter((item) => item.slot === slot).map((item) => {
+                      const unlocked = isItemUnlocked(item);
+                      const isEquipped = equippedMap[slot] === item.id;
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={() => unlocked && handleToggleEquip(item)}
+                          disabled={!unlocked}
+                          className="relative p-4 rounded-xl text-center border-2 transition-all hover:scale-[1.02] disabled:hover:scale-100 disabled:cursor-not-allowed"
+                          style={{
+                            borderColor: isEquipped ? colors.accentGold : unlocked ? colors.cardBorder : "transparent",
+                            background: isEquipped ? "rgba(255,198,39,0.12)" : "rgba(128,128,128,0.04)",
+                            opacity: unlocked ? 1 : 0.5,
+                          }}
+                        >
+                          {!unlocked && (
+                            <div
+                              className="absolute top-1.5 right-1.5 rounded-full p-1"
+                              style={{ backgroundColor: colors.cardBackground }}
+                            >
+                              <Lock size={12} style={{ color: colors.textSecondary }} />
+                            </div>
+                          )}
+                          <div className="mb-2 flex items-center justify-center" style={{ height: 24 }}>
+                            {item.slot === "frame" ? (
+                              <span
+                                className="inline-block w-5 h-5 rounded-full"
+                                style={{
+                                  border: `3px solid ${unlocked ? FRAME_BORDER_COLORS[item.id] : colors.textSecondary}`,
+                                  filter: unlocked ? "none" : "grayscale(1)",
+                                }}
+                              />
+                            ) : (
+                              <span
+                                className="text-xl"
+                                style={{ color: unlocked ? colors.accentGold : colors.textSecondary }}
+                              >
+                                ✦
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm font-bold" style={{ color: colors.textPrimary }}>{item.name}</p>
+                          <p className="text-xs mt-1" style={{ color: colors.textSecondary }}>
+                            {unlocked ? (isEquipped ? "Equipped — tap to remove" : "Tap to equip") : describeUnlock(item.unlock)}
+                          </p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* ── Appearance ───────────────────────────────────────── */}

@@ -60,11 +60,10 @@ export function HomePage() {
                 Built With Purpose
               </h2>
               <p className="text-lg text-center max-w-3xl mx-auto" style={{ color: colors.textPrimary }}>
-                Generative AI is now part of everyday academic life, but many people hold real misconceptions
-                about how it works, where it gets things wrong, and how to use it responsibly. ASU GenAI Lab
-                was built to close that gap. Through short, interactive lessons and games, we help ASU
-                students, faculty, and staff build practical GenAI literacy: not just how to write a prompt,
-                but how to think critically about what comes back.
+                Generative AI is part of everyday academic life, and yet there are many misconceptions about
+                how it works, when it does not work, how to use it responsibly, and when one should not use
+                it. Use these short lessons and games to learn everything from how to write a prompt well,
+                how GenAI works, what we cannot rely on AI for, to best practices in and out of the classroom.
               </p>
             </div>
 
