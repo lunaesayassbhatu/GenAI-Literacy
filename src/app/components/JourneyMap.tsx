@@ -81,9 +81,23 @@ function nodeKey(node: MapNode) {
   return `${node.kind}-${node.id}`;
 }
 
+// Small decorative accents scattered on each floating-island platform,
+// cycling for a bit of variety from stop to stop.
+const ISLAND_DECOR: Array<[string, string]> = [
+  ["🌳", "🌸"],
+  ["🌲", "🌼"],
+  ["🌳", "🌺"],
+];
+
 interface Point {
   x: number;
   y: number;
+}
+
+interface Footprint {
+  x: number;
+  y: number;
+  angle: number;
 }
 
 // Smooth curve through every module's actual on-screen position, so the
@@ -123,8 +137,10 @@ export function JourneyMap() {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const nodeRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const basePathRef = useRef<SVGPathElement>(null);
   const [trailD, setTrailD] = useState("");
   const [svgSize, setSvgSize] = useState({ width: 0, height: 0 });
+  const [footprints, setFootprints] = useState<Footprint[]>([]);
 
   useEffect(() => {
     function measure() {
@@ -156,6 +172,33 @@ export function JourneyMap() {
       window.removeEventListener("resize", measure);
     };
   }, [levels.length]);
+
+  // Walk stepping-length increments along the real rendered curve (not the
+  // straight-line points) so footprints actually sit on the path and turn
+  // to face the direction of travel.
+  useEffect(() => {
+    if (!trailD) {
+      setFootprints([]);
+      return;
+    }
+    const raf = requestAnimationFrame(() => {
+      const pathEl = basePathRef.current;
+      if (!pathEl) return;
+      const total = pathEl.getTotalLength();
+      const spacing = 32;
+      const steps = Math.floor(total / spacing);
+      const pts: Footprint[] = [];
+      for (let i = 1; i < steps; i++) {
+        const len = i * spacing;
+        const p = pathEl.getPointAtLength(len);
+        const p2 = pathEl.getPointAtLength(Math.min(len + 1, total));
+        const angle = Math.atan2(p2.y - p.y, p2.x - p.x) * (180 / Math.PI);
+        pts.push({ x: p.x, y: p.y, angle });
+      }
+      setFootprints(pts);
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [trailD]);
 
   const flagsByKey = new Map(
     flat.map((node, idx) => [
@@ -256,9 +299,9 @@ export function JourneyMap() {
         </div>
 
         <div ref={containerRef} className="relative">
-          {/* The winding trail — a smooth curve through every module's actual
-              position, so it genuinely bends left/center/right with them
-              instead of running straight down the middle. */}
+          {/* Rope bridges between floating islands — a smooth curve through
+              every module's actual position (so it bends with the zigzag),
+              styled as a rope with wooden planks crossing it. */}
           {trailD && (
             <svg
               className="absolute top-0 left-0 pointer-events-none"
@@ -266,8 +309,20 @@ export function JourneyMap() {
               height={svgSize.height}
               style={{ zIndex: 0 }}
             >
-              <path d={trailD} fill="none" stroke={colors.cardBorder} strokeWidth={16} strokeLinecap="round" strokeLinejoin="round" opacity={0.6} />
-              <path d={trailD} fill="none" stroke={colors.accentGold} strokeWidth={3} strokeLinecap="round" strokeDasharray="2 14" opacity={0.85} />
+              <path ref={basePathRef} d={trailD} fill="none" stroke="#8B6F47" strokeWidth={4} strokeLinecap="round" opacity={0.7} />
+              {footprints.map((f, i) => (
+                <rect
+                  key={i}
+                  x={-9}
+                  y={-2.5}
+                  width={18}
+                  height={5}
+                  rx={1.5}
+                  fill="#6B4A2B"
+                  opacity={0.85}
+                  transform={`translate(${f.x} ${f.y}) rotate(${f.angle + 90})`}
+                />
+              ))}
             </svg>
           )}
 
@@ -287,23 +342,37 @@ export function JourneyMap() {
                   className="relative flex"
                   style={{ justifyContent: justify }}
                 >
-                  <div
-                    className="flex flex-col sm:flex-row items-center gap-x-6 gap-y-4 rounded-3xl p-4"
-                    style={{
-                      marginLeft: needsClearance ? 100 : 0,
-                      border: level.games.length > 0 ? `1px dashed ${colors.cardBorder}` : "none",
-                      backgroundColor: level.games.length > 0 ? colors.cardBackground : "transparent",
-                    }}
-                  >
-                    {renderNode(level.module, 64, (el) => {
-                      nodeRefs.current[idx] = el;
-                    })}
+                  <div className="relative" style={{ marginLeft: needsClearance ? 100 : 0, marginTop: 14 }}>
+                    {/* Grassy cap peeking over the top edge of the platform */}
+                    <div
+                      className="absolute -top-2 left-3 right-3 rounded-full"
+                      style={{ height: 14, background: "linear-gradient(180deg, #6ee089 0%, #2f9e4f 100%)", zIndex: 1 }}
+                    />
+                    <span className="absolute -top-4 left-1 text-base" style={{ zIndex: 2 }}>
+                      {ISLAND_DECOR[idx % ISLAND_DECOR.length][0]}
+                    </span>
+                    <span className="absolute -top-4 right-1 text-base" style={{ zIndex: 2 }}>
+                      {ISLAND_DECOR[idx % ISLAND_DECOR.length][1]}
+                    </span>
 
-                    {level.games.length > 0 && (
-                      <div className="flex flex-wrap justify-center gap-4">
-                        {level.games.map((game) => renderNode(game, 52))}
-                      </div>
-                    )}
+                    {/* The floating platform itself — a rock/earth body under the grass cap */}
+                    <div
+                      className="relative flex flex-col sm:flex-row items-center gap-x-6 gap-y-4 rounded-3xl p-4 shadow-lg"
+                      style={{
+                        background: "linear-gradient(180deg, #5a4632 0%, #3d2f1f 100%)",
+                        border: "2px solid rgba(255,255,255,0.08)",
+                      }}
+                    >
+                      {renderNode(level.module, 64, (el) => {
+                        nodeRefs.current[idx] = el;
+                      })}
+
+                      {level.games.length > 0 && (
+                        <div className="flex flex-wrap justify-center gap-4">
+                          {level.games.map((game) => renderNode(game, 52))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </motion.div>
               );

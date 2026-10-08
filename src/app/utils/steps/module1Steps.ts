@@ -6,18 +6,18 @@ export const module1Steps: Step[] = [
     data: {
       emoji: "🤖",
       badge: "Module 1 of 7",
-      title: "What Is AI, Really?",
-      highlightWord: "Really?",
-      subtitle: "Understand the basics — no jargon, just clarity.",
+      title: "What is Generative AI, really?",
+      highlightWord: "really?",
+      subtitle: "Understanding the basics can help you to use GenAI more responsibly and efficiently.",
       learningPoints: [
-        "🧠 What generative AI actually is and how it works",
-        "⚠️ Why AI can sound confident and still be wrong",
-        "✅ How to use AI as a tool — not a shortcut"
+        "🧠 What GenAI is and how it works",
+        "⚖️ What GenAI can do well and where it might fall short",
+        "🎨 The different types of GenAI you might encounter and use"
       ],
       info: {
-        time: "~10 min",
+        time: "~12 min",
         sections: "3",
-        maxXp: "100 XP",
+        maxXp: "160 XP",
         badges: "2"
       }
     }
@@ -28,19 +28,38 @@ export const module1Steps: Step[] = [
     type: "wave-talk",
     data: {
       section: "1 of 3",
-      title: "So... what is generative AI?",
-      subtitle: "No jargon. Just what's actually happening when you hit send.",
+      title: "What is generative AI?",
+      subtitle: "AI isn't always generative, and it isn't only a chatbot.",
       messages: [
         {
-          text: "You've used AI before. But do you actually know what it's doing when you hit send? 🤔",
+          text: "You hear that AI is everywhere. It's in your phone, your streaming services, and your search bar. You might have professors warning you against using it for homework and others encouraging you to offload some of your busy work. How are you supposed to know if you should use GenAI or not? And how do you use it effectively?",
           mood: "thinking"
         },
         {
-          text: "Key idea: it's not pulling answers from the internet — it's *building* them from scratch, every time.",
+          text: "One of the first things to understand is that AI has been around for a while. *Traditional AI* refers to earlier types of AI that rely on programmed rules and human-defined knowledge. It follows the rules that a human wrote, like the spam filter in your email.",
+          mood: "default",
+          link: "https://hai.stanford.edu/ai-definitions/what-is-traditional-ai"
+        },
+        {
+          text: "Comparatively, *Generative AI* is … generative. Every time it receives a prompt, it creates new content (text, images, code, audio, etc.) that didn't exist before you asked. Through techniques like machine learning, natural language processing, and deep learning, AI learns from data, recognizes patterns, and completes difficult tasks.",
+          mood: "default",
+          link: "https://www.sciencedirect.com/science/article/pii/S1472811723000605"
+        },
+        {
+          text: "Some GenAI (like ChatGPT or Claude) rely mostly on Large Language Models (LLMs) to generate linguistic content like answers to questions. Other types of GenAI focus on images, audio, and even protein structures.",
           mood: "default"
         },
         {
-          text: "Dev asked ChatGPT to explain mitosis. He assumed it found an article. It didn't — it generated that answer just for him. Think autocomplete, but way more powerful. 🧠",
+          text: "GenAI does not pull from the internet like search engines used to. Instead, it builds from scratch — using the information available to it, it predicts the most likely word, over and over, until it forms a full response.",
+          mood: "thinking"
+        },
+        {
+          text: "New capabilities are emerging all the time to allow for more sophisticated processing of your question. One example is *Model Context Protocol (MCP)*, which lets AI applications communicate with external services and tools — resulting in more specialized, self-checking responses.",
+          mood: "celebrate",
+          link: "https://www.ibm.com/think/topics/model-context-protocol"
+        },
+        {
+          text: "Dev used a grammar checker and a GenAI chatbot in the same afternoon. One flagged errors using pre-programmed rules of grammar, while the other generated a paragraph from scratch. Later, he gave a GenAI tool an image of his friend and prompted it to create a birthday card image of the friend in outer space. All three are examples of AI — but only the last two are generative. 🎂",
           mood: "celebrate"
         }
       ]
@@ -51,21 +70,24 @@ export const module1Steps: Step[] = [
     data: {
       section: "1",
       number: "1",
-      question: "Dev got an explanation from AI he'd never seen before. Where did it come from?",
+      multiSelect: true,
+      question: "Which of these options is an example of Generative AI? (Select all that apply)",
       options: [
-        { text: "The AI found and rewrote a webpage", correct: false },
-        { text: "The AI generated it using patterns learned from its training data", correct: true },
-        { text: "A human pre-wrote it in advance", correct: false },
-        { text: "It reused a previous conversation", correct: false }
+        { text: "A newly-created image based on a prompt", correct: true },
+        { text: "Filtering search results to show only specific years", correct: false },
+        { text: "A coding assistant that helps to write and debug code on demand", correct: true },
+        { text: "An email draft based on a prompt", correct: true },
+        { text: "A voice assistant that handles only basic commands", correct: false },
+        { text: "A bank algorithm that flags suspicious credit card activity", correct: false }
       ],
       hints: [
-        "Ask yourself: did the AI make this answer, or find it somewhere?",
-        "Cross out any option that involves searching, storing, or retrieving.",
-        "Pick the one about building a response from learned patterns."
+        "Ask yourself: did this create brand-new content, or just sort/flag existing information?",
+        "Filtering, flagging, and command-following all follow pre-set rules — that's traditional AI, not generative.",
+        "Pick the options where new text, code, or images were created from a prompt."
       ],
-      correctFeedback: "Exactly! GenAI builds responses from patterns — it never retrieves anything from the web.",
-      wrongFeedback: "GenAI doesn't search or retrieve — it generates a fresh response from learned patterns every single time.",
-      xpReward: 30
+      correctFeedback: "Exactly! Generating a new image, code, or email draft all involve creating something new from a prompt — that's generative AI.",
+      wrongFeedback: "Filtering, flagging, and handling basic commands all follow pre-set rules rather than generating anything new — those are traditional AI, not generative.",
+      xpReward: 40
     }
   },
 
@@ -74,44 +96,109 @@ export const module1Steps: Step[] = [
     type: "wave-talk",
     data: {
       section: "2 of 3",
-      title: "Can you always trust what it says?",
-      subtitle: "Why confidence ≠ accuracy.",
+      title: "What is GenAI good at?",
+      subtitle: "Knowing its strengths (and weaknesses!) can help you learn to use it better.",
       messages: [
         {
-          text: "Here's where things get tricky. GenAI sounds confident — but confidence ≠ correctness. 😬",
-          mood: "hint"
-        },
-        {
-          text: "Aisha asked AI for paper sources. She got five perfectly-formatted citations. Two of the books don't exist. The AI wasn't lying — it just followed the *pattern* of what citations look like.",
-          mood: "thinking"
-        },
-        {
-          text: "This is called a hallucination. Fluent ≠ factual. Always verify before you submit. 🔍",
+          text: "GenAI can be useful for some tasks, but other tasks are probably better suited for different tools. What is it good at? And where is it lacking? The following isn't exhaustive, but should give you a better idea of where to start.",
           mood: "default"
         }
       ]
     }
   },
   {
-    type: "knowledge-check",
+    type: "pros-cons",
+    data: {
+      title: "GenAI Strengths and Weaknesses",
+      strengths: [
+        "Automates repetitive tasks, saving time and effort",
+        "Creates a personalized experience for its users, which can make services more user friendly",
+        "Works as a starting point for creative tasks, like brainstorming ideas for an essay"
+      ],
+      weaknesses: [
+        "Possibility for the creation of harmful and/or false content, like fake news or hallucinated statistics",
+        "Quality of GenAI content may be lacking depth, originality, creativity, etc. There are some tasks that will have better quality when completed by a human",
+        "Biases and derogatory language may be present due to the data the AI was trained on. Minority voices may be underrepresented and the majority overrepresented.",
+        "Environmental and financial costs"
+      ],
+      sources: [
+        { label: "The pros and cons of generative AI — AWS Builder", url: "https://builder.aws.com/content/2p12gt8r9e3SEgc0yPeEuwzj2XF/the-pros-and-cons-of-generative-ai-a-simple-guide" },
+        { label: "Bender, E. M., Gebru, T., McMillan-Major, A., & Shmitchell, S. (2021). On the dangers of stochastic parrots: Can language models be too big? In Proceedings of the 2021 ACM Conference on Fairness, Accountability, and Transparency (pp. 610–623)." }
+      ]
+    }
+  },
+  {
+    type: "wave-talk",
+    data: {
+      section: "2 of 3",
+      title: "Is GenAI the right tool for the job?",
+      subtitle: "Match the task to the tool.",
+      messages: [
+        {
+          text: "GenAI is capable of helping in many different domains. But it's important to consider whether GenAI is actually the tool best suited for the task.",
+          mood: "default"
+        },
+        {
+          text: "Jordan wrote an essay using his own research and his own words. When it came to titling the essay, he got stuck — so he used AI to generate 10 possible essay titles, then used his own judgment from there. He used GenAI to help inspire him, not to do all the work. ✍️",
+          mood: "celebrate"
+        }
+      ]
+    }
+  },
+  {
+    type: "ranking-check",
     data: {
       section: "2",
       number: "2",
-      question: "Why did the AI give Aisha citations for books that don't exist?",
-      options: [
-        { text: "It found similar books and got the details slightly wrong", correct: false },
-        { text: "It generated text that looks like citations, with no way to verify if they're real", correct: true },
-        { text: "The books existed when the AI was trained but have since been removed", correct: false },
-        { text: "It misunderstood what she was asking for", correct: false }
+      instructions: "Some tasks GenAI can complete pretty well, but in other areas it might not do a very good job. Rank each of the following tasks according to how well GenAI might complete the task.",
+      scale: [
+        { value: 1, label: "GenAI would be well-suited for this task in most situations" },
+        { value: 2, label: "GenAI could do well at this task as long as the user verifies using other sources" },
+        { value: 3, label: "GenAI would most likely not do well at this task" }
       ],
-      hints: [
-        "This isn't about a typo — it's about how AI handles facts.",
-        "AI knows what a citation looks like. That's not the same as knowing if it exists.",
-        "Pick the option about generating text without any fact-checking."
+      items: [
+        {
+          prompt: "Finding a quote from a credible source",
+          correctValue: 2,
+          feedback: "AI can point you toward real-sounding quotes, but it can also invent ones that look completely legitimate — always verify the quote actually exists before using it."
+        },
+        {
+          prompt: "Explaining a topic you need some clarification on",
+          correctValue: 2,
+          feedback: "A plain-language explanation can be a great starting point, but double-check any specific facts or figures it includes."
+        },
+        {
+          prompt: "Brainstorming ideas for a group project",
+          correctValue: 1,
+          feedback: "Open-ended brainstorming is low-stakes — GenAI is great for generating a wide range of starting ideas."
+        },
+        {
+          prompt: "Creating an original piece of art",
+          correctValue: 3,
+          feedback: "GenAI generates from patterns in existing work, so what it produces isn't truly original — it can mimic styles, not create genuinely new ones."
+        },
+        {
+          prompt: "Making a personalized workout plan",
+          correctValue: 1,
+          feedback: "This is a low-risk, structured task GenAI can typically handle well based on the details you provide."
+        },
+        {
+          prompt: "Confirming medical or legal information",
+          correctValue: 2,
+          feedback: "GenAI can offer a starting point, but medical and legal information needs to be verified with a qualified professional or authoritative source."
+        },
+        {
+          prompt: "Receiving advice about a personal life situation",
+          correctValue: 2,
+          feedback: "GenAI tends to be agreeable rather than objective here — treat its advice as one perspective, not the final word."
+        },
+        {
+          prompt: "Making informed decisions that affect diverse groups of people",
+          correctValue: 3,
+          feedback: "Decisions with wide-reaching impact need human judgment, accountability, and context that GenAI cannot fully provide."
+        }
       ],
-      correctFeedback: "Right! AI knows citation patterns — but has no way to check whether those books are actually real.",
-      wrongFeedback: "AI doesn't verify facts. It generates text that looks right because it learned what citations are supposed to look like.",
-      xpReward: 30
+      xpReward: 80
     }
   },
 
@@ -120,48 +207,69 @@ export const module1Steps: Step[] = [
     type: "wave-talk",
     data: {
       section: "3 of 3",
-      title: "So how should you actually use it?",
-      subtitle: "Use it as a starting point, not a finish line.",
+      title: "Not all instances of GenAI do the same thing",
+      subtitle: "\"Generative AI\" can include a lot more than just chatbots.",
       messages: [
         {
-          text: "So if it can be wrong... is it even useful? Yes — but how you use it matters. 🎯",
+          text: "Not all GenAI tools do the same thing — here are the main types you'll run into.",
           mood: "default"
         },
         {
-          text: "Jordan used AI to draft a rough outline, then rewrote it in his own words. He used it to get unstuck — not to skip the thinking.",
+          text: "*Text generators* (like chatbots) are powered by Large Language Models (LLMs) to write, summarize, and converse.",
+          mood: "default"
+        },
+        {
+          text: "*Image generators* turn written descriptions into a picture. These may use Generative Adversarial Networks (GANs) or Variational Autoencoders (VAEs).",
+          mood: "default"
+        },
+        {
+          text: "*Audio and music generators* can create new melodies, harmonize against existing ones, and create realistic sound effects.",
+          mood: "default"
+        },
+        {
+          text: "*Video generators* can create frames based on written descriptions or existing video data.",
+          mood: "default"
+        },
+        {
+          text: "*Code generators* can create code snippets or debug software.",
+          mood: "default",
+          link: "https://tudublin.libguides.com/GenAI/typesofgenai"
+        },
+        {
+          text: "Aisha needed to create a multi-media presentation. She used a text generator to draft and iterate on her main points, an image generator for a picture that aligned with her topic, and an audio generator for some engaging sound effects. By matching the tool to the task, she created a fun, informative presentation. 🎤",
           mood: "celebrate"
         },
         {
-          text: "Bottom line: you're responsible for what you submit. Use it like a tool you control — not an authority you trust. 💡",
+          text: "John needed to code a basic website from scratch. He asked GenAI to create all of the code, but it didn't run quite right. On his next try, he attempted the code himself and asked GenAI questions as he progressed — this time, it ran how he wanted. He used GenAI to help when he got stuck, not to do all the work for him. 💻",
+          mood: "celebrate"
+        },
+        {
+          text: "When you know what tools are available to you, what kind of data they've been trained on, and what their recommended uses are, you can decide which tool is best for your goals. 🎯",
           mood: "hint"
         }
       ]
     }
   },
   {
-    type: "drag-drop",
+    type: "knowledge-check",
     data: {
-      title: "Sort the Tasks",
-      highlightWord: "Tasks",
-      subtitle: "Drag each task to the right category. Where does GenAI shine — and where do you need to double-check?",
-      tasks: [
-        { id: "1", text: "Brainstorming essay topics", category: "good" },
-        { id: "2", text: "Finding statistics for a paper", category: "verify" },
-        { id: "3", text: "Getting a first draft started", category: "good" },
-        { id: "4", text: "Checking if a citation is real", category: "verify" },
-        { id: "5", text: "Explaining a complex concept", category: "good" },
-        { id: "6", text: "Medical or legal information", category: "verify" }
+      section: "3",
+      number: "3",
+      question: "A student wants GenAI to generate new frames for a short clip, either from a written description or from existing footage. What kind of tool fits this need best?",
+      options: [
+        { text: "Code generator", correct: false },
+        { text: "Image generator", correct: false },
+        { text: "Video generator", correct: true },
+        { text: "Text generator", correct: false }
       ],
       hints: [
-        "Ask: does this need to be factually correct or safe? If yes — Always Verify.",
-        "Brainstorming, drafting, and explaining ideas usually go in Works Well.",
-        "Stats, citations, and medical or legal topics always go in Always Verify."
+        "Think about which type of GenAI tool was described as creating frames from a description or existing footage.",
+        "Code and text generators don't produce visual frames at all.",
+        "Pick the option built specifically for generating video content."
       ],
-      zones: {
-        good: { label: "✅ Works Well", color: "#4AB7C4" },
-        verify: { label: "⚠️ Always Verify", color: "#FF8A50" }
-      },
-      xpRewards: { perfect: 40, partial: 20, low: 10 }
+      correctFeedback: "Right! Video generators create frames from written descriptions or existing footage — exactly this use case.",
+      wrongFeedback: "Code and text generators don't produce video frames, and image generators make single still pictures, not clip frames. A video generator is built for exactly this.",
+      xpReward: 40
     }
   },
 
@@ -172,12 +280,12 @@ export const module1Steps: Step[] = [
       emoji: "🎉",
       title: "Module 1 Complete!",
       highlightWord: "Complete!",
-      subtitle: "You decoded what AI really is — and how to actually use it.",
+      subtitle: "You now know what generative AI is, how it generally works, and what it can (and cannot) do.",
       takeaways: [
-        "GenAI generates — it doesn't retrieve. Every response is built from patterns, not pulled from the web.",
-        "It can hallucinate convincingly. A confident, fluent answer is not proof it's accurate.",
-        "Always verify facts, citations, and statistics before submitting anything.",
-        "Use AI as a starting point — keep the thinking and the decisions yours."
+        "GenAI is one category of AI — the kind that creates new content rather than following strict rules.",
+        "GenAI generates from patterns, it does not retrieve answers from the internet.",
+        "GenAI is suitable for some tasks but not for others. Think critically about your specific goals and GenAI's abilities to determine if it's the right tool.",
+        "GenAI comes in several forms. Knowing which tool fits the task — and what GenAI may not be good at — is the first step to leveraging AI to your advantage."
       ],
       badges: [
         { emoji: "🥇", name: "First Steps" },
@@ -187,7 +295,10 @@ export const module1Steps: Step[] = [
   }
 ];
 
-// ── Section knowledge-check variants (3 rotating per section) ────────────────
+// ── Legacy rotating knowledge-check variants ──────────────────────────────────
+// No longer used now that Module 1 has fixed, rewritten content (see
+// getStepsForModule in moduleStepsData.ts). Left in place only because
+// MODULE1_SECTION1_VARIANT_COUNT below is still imported as a generic constant.
 
 export const module1Section1Variants: Step[] = [
   {

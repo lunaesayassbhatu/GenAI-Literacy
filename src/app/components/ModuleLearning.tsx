@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { ArrowLeft, Zap, ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Zap, ArrowRight, CheckCircle2, Star, X as XIcon } from "lucide-react";
 import { WaveMascot } from "./WaveMascot";
 import { CharacterMascot } from "./CharacterMascot";
 import { useTheme } from "../utils/themeContext";
@@ -223,7 +223,7 @@ export function ModuleLearning() {
     // Update Wave message based on step
     updateWaveForStep(currentStep);
     // Reset proceed state
-    setCanProceed(currentStep.type === "intro" || currentStep.type === "reading" || currentStep.type === "transition");
+    setCanProceed(currentStep.type === "intro" || currentStep.type === "reading" || currentStep.type === "transition" || currentStep.type === "pros-cons");
     setHintClickCount(0);
   }, [currentStepIndex]);
 
@@ -510,12 +510,39 @@ export function ModuleLearning() {
               )}
 
               {currentStep.type === "knowledge-check" && (
-                <KnowledgeCheckStep
+                currentStep.data.multiSelect ? (
+                  <MultiSelectKnowledgeCheck
+                    data={currentStep.data}
+                    colors={colors}
+                    onProceed={() => setCanProceed(true)}
+                    onAwardXP={awardXP}
+                    onWaveReaction={(mood: WaveMood) => setWaveMood(mood)}
+                  />
+                ) : (
+                  <KnowledgeCheckStep
+                    data={currentStep.data}
+                    colors={colors}
+                    onProceed={() => setCanProceed(true)}
+                    onAwardXP={awardXP}
+                    onWaveReaction={(mood: WaveMood) => setWaveMood(mood)}
+                  />
+                )
+              )}
+
+              {currentStep.type === "ranking-check" && (
+                <RankingCheckStep
                   data={currentStep.data}
                   colors={colors}
                   onProceed={() => setCanProceed(true)}
                   onAwardXP={awardXP}
                   onWaveReaction={(mood: WaveMood) => setWaveMood(mood)}
+                />
+              )}
+
+              {currentStep.type === "pros-cons" && (
+                <ProsConsStep
+                  data={currentStep.data}
+                  colors={colors}
                 />
               )}
 
@@ -1272,6 +1299,366 @@ function KnowledgeCheckStep({ data, colors, onProceed, onAwardXP, onWaveReaction
   );
 }
 
+function MultiSelectKnowledgeCheck({ data, colors, onProceed, onAwardXP, onWaveReaction }: any) {
+  const correctIndices = useMemo(
+    () => data.options.map((o: any, i: number) => (o.correct ? i : null)).filter((i: any) => i !== null) as number[],
+    [data]
+  );
+
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [submittedSelected, setSubmittedSelected] = useState<Set<number> | null>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [answerRevealed, setAnswerRevealed] = useState(false);
+  const [locked, setLocked] = useState(false);
+
+  const isCorrectSet = (s: Set<number>) =>
+    s.size === correctIndices.length && correctIndices.every((i) => s.has(i));
+
+  const handleToggle = (index: number) => {
+    if (locked) return;
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+  };
+
+  const handleSubmit = () => {
+    if (selected.size === 0 || locked) return;
+    const submitted = new Set(selected);
+    setSubmittedSelected(submitted);
+    setShowFeedback(true);
+    onProceed();
+
+    if (isCorrectSet(submitted)) {
+      setLocked(true);
+      onWaveReaction("celebrate");
+      onAwardXP(data.xpReward);
+    } else {
+      onWaveReaction("hint");
+    }
+  };
+
+  const handleTryAgain = () => {
+    setSelected(new Set());
+    setSubmittedSelected(null);
+    setShowFeedback(false);
+  };
+
+  const handleRevealAnswer = () => {
+    if (locked) return;
+    const correctSet = new Set(correctIndices);
+    setSelected(correctSet);
+    setSubmittedSelected(correctSet);
+    setShowFeedback(true);
+    setAnswerRevealed(true);
+    setLocked(true);
+    onProceed();
+    onWaveReaction("hint");
+  };
+
+  const wasWrongSubmit = submittedSelected !== null && !locked;
+
+  return (
+    <div
+      className="rounded-2xl p-8 border space-y-6"
+      style={{ backgroundColor: colors.cardBackground, borderColor: "rgba(255,198,39,0.13)" }}
+    >
+      <div className="text-sm font-bold" style={{ color: colors.accentGold }}>
+        ☑️ Knowledge Check {data.number}
+      </div>
+
+      <h3 className="text-xl font-bold" style={{ color: colors.textPrimary }}>{data.question}</h3>
+
+      <div className="space-y-3">
+        {data.options.map((option: any, index: number) => {
+          const isPendingPick = !submittedSelected && selected.has(index);
+          const isSubmittedWrongPick = submittedSelected?.has(index) && !option.correct;
+          const isSubmittedCorrectPick = submittedSelected?.has(index) && option.correct;
+          const showAsFinalCorrect = locked && option.correct;
+
+          return (
+            <button
+              key={index}
+              onClick={() => handleToggle(index)}
+              disabled={locked}
+              className="w-full flex items-start gap-4 p-4 rounded-xl border-2 transition-all text-left disabled:cursor-not-allowed hover:border-opacity-100"
+              style={{
+                backgroundColor: colors.cardBackground,
+                borderColor: (() => {
+                  if (isSubmittedWrongPick) return colors.accentPink;
+                  if (showAsFinalCorrect || isSubmittedCorrectPick) return "#10B981";
+                  if (isPendingPick) return colors.accentTeal;
+                  return "rgba(122,90,98,0.3)";
+                })(),
+                ...(() => {
+                  if (isSubmittedWrongPick) return { backgroundColor: "rgba(232,84,122,0.1)" };
+                  if (showAsFinalCorrect || isSubmittedCorrectPick) return { backgroundColor: "rgba(16,185,129,0.1)" };
+                  if (isPendingPick) return { backgroundColor: "rgba(75,183,196,0.08)" };
+                  return {};
+                })(),
+              }}
+            >
+              <div
+                className="w-6 h-6 rounded-md border-2 flex items-center justify-center flex-shrink-0"
+                style={{
+                  borderColor: (() => {
+                    if (isSubmittedWrongPick) return colors.accentPink;
+                    if (showAsFinalCorrect || isSubmittedCorrectPick) return "#10B981";
+                    if (isPendingPick) return colors.accentTeal;
+                    return colors.textSecondary;
+                  })(),
+                  backgroundColor: (() => {
+                    if (isSubmittedWrongPick) return colors.accentPink;
+                    if (showAsFinalCorrect || isSubmittedCorrectPick) return "#10B981";
+                    if (isPendingPick) return colors.accentTeal;
+                    return "transparent";
+                  })(),
+                }}
+              >
+                {(isPendingPick || isSubmittedWrongPick || isSubmittedCorrectPick || showAsFinalCorrect) && (
+                  <CheckCircle2 size={14} color="#FFFFFF" />
+                )}
+              </div>
+              <span style={{ color: colors.textPrimary }}>{option.text}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="flex justify-end gap-3">
+        {!locked && !wasWrongSubmit && (
+          <button
+            onClick={handleRevealAnswer}
+            className="px-4 py-2 rounded-lg font-semibold border transition-all hover:scale-105"
+            style={{ color: colors.textPrimary, borderColor: colors.cardBorder, backgroundColor: "transparent" }}
+          >
+            Reveal Answer
+          </button>
+        )}
+        {wasWrongSubmit ? (
+          <button
+            onClick={handleTryAgain}
+            className="px-5 py-2 rounded-lg font-bold transition-all hover:scale-105"
+            style={{ backgroundColor: colors.accentPink, color: "#FFFFFF" }}
+          >
+            Try Again
+          </button>
+        ) : !locked && (
+          <button
+            onClick={handleSubmit}
+            disabled={selected.size === 0}
+            className="px-5 py-2 rounded-lg font-bold transition-all hover:scale-105 disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ backgroundColor: colors.accentGold, color: "#0D0508" }}
+          >
+            Submit
+          </button>
+        )}
+      </div>
+
+      {showFeedback && submittedSelected !== null && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-xl p-6 border-2"
+          style={{
+            backgroundColor: answerRevealed ? "rgba(75,183,196,0.1)" : isCorrectSet(submittedSelected) ? "rgba(16,185,129,0.1)" : "rgba(232,84,122,0.1)",
+            borderColor: answerRevealed ? colors.accentTeal : isCorrectSet(submittedSelected) ? "#10B981" : colors.accentPink,
+          }}
+        >
+          <p style={{ color: colors.textPrimary }}>
+            {answerRevealed
+              ? `💡 Answer revealed: ${data.correctFeedback}`
+              : isCorrectSet(submittedSelected)
+                ? data.correctFeedback
+                : data.wrongFeedback}
+          </p>
+          {answerRevealed && (
+            <p className="mt-2 text-sm" style={{ color: colors.textSecondary }}>
+              Revealed answers do not award XP.
+            </p>
+          )}
+        </motion.div>
+      )}
+    </div>
+  );
+}
+
+interface RankingItem {
+  prompt: string;
+  correctValue: number;
+  feedback?: string;
+}
+
+function RankingCheckStep({ data, colors, onProceed, onAwardXP, onWaveReaction }: any) {
+  const items: RankingItem[] = data.items;
+  const scale: { value: number; label: string }[] = data.scale;
+
+  const [answers, setAnswers] = useState<Record<number, number | null>>(
+    () => Object.fromEntries(items.map((_: RankingItem, i: number) => [i, null]))
+  );
+  const [submitted, setSubmitted] = useState(false);
+  const [locked, setLocked] = useState(false);
+
+  const allAnswered = items.every((_: RankingItem, i: number) => answers[i] !== null);
+  const allCorrect = items.every((item: RankingItem, i: number) => answers[i] === item.correctValue);
+
+  const handleSelect = (index: number, value: number) => {
+    if (locked) return;
+    setAnswers((prev) => ({ ...prev, [index]: value }));
+  };
+
+  const handleSubmit = () => {
+    if (!allAnswered) return;
+    setSubmitted(true);
+    onProceed();
+    if (allCorrect) {
+      setLocked(true);
+      onWaveReaction("celebrate");
+      onAwardXP(data.xpReward);
+    } else {
+      onWaveReaction("hint");
+    }
+  };
+
+  return (
+    <div
+      className="rounded-2xl p-8 border space-y-6"
+      style={{ backgroundColor: colors.cardBackground, borderColor: "rgba(255,198,39,0.13)" }}
+    >
+      <div className="text-sm font-bold" style={{ color: colors.accentGold }}>
+        ☑️ Knowledge Check {data.number}
+      </div>
+
+      <div
+        className="rounded-xl p-5 space-y-2"
+        style={{ backgroundColor: colors.background, border: `1px solid ${colors.cardBorder}` }}
+      >
+        <p style={{ color: colors.textPrimary }}>{data.instructions}</p>
+        <div className="pt-1 space-y-1">
+          {scale.map((s) => (
+            <p key={s.value} className="text-sm italic" style={{ color: colors.textSecondary }}>
+              ({s.value}) {s.label}
+            </p>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {items.map((item: RankingItem, index: number) => {
+          const value = answers[index];
+          const isCorrect = submitted && value === item.correctValue;
+          const isWrong = submitted && value !== item.correctValue;
+
+          return (
+            <div
+              key={index}
+              className="p-4 rounded-xl border-2"
+              style={{
+                borderColor: isCorrect ? "#10B981" : isWrong ? colors.accentPink : "rgba(122,90,98,0.3)",
+                backgroundColor: isCorrect ? "rgba(16,185,129,0.08)" : isWrong ? "rgba(232,84,122,0.08)" : "transparent",
+              }}
+            >
+              <div className="flex items-center gap-4">
+                <p className="flex-1" style={{ color: colors.textPrimary }}>{item.prompt}</p>
+                <select
+                  value={value ?? ""}
+                  onChange={(e) => handleSelect(index, Number(e.target.value))}
+                  disabled={locked}
+                  className="px-3 py-2 rounded-lg font-bold disabled:cursor-not-allowed flex-shrink-0"
+                  style={{
+                    backgroundColor: colors.background,
+                    color: colors.textPrimary,
+                    border: `2px solid ${colors.accentGold}`,
+                  }}
+                >
+                  <option value="" disabled>Select...</option>
+                  {scale.map((s) => (
+                    <option key={s.value} value={s.value}>{s.value}</option>
+                  ))}
+                </select>
+              </div>
+              {submitted && item.feedback && (
+                <p className="text-sm mt-2" style={{ color: colors.textSecondary }}>
+                  {isCorrect ? "✅" : "❌"} {item.feedback}
+                </p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="flex justify-end">
+        <button
+          onClick={handleSubmit}
+          disabled={!allAnswered || locked}
+          className="px-5 py-2 rounded-lg font-bold transition-all hover:scale-105 disabled:opacity-40 disabled:cursor-not-allowed"
+          style={{ backgroundColor: colors.accentGold, color: "#0D0508" }}
+        >
+          {locked ? "Correct!" : submitted ? "Try Again" : "Submit"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ProsConsStep({ data, colors }: any) {
+  return (
+    <div
+      className="rounded-2xl p-8 border space-y-6"
+      style={{ backgroundColor: colors.cardBackground, borderColor: "rgba(255,198,39,0.13)" }}
+    >
+      <h3 className="text-xl font-bold" style={{ color: colors.textPrimary }}>{data.title}</h3>
+
+      <div className="grid sm:grid-cols-2 gap-6">
+        <div className="space-y-3">
+          <p className="text-sm font-bold text-center" style={{ color: "#10B981" }}>GenAI Strengths</p>
+          {data.strengths.map((text: string, i: number) => (
+            <div key={i} className="flex items-start gap-3">
+              <CheckCircle2 size={20} color="#10B981" className="flex-shrink-0 mt-0.5" />
+              <p style={{ color: colors.textPrimary }}>{text}</p>
+            </div>
+          ))}
+        </div>
+        <div className="space-y-3">
+          <p className="text-sm font-bold text-center" style={{ color: colors.accentPink }}>GenAI Weaknesses</p>
+          {data.weaknesses.map((text: string, i: number) => (
+            <div key={i} className="flex items-start gap-3">
+              <XIcon size={20} color={colors.accentPink} className="flex-shrink-0 mt-0.5" />
+              <p style={{ color: colors.textPrimary }}>{text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {Array.isArray(data.sources) && data.sources.length > 0 && (
+        <div className="pt-4" style={{ borderTop: `1px solid ${colors.cardBorder}` }}>
+          <p className="text-xs font-bold mb-2" style={{ color: colors.textSecondary }}>Sources</p>
+          <div className="space-y-1">
+            {data.sources.map((s: { label: string; url?: string }, i: number) => (
+              s.url ? (
+                <a
+                  key={i}
+                  href={s.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-xs hover:underline"
+                  style={{ color: colors.accentTeal }}
+                >
+                  {s.label}
+                </a>
+              ) : (
+                <p key={i} className="text-xs" style={{ color: colors.textSecondary }}>{s.label}</p>
+              )
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function DragDropStep({ data, colors, onProceed, onAwardXP, onWaveReaction }: any) {
   const [poolItems, setPoolItems] = useState(data.tasks);
   const [goodZone, setGoodZone] = useState<any[]>([]);
@@ -1719,7 +2106,7 @@ function CompletionStep({ data, colors, totalXP, onComplete, nextModule, onNextM
 // and faces right toward the speech bubble. Previous bubbles stack above faded.
 function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext: () => void }) {
   const [msgIndex, setMsgIndex] = useState(0);
-  const messages: { text: string; mood: string }[] = data.messages;
+  const messages: { text: string; mood: string; link?: string }[] = data.messages;
   const isLast = msgIndex === messages.length - 1;
   const current = messages[msgIndex];
   const currentStoryCharacter = detectStoryCharacter(current.text);
@@ -1845,6 +2232,33 @@ function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext
                 style={{ color: colors.textPrimary }}
                 dangerouslySetInnerHTML={{ __html: current.text.replace(/\*(.*?)\*/g, '<em>$1</em>') }}
               />
+
+              {/* Link-available star — hover reveals a message with a link to the
+                  related learning module, opening in a new tab. */}
+              {current.link && (
+                <div className="group absolute -right-3 top-1/2 -translate-y-1/2 z-20">
+                  <a
+                    href={current.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative block"
+                    aria-label="Related learning link available"
+                  >
+                    <Star
+                      size={22}
+                      fill={colors.accentPink}
+                      color={colors.accentPink}
+                      className="drop-shadow transition-transform group-hover:scale-125"
+                    />
+                    <div
+                      className="pointer-events-none absolute right-0 top-full mt-2 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg px-3 py-2 text-xs font-semibold shadow-lg"
+                      style={{ backgroundColor: colors.cardBackground, border: `1px solid ${colors.accentPink}`, color: colors.textPrimary, width: 200 }}
+                    >
+                      Want to learn more? Click <span style={{ textDecoration: "underline", color: colors.accentPink }}>here</span> for more information!
+                    </div>
+                  </a>
+                </div>
+              )}
             </motion.div>
           </div>
         </AnimatePresence>

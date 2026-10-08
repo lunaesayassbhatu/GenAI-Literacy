@@ -5,6 +5,8 @@ export type StepType =
   | "transition"
   | "scenario"
   | "knowledge-check"
+  | "ranking-check"
+  | "pros-cons"
   | "drag-drop"
   | "wave-talk"
   | "completion";
@@ -17,19 +19,9 @@ export interface Step {
 // ─────────────────────────────────────────────────────────────────────────────
 // Per-module step files
 // ─────────────────────────────────────────────────────────────────────────────
-import {
-  module1Steps,
-  module1Section1Variants,
-  module1Section2Variants,
-  module1Section3Variants,
-} from "./steps/module1Steps";
+import { module1Steps } from "./steps/module1Steps";
 
-import {
-  module2Steps,
-  module2Section1Variants,
-  module2Section2Variants,
-  module2Section3Variants,
-} from "./steps/module2Steps";
+import { module2Steps } from "./steps/module2Steps";
 
 import {
   module3Steps,
@@ -92,27 +84,8 @@ export function getStepsForModule(moduleId: string, questionVariant: number = 0)
   const base = MODULE_STEPS[moduleId];
   if (!base) return [];
 
-  if (moduleId === "module-1") {
-    const idx = questionVariant % module1Section1Variants.length;
-    return base.map(step => {
-      const section = (step.data as any)?.section;
-      if (step.type === "knowledge-check" && section === "1") return module1Section1Variants[idx];
-      if (step.type === "knowledge-check" && section === "2") return module1Section2Variants[idx];
-      if (step.type === "knowledge-check" && section === "3") return module1Section3Variants[idx];
-      return step;
-    });
-  }
-
-  if (moduleId === "module-2") {
-    const idx = questionVariant % module2Section1Variants.length;
-    return base.map(step => {
-      const section = (step.data as any)?.section;
-      if (step.type === "knowledge-check" && section === "1") return module2Section1Variants[idx];
-      if (step.type === "knowledge-check" && section === "2") return module2Section2Variants[idx];
-      if (step.type === "knowledge-check" && section === "3") return module2Section3Variants[idx];
-      return step;
-    });
-  }
+  // Modules 1 and 2 now carry fixed, rewritten content (no rotating variants —
+  // the rewrite is shown the same way every time).
 
   if (moduleId === "module-3") {
     const idx = questionVariant % module3Section1Variants.length;
