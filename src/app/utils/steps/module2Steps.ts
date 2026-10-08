@@ -92,7 +92,7 @@ export const module2Steps: Step[] = [
           mood: "hint"
         },
         {
-          text: "*Sycophancy* refers to the tendency of AI to be excessively agreeable, flattering, or validating towards its users. This can include AI telling you what it thinks you want to hear instead of stating facts, changing a correct answer when you push back, offering exaggerated praise, or agreeing with dangerous or false statements instead of correcting them.",
+          text: "*Sycophancy* refers to the tendency of AI to be excessively agreeable, flattering, or validating towards its users. This can include AI telling you what it thinks you want to hear instead of stating facts, changing a correct answer when you push back, offering exaggerated praise, or agreeing with dangerous, biased, or false statements instead of correcting them.",
           mood: "thinking"
         },
         {
@@ -236,7 +236,7 @@ export const module2Steps: Step[] = [
         "GenAI can confidently hallucinate: fake references, invented statistics, incorrect summaries, and subtle errors can look real.",
         "Defer to other human beings when you need advice that relates to your life, relationships, and mental state.",
         "AI is not guaranteed to have an internal fact-checker. The burden of verification is on you.",
-        "In sensitive life situations, it is best not to solely rely on GenAI — it is not designed to provide safe and rational advice, and its advice can emphasize sycophantic responses over constructive ones."
+        "In sensitive life situations (e.g., relationship issues, mental health crises), it is best not to solely rely on GenAI. It is not designed to provide safe and rational advice, and its advice can emphasize sycophantic responses over constructive ones."
       ],
       badges: [
         { emoji: "🔍", name: "Truth Seeker" }
