@@ -20,7 +20,7 @@ export function HomePage() {
 
       <main className="max-w-6xl mx-auto px-4 py-8">
         {/* Hero Section */}
-        <section className="mb-12">
+        <section className="mb-4">
           {/* Main Title Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
