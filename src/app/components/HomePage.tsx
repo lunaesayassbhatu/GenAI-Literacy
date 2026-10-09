@@ -18,7 +18,7 @@ export function HomePage() {
     >
       <Header />
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="max-w-6xl mx-auto px-4 pt-8 pb-2">
         {/* Hero Section */}
         <section className="mb-0">
           {/* Main Title Card */}
@@ -48,7 +48,7 @@ export function HomePage() {
           className="relative mb-12"
         >
           <div
-            className="px-8 pb-8 pt-2 md:px-12 md:pb-12 md:pt-3 relative overflow-hidden"
+            className="px-8 pb-4 pt-2 md:px-12 md:pb-6 md:pt-3 relative overflow-hidden"
             style={{
               borderLeft: `1px solid ${colors.cardBorder}`,
               borderRight: `1px solid ${colors.cardBorder}`,
@@ -301,7 +301,7 @@ export function HomePage() {
 
       {/* Help & documentation footer */}
       <footer
-        className="mt-16 border-t"
+        className="mt-4 border-t"
         style={{ borderColor: colors.cardBorder, backgroundColor: colors.cardBackground }}
       >
         <div className="max-w-6xl mx-auto px-4 pt-10 pb-24 grid sm:grid-cols-3 gap-8 text-sm">
