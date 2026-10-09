@@ -20,13 +20,13 @@ export function HomePage() {
 
       <main className="max-w-6xl mx-auto px-4 py-8">
         {/* Hero Section */}
-        <section className="mb-4">
+        <section className="mb-0">
           {/* Main Title Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.5 }}
-            className="rounded-2xl p-10 mb-8 text-center"
+            className="rounded-2xl p-10 mb-2 text-center"
             style={{
               background: '#6B1530'
             }}
@@ -48,7 +48,7 @@ export function HomePage() {
           className="relative mb-12"
         >
           <div
-            className="p-8 md:p-12 relative overflow-hidden"
+            className="px-8 pb-8 pt-2 md:px-12 md:pb-12 md:pt-3 relative overflow-hidden"
             style={{
               borderLeft: `1px solid ${colors.cardBorder}`,
               borderRight: `1px solid ${colors.cardBorder}`,
