@@ -3,6 +3,7 @@ import { useAuth } from "./utils/authContext";
 import { getUserData } from "./utils/userData";
 import { AskWaveChat } from "./components/AskWaveChat";
 import { Login } from "./components/Login";
+import { ResetPassword } from "./components/ResetPassword";
 import { HomePage } from "./components/HomePage";
 import { LearningLab } from "./components/LearningLab";
 import { Games } from "./components/Games";
@@ -61,6 +62,10 @@ export const router = createBrowserRouter([
   {
     path: "/",
     element: <Login />
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPassword />
   },
   {
     path: "/home",

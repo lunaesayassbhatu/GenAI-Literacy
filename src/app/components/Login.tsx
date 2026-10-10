@@ -7,6 +7,10 @@ import { checkDailyCheckIn } from "../utils/userData";
 
 export function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotError, setForgotError] = useState("");
+  const [forgotSent, setForgotSent] = useState(false);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,6 +21,32 @@ export function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState("");
   const navigate = useNavigate();
+
+  const handleForgotPasswordSubmit = async (e: { preventDefault(): void }) => {
+    e.preventDefault();
+    setForgotError("");
+    if (!forgotEmail.trim().toLowerCase().endsWith("@asu.edu")) {
+      setForgotError("Please use your ASU email (@asu.edu)");
+      return;
+    }
+    setIsLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail.trim().toLowerCase(), {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setIsLoading(false);
+    if (error) {
+      setForgotError(error.message);
+      return;
+    }
+    setForgotSent(true);
+  };
+
+  const closeForgotPassword = () => {
+    setShowForgotPassword(false);
+    setForgotSent(false);
+    setForgotError("");
+    setForgotEmail("");
+  };
 
   const validateEmail = (email: string) => {
     if (!email.trim()) {
@@ -236,7 +266,9 @@ export function Login() {
               ASU Sunwave
             </h1>
             <p className="text-gray-500 text-sm">
-              {isSignUp ? (
+              {showForgotPassword ? (
+                "Reset your password"
+              ) : isSignUp ? (
                 "Create your account to get started"
               ) : (
                 <span className="font-bold">
@@ -246,6 +278,76 @@ export function Login() {
             </p>
           </div>
 
+          {showForgotPassword ? (
+            <>
+              {/* Forgot Password */}
+              {forgotSent ? (
+                <div className="text-center py-4">
+                  <p className="text-gray-800 font-bold mb-2">📬 Check your email!</p>
+                  <p className="text-gray-500 text-sm mb-6">
+                    If an account exists for <span className="font-semibold">{forgotEmail.trim()}</span>, we've sent a
+                    link to reset your password.
+                  </p>
+                  <button
+                    onClick={closeForgotPassword}
+                    className="w-full py-3 rounded-2xl transition-all duration-300 hover:scale-105 font-black text-base"
+                    style={{ background: "linear-gradient(135deg, #FFC627 0%, #ffd966 100%)", color: "#000000" }}
+                  >
+                    Back to Sign In
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
+                  <p className="text-gray-500 text-sm -mt-2 mb-1">
+                    Enter your ASU email and we'll send you a link to reset your password.
+                  </p>
+                  <div>
+                    <label className="block mb-2 text-gray-800 font-black flex items-center gap-2">
+                      <Mail size={18} className="text-[#8C1D40]" />
+                      ASU Email Badge
+                    </label>
+                    <input
+                      type="email"
+                      value={forgotEmail}
+                      onChange={(e) => { setForgotEmail(e.target.value); setForgotError(""); }}
+                      placeholder="yourname@asu.edu"
+                      className={`w-full px-4 py-3 rounded-xl border-2 focus:outline-none transition-all font-semibold ${forgotError ? "border-red-400 bg-red-50" : ""}`}
+                      style={!forgotError ? { borderColor: "rgba(140, 29, 64, 0.3)" } : {}}
+                      required
+                    />
+                    {forgotError && <p className="mt-1 text-sm text-red-500 font-bold">⚠️ {forgotError}</p>}
+                  </div>
+
+                  <p className="text-gray-400 text-xs">
+                    Not sure which email you signed up with? Contact{" "}
+                    <a href="mailto:lei@example.asu.edu" className="underline">lei@example.asu.edu</a> for help.
+                  </p>
+
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full py-4 rounded-2xl text-white flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 font-black text-lg"
+                    style={{
+                      background: "linear-gradient(135deg, #8C1D40 0%, #6B1530 100%)",
+                      boxShadow: "0 8px 24px rgba(140, 29, 64, 0.5)",
+                    }}
+                  >
+                    {isLoading ? "Sending..." : "Send Reset Link"}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={closeForgotPassword}
+                    className="w-full py-3 rounded-2xl transition-all duration-300 hover:scale-105 font-black text-base"
+                    style={{ background: "linear-gradient(135deg, #FFC627 0%, #ffd966 100%)", color: "#000000" }}
+                  >
+                    Back to Sign In
+                  </button>
+                </form>
+              )}
+            </>
+          ) : (
+            <>
           {/* SSO Button */}
           <button
             onClick={handleSSOLogin}
@@ -329,6 +431,16 @@ export function Login() {
                 onBlur={(e) => (e.target.style.borderColor = "rgba(140, 29, 64, 0.3)")}
                 required
               />
+              {!isSignUp && (
+                <button
+                  type="button"
+                  onClick={() => setShowForgotPassword(true)}
+                  className="mt-2 text-sm font-semibold underline"
+                  style={{ color: "#8C1D40" }}
+                >
+                  Forgot your password or which email you used?
+                </button>
+              )}
             </div>
 
             {/* Confirm Password (sign up only) */}
@@ -419,6 +531,8 @@ export function Login() {
               {isSignUp ? "🎯 Already have an account? Jump Back In!" : "🌟 New here? Create Your Character!"}
             </button>
           </div>
+            </>
+          )}
         </div>
 
         {/* ASU Branding */}
