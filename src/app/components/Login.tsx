@@ -438,7 +438,7 @@ export function Login() {
                   className="mt-2 text-sm font-semibold underline"
                   style={{ color: "#8C1D40" }}
                 >
-                  Forgot your password or which email you used?
+                  Forgot your password?
                 </button>
               )}
             </div>
