@@ -2,6 +2,9 @@ import { motion } from "motion/react";
 import type { ReactNode } from "react";
 import type { CharacterId } from "../utils/userData";
 import { getCharacterInfo } from "../data/charactersData";
+import aishaArt from "../assets/characters/aisha.png";
+import devArt from "../assets/characters/dev.png";
+import jordanArt from "../assets/characters/jordan.png";
 
 interface CharacterFrames {
   default: string;
@@ -9,10 +12,14 @@ interface CharacterFrames {
   wave?: string;
 }
 
-// Filled in once real generated art exists for a character (Step 5 of the
-// character feature). Until then every character renders as a procedural
-// SVG sea-creature figure (below) with blinking eyes and a waving fin.
-const CHARACTER_ASSETS: Partial<Record<CharacterId, CharacterFrames>> = {};
+// Real generated 3D-render art per character — otter (Aisha), octopus (Dev),
+// sea turtle (Jordan). Falls back to the procedural SVG fish below for any
+// character without art yet.
+const CHARACTER_ASSETS: Partial<Record<CharacterId, CharacterFrames>> = {
+  aisha: { default: aishaArt },
+  dev: { default: devArt },
+  jordan: { default: jordanArt },
+};
 
 type TailShape = "flowing" | "sleek" | "paddle";
 
@@ -100,6 +107,22 @@ export function CharacterMascot({ character, size = 80, animate = true, variant 
   const tailTransition = { duration: 1.1, repeat: Infinity, repeatType: "mirror" as const, ease: "easeInOut" as const };
 
   if (frames) {
+    if (variant === "portrait") {
+      // Crop in on the head for tight circular/square spots (nav bar, profile).
+      return (
+        <motion.div
+          style={{ width: size, height: size, overflow: "hidden", display: "block" }}
+          animate={animate ? { y: [0, -4, 0] } : undefined}
+          transition={bobTransition}
+        >
+          <img
+            src={frames.default}
+            alt={`${info.name} character`}
+            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center" }}
+          />
+        </motion.div>
+      );
+    }
     return (
       <motion.img
         src={frames.default}

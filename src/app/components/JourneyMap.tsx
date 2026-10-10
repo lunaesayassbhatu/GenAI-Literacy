@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import { Lock, CheckCircle2 } from "lucide-react";
@@ -9,6 +10,14 @@ import { getEquippedItemIds } from "../utils/itemsSystem";
 import { MODULES } from "../utils/modulesData";
 import { hasEverCompletedModule } from "../utils/moduleProgress";
 import { GAME_OPTIONS } from "./Games";
+import islandImg from "../assets/journey/island.png";
+import roadImg from "../assets/journey/road.png";
+import treeImg from "../assets/journey/tree.png";
+
+// Natural aspect ratios (w/h) of the generated art — used to size each piece
+// without ever stretching/distorting it.
+const ISLAND_RATIO = 452 / 853;
+const ROAD_RATIO = 1124 / 790;
 
 interface MapNode {
   kind: "module" | "game";
@@ -80,11 +89,72 @@ function nodeKey(node: MapNode) {
   return `${node.kind}-${node.id}`;
 }
 
+interface RoadSegment {
+  left: number;
+  top: number;
+  height: number;
+  flip: boolean;
+}
+
+// Sizes each level's island so it comfortably fits its module + games, while
+// always keeping island.png's own proportions intact (no stretching).
+function islandSizeFor(itemCount: number) {
+  const width = itemCount === 1 ? 220 : itemCount === 2 ? 290 : 360;
+  return { width, height: Math.round(width * ISLAND_RATIO) };
+}
+
 export function JourneyMap() {
   const { colors } = useTheme();
   const navigate = useNavigate();
   const levels = buildLevels();
   const flat = flattenLevels(levels);
+
+  const trailRef = useRef<HTMLDivElement>(null);
+  const islandRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const [roadSegments, setRoadSegments] = useState<RoadSegment[]>([]);
+
+  useLayoutEffect(() => {
+    function measure() {
+      const trail = trailRef.current;
+      if (!trail) return;
+      const trailRect = trail.getBoundingClientRect();
+
+      const centers = islandRefs.current.map((el) => {
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return { x: r.left + r.width / 2 - trailRect.left, y: r.top + r.height / 2 - trailRect.top };
+      });
+
+      const next: RoadSegment[] = [];
+      for (let i = 0; i < centers.length - 1; i++) {
+        const a = centers[i];
+        const b = centers[i + 1];
+        if (!a || !b) continue;
+        // The road art keeps its own natural orientation (never rotated, so
+        // it can't twist into a weird hook) and is scaled to the full actual
+        // vertical gap between islands (never capped, so it always reaches
+        // both — no floating disconnected segments). It only runs one
+        // diagonal (bottom-left to top-right), so when the upper island
+        // actually sits to the LEFT of the lower one, mirror it horizontally
+        // to match — otherwise it visually leans the wrong way.
+        next.push({
+          left: (a.x + b.x) / 2,
+          top: (a.y + b.y) / 2,
+          height: Math.abs(b.y - a.y) * 1.05,
+          flip: a.x < b.x,
+        });
+      }
+      setRoadSegments(next);
+    }
+
+    measure();
+    const settleTimer = setTimeout(measure, 500);
+    window.addEventListener("resize", measure);
+    return () => {
+      clearTimeout(settleTimer);
+      window.removeEventListener("resize", measure);
+    };
+  }, [levels.length]);
 
   const completedFlags = flat.map((node) => node.isComplete());
   // "You are here" = the first incomplete node, or the last node if everything's done.
@@ -153,21 +223,26 @@ export function JourneyMap() {
           )}
         </button>
 
-        <p
-          className="text-[10px] font-bold uppercase tracking-wider mt-2"
-          style={{ color: flags.isLocked ? colors.textSecondary : roleColor }}
+        <div
+          className="mt-2 px-2 py-1 rounded-lg"
+          style={{ backgroundColor: "rgba(13,5,8,0.62)" }}
         >
-          {node.kind === "module" ? "Module" : "Game"}
-        </p>
-        <p
-          className="text-xs font-semibold leading-tight"
-          style={{ color: flags.isLocked ? colors.textSecondary : node.kind === "game" ? roleColor : colors.textPrimary }}
-        >
-          {node.name}
-        </p>
-        <p className="text-[10px]" style={{ color: colors.textSecondary }}>
-          +{node.xpReward} XP
-        </p>
+          <p
+            className="text-[10px] font-bold uppercase tracking-wider"
+            style={{ color: flags.isLocked ? colors.textSecondary : roleColor }}
+          >
+            {node.kind === "module" ? "Module" : "Game"}
+          </p>
+          <p
+            className="text-xs font-semibold leading-tight"
+            style={{ color: flags.isLocked ? colors.textSecondary : node.kind === "game" ? roleColor : "#FFFFFF" }}
+          >
+            {node.name}
+          </p>
+          <p className="text-[10px]" style={{ color: "#D8D0D4" }}>
+            +{node.xpReward} XP
+          </p>
+        </div>
       </div>
     );
   }
@@ -186,21 +261,33 @@ export function JourneyMap() {
           </p>
         </div>
 
-        <div className="relative">
-          {/* Center connecting line — the trail the level clusters wind along */}
-          <div
-            className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-1"
-            style={{
-              backgroundImage: `repeating-linear-gradient(to bottom, ${colors.cardBorder} 0 10px, transparent 10px 20px)`,
-            }}
-          />
+        <div className="relative" ref={trailRef}>
+          {roadSegments.map((seg, i) => (
+            <img
+              key={i}
+              src={roadImg}
+              alt=""
+              className="absolute pointer-events-none select-none"
+              style={{
+                left: seg.left,
+                top: seg.top,
+                height: seg.height,
+                width: seg.height * ROAD_RATIO,
+                transform: `translate(-50%, -50%) ${seg.flip ? "scaleX(-1)" : ""}`,
+                zIndex: 0,
+              }}
+            />
+          ))}
 
-          <div className="relative flex flex-col gap-16">
+          <div className="relative flex flex-col gap-16" style={{ zIndex: 1 }}>
             {levels.map((level, idx) => {
               const justify = WAVE_POSITIONS[idx % WAVE_POSITIONS.length];
               // Levels sitting at the left edge need clearance from the fixed,
               // draggable "Ask Wave" button which defaults to the bottom-left.
               const needsClearance = justify === "flex-start";
+              const itemCount = 1 + level.games.length;
+              const { width: islandWidth, height: islandHeight } = islandSizeFor(itemCount);
+              const flipTrees = idx % 2 === 1;
 
               return (
                 <motion.div
@@ -212,20 +299,59 @@ export function JourneyMap() {
                   style={{ justifyContent: justify }}
                 >
                   <div
-                    className="flex flex-col sm:flex-row items-center gap-x-6 gap-y-4 rounded-3xl p-4"
+                    ref={(el) => {
+                      islandRefs.current[idx] = el;
+                    }}
+                    className="relative flex items-center justify-center"
                     style={{
+                      width: islandWidth,
+                      height: islandHeight,
+                      maxWidth: "88vw",
                       marginLeft: needsClearance ? 100 : 0,
-                      border: level.games.length > 0 ? `1px dashed ${colors.cardBorder}` : "none",
-                      backgroundColor: level.games.length > 0 ? colors.cardBackground : "transparent",
                     }}
                   >
-                    {renderNode(level.module, 64)}
+                    <img
+                      src={islandImg}
+                      alt=""
+                      className="absolute inset-0 w-full h-full object-contain pointer-events-none select-none"
+                    />
+                    <img
+                      src={treeImg}
+                      alt=""
+                      className="absolute pointer-events-none select-none"
+                      style={{
+                        width: islandWidth * 0.26,
+                        top: "-10%",
+                        left: flipTrees ? undefined : "0%",
+                        right: flipTrees ? "0%" : undefined,
+                        transform: flipTrees ? "scaleX(-1)" : undefined,
+                      }}
+                    />
+                    <img
+                      src={treeImg}
+                      alt=""
+                      className="absolute pointer-events-none select-none"
+                      style={{
+                        width: islandWidth * 0.16,
+                        bottom: "-6%",
+                        right: flipTrees ? undefined : "6%",
+                        left: flipTrees ? "6%" : undefined,
+                        transform: flipTrees ? undefined : "scaleX(-1)",
+                      }}
+                    />
 
-                    {level.games.length > 0 && (
-                      <div className="flex flex-wrap justify-center gap-4">
-                        {level.games.map((game) => renderNode(game, 52))}
-                      </div>
-                    )}
+                    <div
+                      className="relative flex flex-row flex-wrap items-center justify-center gap-x-4 gap-y-2 p-2"
+                      style={{ zIndex: 1 }}
+                    >
+                      {renderNode(level.module, 64)}
+
+                      {level.games.length > 0 && (
+                        <div className="flex flex-wrap justify-center gap-3">
+                          {level.games.map((game) => renderNode(game, 52))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </motion.div>
               );
