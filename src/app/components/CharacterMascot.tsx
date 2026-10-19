@@ -101,7 +101,13 @@ export function CharacterMascot({ character, size = 80, animate = true, variant 
   const frames = character ? CHARACTER_ASSETS[character] : undefined;
   const { accent, tail } = APPEARANCE[info.id];
 
-  const bobTransition = { duration: 2.6, repeat: Infinity, ease: "easeInOut" as const };
+  const bobTransition = { duration: 2, repeat: Infinity, ease: "easeInOut" as const };
+  // A friendly "waving hi" rock: tilts side to side (pivoting from the feet)
+  // with a little lift, then pauses before repeating — reads as a greeting
+  // rather than a constant idle sway.
+  const waveRockTransition = { duration: 1.4, repeat: Infinity, repeatDelay: 1.1, ease: "easeInOut" as const };
+  const waveRockMotion = { rotate: [0, -10, 8, -5, 0], y: [0, -3, -7, -3, 0] };
+  const waveRockMotionSmall = { rotate: [0, -7, 5, -3, 0], y: [0, -2, -4, -2, 0] };
   const blinkTransition = { duration: 0.25, repeat: Infinity, repeatDelay: 3, ease: "easeInOut" as const };
   const waveTransition = { duration: 0.7, repeat: Infinity, repeatDelay: 1.6, ease: "easeInOut" as const };
   const tailTransition = { duration: 1.1, repeat: Infinity, repeatType: "mirror" as const, ease: "easeInOut" as const };
@@ -111,9 +117,9 @@ export function CharacterMascot({ character, size = 80, animate = true, variant 
       // Crop in on the head for tight circular/square spots (nav bar, profile).
       return (
         <motion.div
-          style={{ width: size, height: size, overflow: "hidden", display: "block" }}
-          animate={animate ? { y: [0, -4, 0] } : undefined}
-          transition={bobTransition}
+          style={{ width: size, height: size, overflow: "hidden", display: "block", transformOrigin: "bottom center" }}
+          animate={animate ? waveRockMotionSmall : undefined}
+          transition={waveRockTransition}
         >
           <img
             src={frames.default}
@@ -124,13 +130,17 @@ export function CharacterMascot({ character, size = 80, animate = true, variant 
       );
     }
     return (
+      // The three art files have different aspect ratios (Aisha is much taller
+      // than Dev/Jordan), so fit each into the same box, anchored to the feet,
+      // instead of letting width set a different height per character.
       <motion.img
         src={frames.default}
         alt={`${info.name} character`}
         width={size}
-        style={{ height: "auto", display: "block" }}
-        animate={animate ? { y: [0, -6, 0] } : undefined}
-        transition={bobTransition}
+        height={Math.round(size * 1.15)}
+        style={{ width: size, height: Math.round(size * 1.15), objectFit: "contain", objectPosition: "bottom center", display: "block", transformOrigin: "bottom center" }}
+        animate={animate ? waveRockMotion : undefined}
+        transition={waveRockTransition}
       />
     );
   }
@@ -156,7 +166,7 @@ export function CharacterMascot({ character, size = 80, animate = true, variant 
 
   return (
     <motion.div
-      animate={animate ? { y: [0, -6, 0] } : undefined}
+      animate={animate ? { y: [0, -16, 0] } : undefined}
       transition={bobTransition}
       style={{ width: size, height, display: "flex", alignItems: "center", justifyContent: "center" }}
     >
