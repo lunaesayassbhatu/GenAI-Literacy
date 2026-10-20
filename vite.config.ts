@@ -31,7 +31,7 @@ function devChatApiPlugin(apiKey: string | undefined): Plugin {
         req.on('data', (chunk) => { raw += chunk })
         req.on('end', async () => {
           try {
-            const { runChat } = await import('./api/chatHandler.ts')
+            const { runChat } = await import('./api/chat.ts')
             const parsed = raw ? JSON.parse(raw) : {}
             const result = await runChat(parsed?.messages, apiKey)
             res.statusCode = result.status

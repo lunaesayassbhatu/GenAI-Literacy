@@ -714,7 +714,7 @@ function ModuleLearningInner() {
       {/* Player's chosen character — accompanies the learner through every step */}
       <Link
         to="/choose-character"
-        className="fixed top-24 right-6 z-40 block hover:opacity-80 transition-opacity"
+        className="fixed top-36 right-6 z-40 block hover:opacity-80 transition-opacity"
         title="Change your character"
       >
         <CharacterMascot character={userData?.selectedCharacter} size={64} equipped={getEquippedItemIds()} />
