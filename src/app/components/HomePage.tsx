@@ -4,7 +4,7 @@ import { useTheme } from "../utils/themeContext";
 import { getUserData } from "../utils/userData";
 import { getCharacterInfo } from "../data/charactersData";
 import { motion } from "motion/react";
-import { BookOpen, Gamepad2, Target, Lightbulb, Users, Award } from "lucide-react";
+import { BookOpen, Gamepad2, Target, Lightbulb, Users, Award, ArrowRight } from "lucide-react";
 
 export function HomePage() {
   const { colors } = useTheme();
@@ -225,73 +225,75 @@ export function HomePage() {
               </p>
 
               <div className="grid md:grid-cols-2 gap-6">
-                <div className="flex items-start gap-4">
-                  <div
-                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: 'rgba(255,198,39,0.2)' }}
-                  >
-                    <Target size={24} style={{ color: colors.accentGold }} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold mb-1" style={{ color: colors.textPrimary }}>
-                      Practical Skills
-                    </h3>
-                    <p className="text-sm" style={{ color: colors.textSecondary }}>
-                      Learn skills you can apply immediately in your coursework and research
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div
-                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: 'rgba(232,84,122,0.2)' }}
-                  >
-                    <Lightbulb size={24} style={{ color: colors.accentPink }} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold mb-1" style={{ color: colors.textPrimary }}>
-                      Interactive Learning
-                    </h3>
-                    <p className="text-sm" style={{ color: colors.textSecondary }}>
-                      Engage with content through games, quizzes, and hands-on activities
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div
-                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: 'rgba(75,183,196,0.2)' }}
-                  >
-                    <Users size={24} style={{ color: colors.accentTeal }} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold mb-1" style={{ color: colors.textPrimary }}>
-                      Built for ASU
-                    </h3>
-                    <p className="text-sm" style={{ color: colors.textSecondary }}>
-                      Designed specifically for ASU students, faculty, and staff
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div
-                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: 'rgba(255,138,80,0.2)' }}
-                  >
-                    <Award size={24} style={{ color: colors.accentOrange }} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold mb-1" style={{ color: colors.textPrimary }}>
-                      Track Progress
-                    </h3>
-                    <p className="text-sm" style={{ color: colors.textSecondary }}>
-                      Monitor your growth with XP, levels, and achievement badges
-                    </p>
-                  </div>
-                </div>
+                {[
+                  {
+                    to: "/learning-lab",
+                    cta: "Open the Learning Lab",
+                    title: "Practical Skills",
+                    text: "Learn skills you can apply immediately in your coursework and research",
+                    Icon: Target,
+                    tint: "rgba(255,198,39,0.2)",
+                    color: colors.accentGold,
+                  },
+                  {
+                    to: "/games",
+                    cta: "Play the games",
+                    title: "Interactive Learning",
+                    text: "Engage with content through games, quizzes, and hands-on activities",
+                    Icon: Lightbulb,
+                    tint: "rgba(232,84,122,0.2)",
+                    color: colors.accentPink,
+                  },
+                  {
+                    to: "/map",
+                    cta: "See your path",
+                    title: "Built for ASU",
+                    text: "Designed specifically for ASU students, faculty, and staff",
+                    Icon: Users,
+                    tint: "rgba(75,183,196,0.2)",
+                    color: colors.accentTeal,
+                  },
+                  {
+                    to: "/profile",
+                    cta: "View your progress",
+                    title: "Track Progress",
+                    text: "Monitor your growth with XP, levels, and achievement badges",
+                    Icon: Award,
+                    tint: "rgba(255,138,80,0.2)",
+                    color: colors.accentOrange,
+                  },
+                ].map(({ to, cta, title, text, Icon, tint, color }) => (
+                  <Link key={to} to={to} className="group block rounded-xl" style={{ textDecoration: "none" }}>
+                    <motion.div
+                      whileHover={{ y: -4, scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-colors h-full"
+                      style={{ borderColor: colors.cardBorder }}
+                    >
+                      <div
+                        className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: tint }}
+                      >
+                        <Icon size={24} style={{ color }} />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold mb-1" style={{ color: colors.textPrimary }}>
+                          {title}
+                        </h3>
+                        <p className="text-sm mb-2" style={{ color: colors.textSecondary }}>
+                          {text}
+                        </p>
+                        <span
+                          className="inline-flex items-center gap-1 text-sm font-bold transition-all group-hover:gap-2"
+                          style={{ color }}
+                        >
+                          {cta}
+                          <ArrowRight size={16} />
+                        </span>
+                      </div>
+                    </motion.div>
+                  </Link>
+                ))}
               </div>
             </div>
           </div>

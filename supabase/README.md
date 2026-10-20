@@ -35,9 +35,9 @@ already call these exact tables and columns.
 
 ## Ask Wave chatbot (separate, optional)
 
-`api/chat.ts` calls the Anthropic API and needs an `ANTHROPIC_API_KEY`. It's a
+`api/chat.ts` calls the CreateAI API and needs a `CREATEAI_API_KEY`. It's a
 Vercel serverless function, so it won't run under plain `npm run dev` — it
 only works when deployed to Vercel (or run via the Vercel CLI's `vercel dev`).
-Set `ANTHROPIC_API_KEY` in the Vercel project's environment variables
+Set `CREATEAI_API_KEY` in the Vercel project's environment variables
 (Production + Preview + Development) when you're ready to use it; it's
 unrelated to the Supabase setup above.

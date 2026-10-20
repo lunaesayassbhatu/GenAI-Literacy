@@ -36,7 +36,7 @@ export const module4Steps: Step[] = [
           mood: "default"
         },
         {
-          text: "In a group project, Aisha's teammate said 'I'll leave the AI stuff to Dev — I'm not a tech person.' Aisha realised she'd said the same thing. But Dev knowing how to code has nothing to do with using AI critically.",
+          text: "In a group project, Aisha's teammate said 'I'll leave the AI stuff to the CS majors — I'm not a tech person.' Aisha realised she'd said the same thing. But knowing how to code has nothing to do with using AI critically.",
           mood: "thinking"
         },
         {

@@ -8,6 +8,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const body = req.body as { messages?: unknown };
-  const result = await runChat(body?.messages, process.env.ANTHROPIC_API_KEY);
+  const result = await runChat(body?.messages, process.env.CREATEAI_API_KEY);
   res.status(result.status).json(result.body);
 }

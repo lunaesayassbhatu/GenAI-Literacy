@@ -46,7 +46,7 @@ export const module2Steps: Step[] = [
           link: "https://www.ibm.com/think/topics/ai-hallucinations"
         },
         {
-          text: "John was working on an academic paper and needed a reference for a specific phenomenon. He asked his GenAI tool for references about that phenomenon and received three references, which he cited in the paper. Easy, right? Not quite. After he submitted his paper to a journal, it got rejected — it contained non-existent references, flagged as undisclosed use of GenAI. Even though the references seemed credible, they didn't actually exist. 😬",
+          text: "Aisha was working on an academic paper and needed a reference for a specific phenomenon. She asked her GenAI tool for references about that phenomenon and received three references, which she cited in the paper. Easy, right? Not quite. After she submitted her paper to a journal, it got rejected — it contained non-existent references, flagged as undisclosed use of GenAI. Even though the references seemed credible, they didn't actually exist. 😬",
           mood: "hint"
         }
       ]
@@ -189,7 +189,7 @@ export const module2Steps: Step[] = [
           mood: "celebrate"
         },
         {
-          text: "John needed help understanding a complex concept in one of his upper-level courses. He asked GenAI to create a 'dumbed down' study guide. As he went through it, he noticed some inconsistencies with his course material, so he kept using the guide as a structured study plan but focused on his instructor's materials instead. His classmate Janet took it further — she uploaded her own course materials and had GenAI explain concepts based only on those, getting much more relevant answers. 📚",
+          text: "Dev needed help understanding a complex concept in one of his upper-level courses. He asked GenAI to create a 'dumbed down' study guide. As he went through it, he noticed some inconsistencies with his course material, so he kept using the guide as a structured study plan but focused on his instructor's materials instead. His classmate Janet took it further — she uploaded her own course materials and had GenAI explain concepts based only on those, getting much more relevant answers. 📚",
           mood: "celebrate"
         },
         {

@@ -7,7 +7,9 @@ export interface ChatMessage {
 
 const MAX_HISTORY = 10;
 const MAX_MESSAGE_LENGTH = 2000;
-const MODEL = "claude-haiku-4-5-20251001";
+// CreateAI (ASU) OpenAI-compatible gateway. Model format is provider/model_name.
+const CREATEAI_URL = "https://api-main.aiml.asu.edu/v1/chat/completions";
+const MODEL = "aws/claude4_5_haiku";
 
 function buildSystemPrompt(): string {
   const topics = MODULES.map((m) => `- ${m.name}: ${m.description}`).join("\n");
@@ -16,7 +18,17 @@ function buildSystemPrompt(): string {
 Your job is to answer questions about generative AI: how it works, its limitations (like hallucinations), prompt engineering, AI ethics, academic integrity, and responsible use. The app's own learning modules cover these topics:
 ${topics}
 
-Stay warm, concise, and encouraging, matching a friendly campus-guide tone. Prefer short answers (a few sentences or a short list) over long essays. If a question is unrelated to GenAI literacy or AI tools, gently redirect the student back to that scope rather than answering it.`;
+Personality: you are bubbly, upbeat, and genuinely excited to help — like the friendliest peer mentor on campus. Greet warmly, cheer on curiosity ("Great question!"), normalize not knowing things, and celebrate small wins. Use plain, everyday language and a relatable analogy or quick real-life example when it helps. Sprinkle in a few fun emojis (🌊 🐬 ✨ 💡 🎉), but never more than one or two per paragraph.
+
+Formatting (the chat renders this lightly, so use ONLY these):
+- Start with a one-line friendly hook or direct answer.
+- Put key terms in **bold**.
+- Use short "- " bullet lists (3-4 bullets max) for steps, tips, or comparisons.
+- Keep paragraphs to 1-2 sentences, and keep the whole reply under about 120 words.
+- End with a short, fun follow-up question or a nudge toward a related module or game in the app.
+- Do not use headings, tables, code fences, or numbered lists.
+
+If a question is unrelated to GenAI literacy or AI tools, kindly and playfully redirect the student back to that scope rather than answering it.`;
 }
 
 export function isValidMessage(m: unknown): m is ChatMessage {
@@ -52,29 +64,30 @@ export async function runChat(rawMessages: unknown, apiKey: string | undefined):
   }
 
   try {
-    const upstream = await fetch("https://api.anthropic.com/v1/messages", {
+    const upstream = await fetch(CREATEAI_URL, {
       method: "POST",
       headers: {
         "content-type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
+        authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 512,
-        system: buildSystemPrompt(),
-        messages: messages.map((m) => ({ role: m.role, content: m.content })),
+        max_tokens: 600,
+        messages: [
+          { role: "system", content: buildSystemPrompt() },
+          ...messages.map((m) => ({ role: m.role, content: m.content })),
+        ],
       }),
     });
 
     if (!upstream.ok) {
       const errText = await upstream.text();
-      console.error("Anthropic API error:", upstream.status, errText);
+      console.error("CreateAI API error:", upstream.status, errText);
       return { status: 502, body: { error: "The AI service is unavailable right now. Please try again." } };
     }
 
     const data = await upstream.json();
-    const reply = data?.content?.[0]?.text;
+    const reply = data?.choices?.[0]?.message?.content;
     if (typeof reply !== "string") {
       return { status: 502, body: { error: "Received an unexpected response from the AI service." } };
     }

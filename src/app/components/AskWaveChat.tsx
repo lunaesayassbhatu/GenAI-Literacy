@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, type ReactNode } from "react";
 import { motion } from "motion/react";
 import { MessageCircle, Send } from "lucide-react";
 import { DolphinMascot } from "./DolphinMascot";
@@ -18,8 +18,54 @@ interface ChatMessage {
 
 const WELCOME_MESSAGE: ChatMessage = {
   role: "assistant",
-  content: "Hi, I'm Wave! Ask me anything about generative AI — how it works, prompt engineering, AI ethics, or academic integrity.",
+  content: "Hey there, I'm **Wave**! 🌊🐬 So happy you stopped by!\n\nAsk me anything about generative AI:\n- ✨ how it works\n- 📝 writing great prompts\n- ⚖️ AI ethics & academic integrity\n\nWhat are you curious about?",
 };
+
+// Tiny, safe markdown renderer (**bold**, *italic*, "- " bullets). It builds React
+// elements instead of injecting HTML, so model output can never inject markup.
+function renderInline(text: string, key: string): ReactNode[] {
+  return text.split(/(\*\*[^*]+\*\*|\*[^*\s][^*]*\*)/g).map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**") && part.length > 4) {
+      return <strong key={`${key}-${i}`} style={{ fontWeight: 700 }}>{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith("*") && part.endsWith("*") && part.length > 2) {
+      return <em key={`${key}-${i}`}>{part.slice(1, -1)}</em>;
+    }
+    return part;
+  });
+}
+
+function RichText({ text }: { text: string }) {
+  const lines = text.split("\n");
+  const blocks: ReactNode[] = [];
+  let bullets: string[] = [];
+  const flush = (k: number) => {
+    if (bullets.length === 0) return;
+    blocks.push(
+      <ul key={`ul-${k}`} className="space-y-1 my-1.5 pl-1">
+        {bullets.map((b, i) => (
+          <li key={i} className="flex gap-2">
+            <span aria-hidden>•</span>
+            <span>{renderInline(b, `li-${k}-${i}`)}</span>
+          </li>
+        ))}
+      </ul>
+    );
+    bullets = [];
+  };
+  lines.forEach((line, i) => {
+    const m = line.match(/^\s*[-*•]\s+(.*)$/);
+    if (m) {
+      bullets.push(m[1]);
+      return;
+    }
+    flush(i);
+    if (line.trim() === "") return;
+    blocks.push(<p key={`p-${i}`} className="my-1.5">{renderInline(line, `p-${i}`)}</p>);
+  });
+  flush(lines.length);
+  return <>{blocks}</>;
+}
 
 const POSITION_KEY = "asu_genai_ask_wave_pos";
 const DRAG_THRESHOLD = 5; // px of movement before a press counts as a drag, not a click
@@ -182,7 +228,7 @@ export function AskWaveChat() {
             {messages.map((m, i) => (
               <div
                 key={i}
-                className="max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed whitespace-pre-line"
+                className="max-w-[88%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed"
                 style={
                   m.role === "user"
                     ? {
@@ -197,7 +243,7 @@ export function AskWaveChat() {
                       }
                 }
               >
-                {m.content}
+                {m.role === "assistant" ? <RichText text={m.content} /> : m.content}
               </div>
             ))}
             {loading && (
@@ -209,7 +255,7 @@ export function AskWaveChat() {
                   color: colors.textSecondary,
                 }}
               >
-                Wave is thinking...
+                Wave is splashing up an answer... 🌊
               </div>
             )}
             {error && (

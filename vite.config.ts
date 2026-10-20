@@ -58,7 +58,7 @@ export default defineConfig(({ mode }) => {
       // Tailwind is not being actively used – do not remove them
       react(),
       tailwindcss(),
-      devChatApiPlugin(env.ANTHROPIC_API_KEY),
+      devChatApiPlugin(env.CREATEAI_API_KEY),
     ],
     resolve: {
       alias: {

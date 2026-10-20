@@ -240,7 +240,7 @@ export const module1Steps: Step[] = [
           mood: "celebrate"
         },
         {
-          text: "John needed to code a basic website from scratch. He asked GenAI to create all of the code, but it didn't run quite right. On his next try, he attempted the code himself and asked GenAI questions as he progressed — this time, it ran how he wanted. He used GenAI to help when he got stuck, not to do all the work for him. 💻",
+          text: "Dev needed to code a basic website from scratch. He asked GenAI to create all of the code, but it didn't run quite right. On his next try, he attempted the code himself and asked GenAI questions as he progressed — this time, it ran how he wanted. He used GenAI to help when he got stuck, not to do all the work for him. 💻",
           mood: "celebrate"
         },
         {

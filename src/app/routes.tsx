@@ -23,14 +23,18 @@ import { BankPortalGame } from "./components/games/BankPortalGame";
 import { KingsNotebookGame } from "./components/games/KingsNotebookGame";
 import { DungeonCrawlGame } from "./components/games/DungeonCrawlGame";
 import { ScrollToTop } from "./components/ScrollToTop";
+import { ProgressStrip } from "./components/ProgressStrip";
+import { WaveIntro } from "./components/WaveIntro";
 
 function RootLayout() {
   const hasUser = Boolean(getUserData());
   return (
     <>
       <ScrollToTop />
+      {hasUser && <ProgressStrip />}
       <Outlet />
       {hasUser && <AskWaveChat />}
+      {hasUser && <WaveIntro />}
     </>
   );
 }

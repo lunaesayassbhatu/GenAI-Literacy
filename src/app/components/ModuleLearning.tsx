@@ -22,6 +22,7 @@ import {
 import { DolphinMascot } from "./DolphinMascot";
 import type { CharacterId } from "../utils/userData";
 import { getCharacterInfo } from "../data/charactersData";
+import { personalizeSteps } from "../utils/personalizeStory";
 
 type WaveMood = "default" | "thinking" | "celebrate" | "hint" | "spin";
 
@@ -36,6 +37,52 @@ function detectStoryCharacter(text: string): CharacterId | null {
   if (/\bDev\b/.test(text)) return "dev";
   if (/\bJordan\b/.test(text)) return "jordan";
   return null;
+}
+
+/** Bolds and colors the character's name wherever it appears in a story. */
+function highlightCharacterName(html: string, character: CharacterId | null): string {
+  if (!character) return html;
+  const info = getCharacterInfo(character);
+  return html.replace(
+    new RegExp(`\b${info.name}\b`, "g"),
+    `<strong style="color:${info.color}">${info.name}</strong>`
+  );
+}
+
+/** Labelled card introducing the character behind a scenario / real-world example. */
+function StoryHeader({ character, label, size = 34 }: { character: CharacterId; label: string; size?: number }) {
+  const info = getCharacterInfo(character);
+  return (
+    <div className="flex items-center gap-3 mb-3">
+      <CharacterMascot character={character} variant="portrait" size={size} animate={false} />
+      <div className="min-w-0">
+        <span
+          className="inline-block px-2 py-0.5 rounded-full text-[10px] font-extrabold tracking-widest"
+          style={{ backgroundColor: info.color, color: "#0D0508" }}
+        >
+          {label}
+        </span>
+        <div className="text-sm font-bold leading-tight mt-1" style={{ color: info.color }}>
+          {info.name} <span className="font-normal opacity-90">· {info.tagline}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Question heading; when it's about a recurring character it becomes a highlighted scenario card. */
+function QuestionHeading({ question, colors }: { question: string; colors: any }) {
+  const character = detectStoryCharacter(question);
+  if (!character) {
+    return <h3 className="text-xl font-bold" style={{ color: colors.textPrimary }}>{question}</h3>;
+  }
+  const info = getCharacterInfo(character);
+  return (
+    <div className="rounded-2xl p-4 border-2" style={{ borderColor: info.color, backgroundColor: `${info.color}1A` }}>
+      <StoryHeader character={character} label="🎭 SCENARIO" size={40} />
+      <h3 className="text-xl font-bold" style={{ color: colors.textPrimary }}>{question}</h3>
+    </div>
+  );
 }
 
 function buildKnowledgeCheckHints(data: any): string[] {
@@ -175,7 +222,12 @@ function ModuleLearningInner() {
     return advanceVariantCounter(moduleId ?? "", MODULE1_SECTION1_VARIANT_COUNT);
   });
 
-  const steps: Step[] = getStepsForModule(moduleId ?? "", variantIndex);
+  // Stories and scenarios star the learner's chosen character (until they pick another on purpose).
+  const chosenCharacter: CharacterId = userData?.selectedCharacter ?? "aisha";
+  const steps: Step[] = useMemo(
+    () => personalizeSteps(getStepsForModule(moduleId ?? "", variantIndex), chosenCharacter),
+    [moduleId, variantIndex, chosenCharacter]
+  );
 
   // Resume from the last saved position, or start at 0
   const [currentStepIndex, setCurrentStepIndex] = useState(() => {
@@ -384,8 +436,14 @@ function ModuleLearningInner() {
         )
     : [];
 
+  // Wave-talk steps fill exactly one screen so the page never scrolls.
+  const fitToScreen = !isReviewMode && currentStep.type === "wave-talk";
+
   return (
-    <div className="min-h-screen" style={{ backgroundColor: colors.background }}>
+    <div
+      className={fitToScreen ? "h-[calc(100vh-2.5rem)] overflow-hidden flex flex-col" : "min-h-screen"}
+      style={{ backgroundColor: colors.background }}
+    >
       {/* Module Nav Bar */}
       <nav
         className="sticky top-0 z-40 px-6 py-4 border-b"
@@ -465,7 +523,7 @@ function ModuleLearningInner() {
 
       {/* Main Content */}
       <main
-        className="max-w-4xl mx-auto px-6 py-12"
+        className={`max-w-4xl w-full mx-auto px-6 ${fitToScreen ? "flex-1 min-h-0 py-4" : "py-12"}`}
         style={{
           paddingBottom:
             !isReviewMode &&
@@ -1184,9 +1242,7 @@ function KnowledgeCheckStep({ data, colors, onProceed, onAwardXP, onWaveReaction
         ☑️ Knowledge Check {data.number}
       </div>
 
-      <h3 className="text-xl font-bold" style={{ color: colors.textPrimary }}>
-        {data.question}
-      </h3>
+      <QuestionHeading question={data.question} colors={colors} />
 
       <div className="space-y-3">
         {data.options.map((option: any, index: number) => {
@@ -1386,7 +1442,7 @@ function MultiSelectKnowledgeCheck({ data, colors, onProceed, onAwardXP, onWaveR
         ☑️ Knowledge Check {data.number}
       </div>
 
-      <h3 className="text-xl font-bold" style={{ color: colors.textPrimary }}>{data.question}</h3>
+      <QuestionHeading question={data.question} colors={colors} />
 
       <div className="space-y-3">
         {data.options.map((option: any, index: number) => {
@@ -2123,6 +2179,7 @@ function CompletionStep({ data, colors, totalXP, onComplete, nextModule, onNextM
 // and faces right toward the speech bubble. Previous bubbles stack above faded.
 function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext: () => void }) {
   const [msgIndex, setMsgIndex] = useState(0);
+  const [maxReached, setMaxReached] = useState(0);
   const messages: { text: string; mood: string; link?: string }[] = data.messages;
   const isLast = msgIndex === messages.length - 1;
   const current = messages[msgIndex];
@@ -2133,57 +2190,79 @@ function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext
   const DOLPHIN_COL = "w-28"; // ~112 px
 
   const advance = () => {
-    if (!isLast) setMsgIndex(i => i + 1);
-    else onNext();
+    if (!isLast) {
+      const next = msgIndex + 1;
+      setMsgIndex(next);
+      setMaxReached(m => Math.max(m, next));
+    } else onNext();
   };
+  const goBack = () => setMsgIndex(i => Math.max(0, i - 1));
+
+  // Earlier messages fade into a small blurred stack behind the active one.
+  const STACK_DEPTH = 3;
+  const stackStart = Math.max(0, msgIndex - STACK_DEPTH);
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col gap-3">
       {/* Section header */}
-      <div>
+      <div className="flex-shrink-0">
         <span
-          className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-3"
+          className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-2"
           style={{ backgroundColor: 'rgba(232,84,122,0.2)', color: colors.accentPink }}
         >
           Section {data.section}
         </span>
-        <h2 className="text-3xl font-bold mb-1" style={{ color: colors.textPrimary }}>
+        <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>
           {data.title}
         </h2>
-        <p style={{ color: colors.textSecondary }}>{data.subtitle}</p>
+        <p className="text-sm" style={{ color: colors.textSecondary }}>{data.subtitle}</p>
       </div>
 
-      {/* Chat thread */}
-      <div className="space-y-3">
+      {/* Chat thread — fills the remaining height; the active message sits at the bottom */}
+      <div className="flex-1 min-h-0 flex flex-col justify-end gap-3">
 
-        {/* Previous messages — full brightness so users can read what came before */}
-        {messages.slice(0, msgIndex).map((msg, idx) => {
-          const storyCharacter = detectStoryCharacter(msg.text);
-          const characterInfo = storyCharacter ? getCharacterInfo(storyCharacter) : null;
-          return (
-            <div key={idx} className="flex gap-4">
-              <div className={`${DOLPHIN_COL} flex-shrink-0`} /> {/* spacer */}
-              <div
-                className="flex-1 rounded-2xl px-5 py-3"
-                style={{ border: `1px solid ${characterInfo ? `${characterInfo.color}55` : 'rgba(255,198,39,0.25)'}` }}
-              >
-                {characterInfo && (
-                  <div className="flex items-center gap-2 mb-2">
-                    <CharacterMascot character={storyCharacter!} variant="portrait" size={22} animate={false} />
-                    <span className="text-xs font-bold tracking-wide" style={{ color: characterInfo.color }}>
-                      🌍 {characterInfo.name}'s Real-World Example
-                    </span>
+        {/* Previous messages — shrunk and blurred behind the active one; click to go back */}
+        <div className="space-y-2 flex-shrink min-h-0 overflow-hidden">
+          <AnimatePresence initial={false}>
+            {messages.slice(stackStart, msgIndex).map((msg, i) => {
+              const idx = stackStart + i;
+              const depth = msgIndex - idx; // 1 = most recent
+              const storyCharacter = detectStoryCharacter(msg.text);
+              const characterInfo = storyCharacter ? getCharacterInfo(storyCharacter) : null;
+              return (
+                <motion.button
+                  key={idx}
+                  type="button"
+                  layout
+                  onClick={() => setMsgIndex(idx)}
+                  aria-label={`Go back to message ${idx + 1}`}
+                  initial={{ opacity: 0, scale: 1.1 }}
+                  animate={{
+                    opacity: Math.max(0.15, 0.75 - depth * 0.2),
+                    scale: Math.max(0.7, 1 - depth * 0.06),
+                    filter: `blur(${depth * 1.5}px)`
+                  }}
+                  whileHover={{ opacity: 0.95, scale: Math.max(0.7, 1 - depth * 0.06) + 0.02, filter: 'blur(0px)' }}
+                  exit={{ opacity: 0, scale: 0.7 }}
+                  transition={{ type: "spring", stiffness: 260, damping: 28 }}
+                  className="flex gap-4 w-full text-left cursor-pointer"
+                >
+                  <div className={`${DOLPHIN_COL} flex-shrink-0`} /> {/* spacer */}
+                  <div
+                    className="flex-1 rounded-2xl px-5 py-2"
+                    style={{ border: `1px solid ${characterInfo ? `${characterInfo.color}55` : 'rgba(255,198,39,0.25)'}` }}
+                  >
+                    <p
+                      className="text-sm leading-relaxed line-clamp-2"
+                      style={{ color: colors.textPrimary }}
+                      dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*(.*?)\*/g, '<em>$1</em>') }}
+                    />
                   </div>
-                )}
-                <p
-                  className="text-sm leading-relaxed"
-                  style={{ color: colors.textPrimary }}
-                  dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*(.*?)\*/g, '<em>$1</em>') }}
-                />
-              </div>
-            </div>
-          );
-        })}
+                </motion.button>
+              );
+            })}
+          </AnimatePresence>
+        </div>
 
         {/* Active row — dolphin bounces in, bubble fades up smoothly */}
         <AnimatePresence mode="wait">
@@ -2216,14 +2295,17 @@ function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext
             {/* Speech bubble */}
             <motion.div
               className="flex-1 relative rounded-2xl px-5 py-4"
-              initial={{ y: 14, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
+              initial={{ scale: 0.82, opacity: 0, filter: 'blur(8px)' }}
+              animate={{ scale: 1, opacity: 1, filter: 'blur(0px)' }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               style={{
                 backgroundColor: colors.cardBackground,
+                backgroundImage: currentCharacterInfo
+                  ? `linear-gradient(${currentCharacterInfo.color}26, ${currentCharacterInfo.color}0D)`
+                  : undefined,
                 border: `2px solid ${currentCharacterInfo ? currentCharacterInfo.color : colors.accentGold}`,
                 boxShadow: currentCharacterInfo
-                  ? `0 0 24px ${currentCharacterInfo.color}22`
+                  ? `0 0 32px ${currentCharacterInfo.color}55`
                   : `0 0 24px rgba(255,198,39,0.08)`
               }}
             >
@@ -2232,28 +2314,31 @@ function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext
                 className="absolute -left-[9px] top-6 w-4 h-4 rotate-45"
                 style={{
                   backgroundColor: colors.cardBackground,
+                  backgroundImage: currentCharacterInfo
+                    ? `linear-gradient(${currentCharacterInfo.color}26, ${currentCharacterInfo.color}26)`
+                    : undefined,
                   borderLeft: `2px solid ${currentCharacterInfo ? currentCharacterInfo.color : colors.accentGold}`,
                   borderBottom: `2px solid ${currentCharacterInfo ? currentCharacterInfo.color : colors.accentGold}`
                 }}
               />
-              {currentCharacterInfo && (
-                <div className="flex items-center gap-2 mb-2">
-                  <CharacterMascot character={currentStoryCharacter!} variant="portrait" size={26} animate={false} />
-                  <span className="text-xs font-bold tracking-wide" style={{ color: currentCharacterInfo.color }}>
-                    🌍 {currentCharacterInfo.name}'s Real-World Example
-                  </span>
-                </div>
+              {currentStoryCharacter && (
+                <StoryHeader character={currentStoryCharacter} label="🌍 REAL-WORLD EXAMPLE" />
               )}
               <p
-                className="leading-relaxed"
+                className="leading-relaxed text-lg max-h-[40vh] overflow-y-auto"
                 style={{ color: colors.textPrimary }}
-                dangerouslySetInnerHTML={{ __html: current.text.replace(/\*(.*?)\*/g, '<em>$1</em>') }}
+                dangerouslySetInnerHTML={{
+                  __html: highlightCharacterName(
+                    current.text.replace(/\*(.*?)\*/g, '<em>$1</em>'),
+                    currentStoryCharacter
+                  )
+                }}
               />
 
               {/* Link-available star — hover reveals a message with a link to the
                   related learning module, opening in a new tab. */}
               {current.link && (
-                <div className="group absolute -right-3 top-1/2 -translate-y-1/2 z-20">
+                <div className="group absolute -right-6 top-1/2 -translate-y-1/2 z-20">
                   <a
                     href={current.link}
                     target="_blank"
@@ -2261,12 +2346,20 @@ function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext
                     className="relative block"
                     aria-label="Related learning link available"
                   >
-                    <Star
-                      size={22}
-                      fill={colors.accentPink}
-                      color={colors.accentPink}
-                      className="drop-shadow transition-transform group-hover:scale-125"
-                    />
+                    {/* Pulsing, glowing star so the learn-more link is hard to miss */}
+                    <motion.div
+                      animate={{ scale: [1, 1.18, 1] }}
+                      transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      <Star
+                        size={46}
+                        fill={colors.accentPink}
+                        color="#FFFFFF"
+                        strokeWidth={1.5}
+                        className="transition-transform group-hover:scale-125"
+                        style={{ filter: `drop-shadow(0 0 8px ${colors.accentPink}) drop-shadow(0 0 16px ${colors.accentPink}88)` }}
+                      />
+                    </motion.div>
                     <div
                       className="pointer-events-none absolute right-0 top-full mt-2 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg px-3 py-2 text-xs font-semibold shadow-lg"
                       style={{ backgroundColor: colors.cardBackground, border: `1px solid ${colors.accentPink}`, color: colors.textPrimary, width: 200 }}
@@ -2280,29 +2373,45 @@ function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext
           </div>
         </AnimatePresence>
 
-        {/* Progress dots + advance button — aligned with bubble column */}
-        <div className="flex items-center justify-between pt-2">
+        {/* Progress dots + back/advance buttons — aligned with bubble column */}
+        <div className="flex-shrink-0 flex items-center justify-between pt-1">
           <div className="flex gap-2 items-center" style={{ marginLeft: 'calc(7rem + 1rem)' }}>
             {messages.map((_, idx) => (
-              <motion.div
+              <motion.button
                 key={idx}
+                type="button"
+                onClick={() => idx <= maxReached && setMsgIndex(idx)}
+                aria-label={`Go to message ${idx + 1}`}
                 animate={{ width: idx === msgIndex ? 20 : 8 }}
                 transition={{ duration: 0.3 }}
                 className="h-2 rounded-full"
                 style={{
-                  backgroundColor: idx <= msgIndex ? colors.accentGold : 'rgba(255,198,39,0.2)'
+                  backgroundColor: idx <= msgIndex ? colors.accentGold : 'rgba(255,198,39,0.2)',
+                  cursor: idx <= maxReached ? 'pointer' : 'default'
                 }}
               />
             ))}
           </div>
-          <button
-            onClick={advance}
-            className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all hover:scale-105"
-            style={{ backgroundColor: colors.accentGold, color: '#0D0508' }}
-          >
-            <span>{isLast ? "Got it!" : "Continue"}</span>
-            <ArrowRight size={18} />
-          </button>
+          <div className="flex items-center gap-3">
+            {msgIndex > 0 && (
+              <button
+                onClick={goBack}
+                className="flex items-center gap-2 px-4 py-3 rounded-xl font-bold transition-all hover:scale-105 border"
+                style={{ color: colors.accentGold, borderColor: 'rgba(255,198,39,0.4)' }}
+              >
+                <ArrowLeft size={18} />
+                <span>Back</span>
+              </button>
+            )}
+            <button
+              onClick={advance}
+              className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all hover:scale-105"
+              style={{ backgroundColor: colors.accentGold, color: '#0D0508' }}
+            >
+              <span>{isLast ? "Got it!" : "Continue"}</span>
+              <ArrowRight size={18} />
+            </button>
+          </div>
         </div>
       </div>
     </div>
