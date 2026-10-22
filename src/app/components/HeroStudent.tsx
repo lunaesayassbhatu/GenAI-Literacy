@@ -165,8 +165,8 @@ export function HeroStudent({ subtitle, character }: { subtitle: string; charact
         {/* text */}
         <div className="flex-1 text-center md:text-left z-10">
           {/* ASU sits centred over the title; the extra left padding offsets the trailing letter-spacing */}
-          <div className="inline-block text-center">
-          <p className="text-sm md:text-base font-bold tracking-[0.5em] uppercase mb-1 pl-[0.5em]" style={{ color: "#F0E0E4" }}>
+          <div style={{ display: "grid", width: "fit-content", justifyItems: "center", textAlign: "center" }}>
+          <p className="text-sm md:text-base font-bold tracking-[0.5em] uppercase mb-1" style={{ color: "#F0E0E4", textAlign: "center", paddingLeft: "0.5em", width: "100%" }}>
             ASU
           </p>
           <h1

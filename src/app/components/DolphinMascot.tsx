@@ -16,14 +16,13 @@ export function DolphinMascot({ size = 80, animate = true }: DolphinMascotProps)
       alt="Wave the dolphin mascot"
       width={size}
       style={{ height: "auto", display: "block" }}
+      // one gentle hello, then Wave holds still
       animate={animate ? {
-        y: -8,
-        rotate: 3
+        y: [0, -8, 0],
+        rotate: [0, 3, 0]
       } : undefined}
       transition={{
         duration: 2,
-        repeat: Infinity,
-        repeatType: "mirror",
         ease: "easeInOut"
       }}
     />

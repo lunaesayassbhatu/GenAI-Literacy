@@ -27,10 +27,11 @@ function AIFrame({ subtitle, background, art }: { subtitle: string; background: 
       `}</style>
       <div className="relative flex flex-col md:flex-row items-center gap-6 md:gap-4">
         <div className="flex-1 text-center md:text-left z-10">
-          <div className="inline-block text-center">
+          {/* inline styles on purpose: ASU must stay centred over the title in every layout */}
+          <div style={{ display: "grid", width: "fit-content", justifyItems: "center", textAlign: "center" }}>
             <p
-              className="text-sm md:text-base font-bold tracking-[0.5em] uppercase mb-1 pl-[0.5em]"
-              style={{ color: "#F0E0E4" }}
+              className="text-sm md:text-base font-bold tracking-[0.5em] uppercase mb-1"
+              style={{ color: "#F0E0E4", textAlign: "center", paddingLeft: "0.5em", width: "100%" }}
             >
               ASU
             </p>
