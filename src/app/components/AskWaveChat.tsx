@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, type ReactNode } from "react";
+import { onOpenAskWave, useAskWaveHostPresent } from "./askWaveBridge";
 import { motion } from "motion/react";
 import { MessageCircle, Send } from "lucide-react";
 import { DolphinMascot } from "./DolphinMascot";
@@ -74,6 +75,10 @@ const DRAG_THRESHOLD = 5; // px of movement before a press counts as a drag, not
 export function AskWaveChat() {
   const { colors } = useTheme();
   const [open, setOpen] = useState(false);
+  const hostPresent = useAskWaveHostPresent();
+
+  // The module mascot (or anything else) can open the chat through this event.
+  useEffect(() => onOpenAskWave(() => setOpen(true)), []);
   const [messages, setMessages] = useState<ChatMessage[]>([WELCOME_MESSAGE]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -179,6 +184,7 @@ export function AskWaveChat() {
 
   return (
     <>
+      {!hostPresent && (
       <motion.button
         ref={buttonRef}
         type="button"
@@ -206,6 +212,7 @@ export function AskWaveChat() {
           Ask Wave
         </span>
       </motion.button>
+      )}
 
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent

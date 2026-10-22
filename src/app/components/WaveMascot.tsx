@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useState } from "react";
-import { X } from "lucide-react";
+import { X, MessageCircle } from "lucide-react";
+import { openAskWave, registerAskWaveHost } from "./askWaveBridge";
 import { DolphinMascot } from "./DolphinMascot";
 import { useTheme } from "../utils/themeContext";
 
@@ -108,8 +109,11 @@ export function WaveMascot({
     }
   };
 
+  // While this mascot is on screen it is the Ask Wave entry, so the separate floating pill hides.
+  useEffect(() => registerAskWaveHost(), []);
+
   return (
-    <div className="fixed bottom-28 right-6 z-50 flex flex-col items-end gap-3">
+    <div className="fixed bottom-14 right-6 z-50 flex flex-col items-end gap-3">
       {/* Speech Bubble */}
       <AnimatePresence mode="wait">
         {isBubbleOpen ? (
@@ -179,6 +183,18 @@ export function WaveMascot({
                 {actionLabel}
               </button>
             )}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                openAskWave();
+              }}
+              className="mt-3 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-105"
+              style={{ color: colors.accentGoldText, border: `1px solid ${colors.accentGold}`, backgroundColor: "transparent" }}
+            >
+              <MessageCircle size={14} />
+              Ask Wave a question
+            </button>
             {compactHintMode && (
               <div className="mt-2 text-[11px] font-semibold" style={{ color: colors.accentGoldText }}>
                 Click to close
@@ -271,6 +287,17 @@ export function WaveMascot({
             }
           />
         </motion.div>
+        {/* Chat badge: opens Ask Wave straight from the mascot */}
+        <button
+          type="button"
+          aria-label="Ask Wave a question"
+          title="Ask Wave a question"
+          onClick={openAskWave}
+          className="absolute -top-1 -left-1 w-8 h-8 rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-110"
+          style={{ backgroundColor: colors.accentGold, color: "#3A0A1A", border: "2px solid #fff" }}
+        >
+          <MessageCircle size={16} />
+        </button>
       </div>
     </div>
   );
