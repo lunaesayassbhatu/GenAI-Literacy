@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { ArrowLeft, Zap, ArrowRight, CheckCircle2, Star, X as XIcon } from "lucide-react";
+import { ArrowLeft, Zap, ArrowRight, CheckCircle2, Search, X as XIcon } from "lucide-react";
 import { WaveMascot } from "./WaveMascot";
 import { CharacterMascot } from "./CharacterMascot";
 import { useTheme } from "../utils/themeContext";
@@ -23,6 +23,7 @@ import { DolphinMascot } from "./DolphinMascot";
 import type { CharacterId } from "../utils/userData";
 import { getCharacterInfo } from "../data/charactersData";
 import { personalizeSteps } from "../utils/personalizeStory";
+import { GuideWaveIntro, hasSeenGuideWaveIntro } from "./GuideWaveIntro";
 
 type WaveMood = "default" | "thinking" | "celebrate" | "hint" | "spin";
 
@@ -242,8 +243,10 @@ function ModuleLearningInner() {
   const xpEarnedRef = useRef(xpEarned);
   const [canProceed, setCanProceed] = useState(false);
   const [waveMood, setWaveMood] = useState<WaveMood>("default");
-  const [waveMessage, setWaveMessage] = useState("Let's start learning! I'm here to guide you.");
+  const [waveMessage, setWaveMessage] = useState("Questions about module content or quizzes? I'm your guy");
   const [hintClickCount, setHintClickCount] = useState(0);
+  // First module a learner ever opens: blur the rest of the screen so Guide Wave stands out.
+  const [showGuideIntro, setShowGuideIntro] = useState(() => !isReviewMode && !hasSeenGuideWaveIntro());
   const [showXpPopup, setShowXpPopup] = useState(false);
   const [xpPopupAmount, setXpPopupAmount] = useState(0);
   const [xpAwardTick, setXpAwardTick] = useState(0);
@@ -312,7 +315,7 @@ function ModuleLearningInner() {
       
       switch (step.type) {
         case "intro":
-          setWaveMessage("Ready to dive in? This module is full of important concepts!");
+          setWaveMessage("Questions about module content or quizzes? I'm your guy");
           break;
         case "reading":
           setWaveMessage("Take your time reading. Understanding this will help you use AI responsibly!");
@@ -530,7 +533,7 @@ function ModuleLearningInner() {
             currentStep.type !== "intro" &&
             currentStep.type !== "completion" &&
             currentStep.type !== "wave-talk"
-              ? "6rem"
+              ? "8.5rem"
               : undefined
         }}
       >
@@ -548,6 +551,8 @@ function ModuleLearningInner() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
+              // full-height wrapper so the Wave-talk frame can centre itself in the screen
+              className={fitToScreen ? "h-full" : undefined}
             >
               {currentStep.type === "intro" && (
                 <IntroStep
@@ -660,7 +665,7 @@ function ModuleLearningInner() {
         currentStep.type !== "completion" &&
         currentStep.type !== "wave-talk" && (
         <div
-          className="fixed bottom-0 left-0 right-0 z-30 border-t"
+          className="fixed bottom-10 left-0 right-0 z-30 border-t"
           style={{ backgroundColor: colors.background, borderColor: colors.cardBorder }}
         >
           <div className="max-w-4xl mx-auto px-6 py-4 flex justify-end">
@@ -679,6 +684,8 @@ function ModuleLearningInner() {
           </div>
         </div>
       )}
+
+      {!isReviewMode && showGuideIntro && <GuideWaveIntro onDismiss={() => setShowGuideIntro(false)} />}
 
       {/* Corner mascot — hidden in review mode and during wave-talk */}
       {!isReviewMode && currentStep.type !== "wave-talk" && (
@@ -714,7 +721,7 @@ function ModuleLearningInner() {
       {/* Player's chosen character — accompanies the learner through every step */}
       <Link
         to="/choose-character"
-        className="fixed top-36 right-6 z-40 block hover:opacity-80 transition-opacity"
+        className="fixed top-24 right-6 z-40 block hover:opacity-80 transition-opacity"
         title="Change your character"
       >
         <CharacterMascot character={userData?.selectedCharacter} size={64} equipped={getEquippedItemIds()} />
@@ -1689,7 +1696,7 @@ function ProsConsStep({ data, colors }: any) {
           <p className="text-sm font-bold text-center" style={{ color: "#10B981" }}>GenAI Strengths</p>
           {data.strengths.map((text: string, i: number) => (
             <div key={i} className="flex items-start gap-3">
-              <CheckCircle2 size={20} color="#10B981" className="flex-shrink-0 mt-0.5" />
+              <CheckCircle2 size={30} strokeWidth={2.5} color="#10B981" className="flex-shrink-0" />
               <p style={{ color: colors.textPrimary }}>{text}</p>
             </div>
           ))}
@@ -1698,7 +1705,7 @@ function ProsConsStep({ data, colors }: any) {
           <p className="text-sm font-bold text-center" style={{ color: colors.accentPink }}>GenAI Weaknesses</p>
           {data.weaknesses.map((text: string, i: number) => (
             <div key={i} className="flex items-start gap-3">
-              <XIcon size={20} color={colors.accentPink} className="flex-shrink-0 mt-0.5" />
+              <XIcon size={30} strokeWidth={3} color={colors.accentPink} className="flex-shrink-0" />
               <p style={{ color: colors.textPrimary }}>{text}</p>
             </div>
           ))}
@@ -2177,7 +2184,7 @@ function CompletionStep({ data, colors, totalXP, onComplete, nextModule, onNextM
 // ── WaveTalkStep ──────────────────────────────────────────────────────────────
 // Wave appears at the same level as the active bubble, slides in from the left,
 // and faces right toward the speech bubble. Previous bubbles stack above faded.
-function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext: () => void }) {
+export function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext: () => void }) {
   const [msgIndex, setMsgIndex] = useState(0);
   const [maxReached, setMaxReached] = useState(0);
   const messages: { text: string; mood: string; link?: string }[] = data.messages;
@@ -2185,6 +2192,11 @@ function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext
   const current = messages[msgIndex];
   const currentStoryCharacter = detectStoryCharacter(current.text);
   const currentCharacterInfo = currentStoryCharacter ? getCharacterInfo(currentStoryCharacter) : null;
+  // Messages that carry a "learn more" link are real-world examples of a concept; character
+  // stories are scenarios. Each gets its own highlight so learners can tell them apart.
+  const isRealWorldExample = !currentStoryCharacter && Boolean(current.link);
+  const EXAMPLE_COLOR = "#4BB7C4";
+  const bubbleColor = currentCharacterInfo ? currentCharacterInfo.color : isRealWorldExample ? EXAMPLE_COLOR : colors.accentGold;
 
   // Width of the dolphin column — used to indent previous messages so they align
   const DOLPHIN_COL = "w-28"; // ~112 px
@@ -2218,11 +2230,12 @@ function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext
         <p className="text-sm" style={{ color: colors.textSecondary }}>{data.subtitle}</p>
       </div>
 
-      {/* Chat thread — fills the remaining height; the active message sits at the bottom */}
-      <div className="flex-1 min-h-0 flex flex-col justify-end gap-3">
+      {/* Chat thread — the active message frame stays fixed in the vertical middle; earlier
+          messages collapse upward into a stack above it one at a time as the learner continues */}
+      <div className="flex-1 min-h-0 flex flex-col gap-3">
 
         {/* Previous messages — shrunk and blurred behind the active one; click to go back */}
-        <div className="space-y-2 flex-shrink min-h-0 overflow-hidden">
+        <div className="flex-1 min-h-0 flex flex-col justify-end space-y-1 overflow-hidden">
           <AnimatePresence initial={false}>
             {messages.slice(stackStart, msgIndex).map((msg, i) => {
               const idx = stackStart + i;
@@ -2238,22 +2251,22 @@ function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext
                   aria-label={`Go back to message ${idx + 1}`}
                   initial={{ opacity: 0, scale: 1.1 }}
                   animate={{
-                    opacity: Math.max(0.15, 0.75 - depth * 0.2),
-                    scale: Math.max(0.7, 1 - depth * 0.06),
-                    filter: `blur(${depth * 1.5}px)`
+                    opacity: Math.max(0.4, 0.85 - depth * 0.17),
+                    scale: Math.max(0.8, 1 - depth * 0.05),
+                    filter: `blur(${depth * 0.8}px)`
                   }}
-                  whileHover={{ opacity: 0.95, scale: Math.max(0.7, 1 - depth * 0.06) + 0.02, filter: 'blur(0px)' }}
+                  whileHover={{ opacity: 0.95, scale: Math.max(0.8, 1 - depth * 0.05) + 0.02, filter: 'blur(0px)' }}
                   exit={{ opacity: 0, scale: 0.7 }}
                   transition={{ type: "spring", stiffness: 260, damping: 28 }}
                   className="flex gap-4 w-full text-left cursor-pointer"
                 >
                   <div className={`${DOLPHIN_COL} flex-shrink-0`} /> {/* spacer */}
                   <div
-                    className="flex-1 rounded-2xl px-5 py-2"
+                    className="flex-1 rounded-2xl px-5 py-1.5"
                     style={{ border: `1px solid ${characterInfo ? `${characterInfo.color}55` : 'rgba(255,198,39,0.25)'}` }}
                   >
                     <p
-                      className="text-sm leading-relaxed line-clamp-2"
+                      className="text-sm leading-snug line-clamp-1"
                       style={{ color: colors.textPrimary }}
                       dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*(.*?)\*/g, '<em>$1</em>') }}
                     />
@@ -2266,7 +2279,7 @@ function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext
 
         {/* Active row — dolphin bounces in, bubble fades up smoothly */}
         <AnimatePresence mode="wait">
-          <div key={msgIndex} className="flex items-center gap-4">
+          <div key={msgIndex} className="flex items-center gap-4 h-[230px] flex-shrink-0">
 
             {/* Dolphin — flipped so it faces right toward the bubble */}
             <motion.div
@@ -2294,18 +2307,18 @@ function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext
 
             {/* Speech bubble */}
             <motion.div
-              className="flex-1 relative rounded-2xl px-5 py-4"
+              className="flex-1 relative rounded-2xl px-5 py-4 flex flex-col justify-center max-h-full"
               initial={{ scale: 0.82, opacity: 0, filter: 'blur(8px)' }}
               animate={{ scale: 1, opacity: 1, filter: 'blur(0px)' }}
               transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               style={{
                 backgroundColor: colors.cardBackground,
-                backgroundImage: currentCharacterInfo
-                  ? `linear-gradient(${currentCharacterInfo.color}26, ${currentCharacterInfo.color}0D)`
+                backgroundImage: currentCharacterInfo || isRealWorldExample
+                  ? `linear-gradient(${bubbleColor}26, ${bubbleColor}0D)`
                   : undefined,
-                border: `2px solid ${currentCharacterInfo ? currentCharacterInfo.color : colors.accentGold}`,
-                boxShadow: currentCharacterInfo
-                  ? `0 0 32px ${currentCharacterInfo.color}55`
+                border: `2px solid ${bubbleColor}`,
+                boxShadow: currentCharacterInfo || isRealWorldExample
+                  ? `0 0 32px ${bubbleColor}55`
                   : `0 0 24px rgba(255,198,39,0.08)`
               }}
             >
@@ -2314,18 +2327,26 @@ function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext
                 className="absolute -left-[9px] top-6 w-4 h-4 rotate-45"
                 style={{
                   backgroundColor: colors.cardBackground,
-                  backgroundImage: currentCharacterInfo
-                    ? `linear-gradient(${currentCharacterInfo.color}26, ${currentCharacterInfo.color}26)`
+                  backgroundImage: currentCharacterInfo || isRealWorldExample
+                    ? `linear-gradient(${bubbleColor}26, ${bubbleColor}26)`
                     : undefined,
-                  borderLeft: `2px solid ${currentCharacterInfo ? currentCharacterInfo.color : colors.accentGold}`,
-                  borderBottom: `2px solid ${currentCharacterInfo ? currentCharacterInfo.color : colors.accentGold}`
+                  borderLeft: `2px solid ${bubbleColor}`,
+                  borderBottom: `2px solid ${bubbleColor}`
                 }}
               />
               {currentStoryCharacter && (
-                <StoryHeader character={currentStoryCharacter} label="🌍 REAL-WORLD EXAMPLE" />
+                <StoryHeader character={currentStoryCharacter} label="🎭 SCENARIO" />
+              )}
+              {isRealWorldExample && (
+                <span
+                  className="inline-block self-start px-2 py-0.5 mb-2 rounded-full text-[10px] font-extrabold tracking-widest"
+                  style={{ backgroundColor: EXAMPLE_COLOR, color: "#0D0508" }}
+                >
+                  🌍 REAL-WORLD EXAMPLE
+                </span>
               )}
               <p
-                className="leading-relaxed text-lg max-h-[40vh] overflow-y-auto"
+                className="leading-relaxed text-lg overflow-y-auto min-h-0"
                 style={{ color: colors.textPrimary }}
                 dangerouslySetInnerHTML={{
                   __html: highlightCharacterName(
@@ -2335,7 +2356,7 @@ function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext
                 }}
               />
 
-              {/* Link-available star — hover reveals a message with a link to the
+              {/* "Learn more" magnifying glass — hover reveals a message with a link to the
                   related learning module, opening in a new tab. */}
               {current.link && (
                 <div className="group absolute -right-6 top-1/2 -translate-y-1/2 z-20">
@@ -2344,21 +2365,19 @@ function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext
                     target="_blank"
                     rel="noopener noreferrer"
                     className="relative block"
-                    aria-label="Related learning link available"
+                    aria-label="More information available"
                   >
-                    {/* Pulsing, glowing star so the learn-more link is hard to miss */}
                     <motion.div
-                      animate={{ scale: [1, 1.18, 1] }}
+                      animate={{ scale: [1, 1.12, 1] }}
                       transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+                      className="w-12 h-12 rounded-full flex items-center justify-center transition-transform group-hover:scale-110"
+                      style={{
+                        backgroundColor: colors.accentPink,
+                        border: "2px solid #FFFFFF",
+                        boxShadow: `0 0 14px ${colors.accentPink}, 0 0 28px ${colors.accentPink}66`,
+                      }}
                     >
-                      <Star
-                        size={46}
-                        fill={colors.accentPink}
-                        color="#FFFFFF"
-                        strokeWidth={1.5}
-                        className="transition-transform group-hover:scale-125"
-                        style={{ filter: `drop-shadow(0 0 8px ${colors.accentPink}) drop-shadow(0 0 16px ${colors.accentPink}88)` }}
-                      />
+                      <Search size={24} color="#FFFFFF" strokeWidth={3} />
                     </motion.div>
                     <div
                       className="pointer-events-none absolute right-0 top-full mt-2 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg px-3 py-2 text-xs font-semibold shadow-lg"
@@ -2372,6 +2391,9 @@ function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext
             </motion.div>
           </div>
         </AnimatePresence>
+
+        {/* Empty lower half: balances the stack above so the active frame sits in the middle */}
+        <div className="flex-1 min-h-0" aria-hidden />
 
         {/* Progress dots + back/advance buttons — aligned with bubble column */}
         <div className="flex-shrink-0 flex items-center justify-between pt-1">

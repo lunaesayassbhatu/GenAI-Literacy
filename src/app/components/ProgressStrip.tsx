@@ -9,7 +9,7 @@ import { loadModuleProgress, hasEverCompletedModule } from "../utils/moduleProgr
 import { getUserData } from "../utils/userData";
 import { getCurrentLevel, getXPProgress, getXPToNextLevel, LEVELS } from "../utils/xpSystem";
 
-/** Height of the strip — pages that fill the viewport subtract this (see ModuleLearning). */
+/** Height of the footer — pages that fill the viewport subtract this (see ModuleLearning). */
 export const PROGRESS_STRIP_HEIGHT = "2.5rem";
 
 const HIDDEN_ROUTES = ["/", "/home", "/reset-password"];
@@ -42,7 +42,7 @@ function readProgress() {
   };
 }
 
-/** Slim, always-visible "Your Progress" bar reserved at the top of every signed-in page. */
+/** Slim, static "Your Progress" footer — pinned to the bottom of every signed-in page, like the header is pinned to the top. */
 export function ProgressStrip() {
   const { colors } = useTheme();
   const location = useLocation();
@@ -91,8 +91,10 @@ export function ProgressStrip() {
         </motion.div>
       )}
     </AnimatePresence>
+    {/* spacer so the last bit of page content is never hidden behind the fixed footer */}
+    <div aria-hidden style={{ height: PROGRESS_STRIP_HEIGHT }} />
     <div
-      className="flex items-center gap-3 px-4 border-b text-xs"
+      className="fixed bottom-0 left-0 right-0 z-40 flex items-center gap-3 px-4 border-t text-xs"
       style={{
         height: PROGRESS_STRIP_HEIGHT,
         backgroundColor: colors.background,

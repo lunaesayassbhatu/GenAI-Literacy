@@ -67,7 +67,8 @@ function RichText({ text }: { text: string }) {
   return <>{blocks}</>;
 }
 
-const POSITION_KEY = "asu_genai_ask_wave_pos";
+// v2: the default spot moved from bottom-left to bottom-right, so older saved drag positions are ignored.
+const POSITION_KEY = "asu_genai_ask_wave_pos_v2";
 const DRAG_THRESHOLD = 5; // px of movement before a press counts as a drag, not a click
 
 export function AskWaveChat() {
@@ -79,7 +80,7 @@ export function AskWaveChat() {
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Draggable position — null means "use the default bottom-8 left-8 CSS position".
+  // Draggable position — null means "use the default bottom-right CSS position" (just above the progress footer).
   const [pos, setPos] = useState<{ x: number; y: number } | null>(() => {
     try {
       const raw = localStorage.getItem(POSITION_KEY);
@@ -188,7 +189,7 @@ export function AskWaveChat() {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         whileHover={{ scale: 1.05 }}
-        className={pos ? "fixed z-50 flex items-center gap-2 rounded-full pl-2 pr-4 py-2 shadow-lg" : "fixed bottom-8 left-8 z-50 flex items-center gap-2 rounded-full pl-2 pr-4 py-2 shadow-lg"}
+        className={pos ? "fixed z-50 flex items-center gap-2 rounded-full pl-2 pr-4 py-2 shadow-lg" : "fixed bottom-14 right-6 z-50 flex items-center gap-2 rounded-full pl-2 pr-4 py-2 shadow-lg"}
         style={{
           backgroundColor: colors.cardBackground,
           border: `2px solid ${colors.accentGold}`,

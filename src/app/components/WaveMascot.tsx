@@ -109,7 +109,7 @@ export function WaveMascot({
   };
 
   return (
-    <div className="fixed bottom-8 right-8 z-50 flex flex-col items-end gap-3">
+    <div className="fixed bottom-28 right-6 z-50 flex flex-col items-end gap-3">
       {/* Speech Bubble */}
       <AnimatePresence mode="wait">
         {isBubbleOpen ? (
@@ -145,7 +145,7 @@ export function WaveMascot({
               <X size={14} />
             </button>
             <div className="text-xs font-bold mb-1 tracking-wider pr-4" style={{ color: colors.accentGoldText }}>
-              WAVE · YOUR GUIDE
+              Wave - Your Guide
             </div>
             <div className="text-sm leading-relaxed whitespace-pre-line pr-4" style={{ color: colors.textPrimary }}>
               {message}

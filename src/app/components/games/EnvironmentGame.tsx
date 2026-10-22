@@ -548,7 +548,7 @@ export function EnvironmentGame() {
       {/* Player's chosen character */}
       <Link
         to="/choose-character"
-        className="fixed top-36 right-6 z-40 block hover:opacity-80 transition-opacity"
+        className="fixed top-24 right-6 z-40 block hover:opacity-80 transition-opacity"
         title="Change your character"
       >
         <CharacterMascot character={getUserData()?.selectedCharacter} size={64} equipped={getEquippedItemIds()} />

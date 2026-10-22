@@ -18,7 +18,7 @@ export function FloatingWave({ message, expression = "default", show = true }: F
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
-          className="fixed bottom-6 right-6 z-50"
+          className="fixed bottom-28 right-6 z-50"
         >
           {/* Speech Bubble */}
           <motion.div

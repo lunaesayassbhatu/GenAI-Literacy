@@ -4,20 +4,14 @@ import { motion, AnimatePresence } from "motion/react";
 import { WaveDolphin3D } from "./WaveDolphin3D";
 import { useTheme } from "../utils/themeContext";
 import { getUserData } from "../utils/userData";
+import { useAuth } from "../utils/authContext";
 
 type IntroKind = "module";
 
-/**
- * TEMPORARY while we review the design: show the intro every time the Learning Lab opens.
- * When everyone is happy, set this to false so it only appears for new users (first visit).
- */
-const SHOW_EVERY_TIME = true;
-
-const COPY: Record<IntroKind, { greeting: string; guide: string; ask: string }> = {
+const COPY: Record<IntroKind, { greeting: string; ask: string }> = {
   module: {
     greeting: "Hi, I'm Wave! 🌊",
-    guide: "I'm in the bottom-right corner of your screen. I walk beside you through each lesson: a quick tip when a new idea starts, a hint if you tap “Need a hint?”, and a cheer (or a nudge) after every answer.",
-    ask: "I'm in the bottom-left corner, on the Ask Wave button. Curious about something outside the lesson? Type any GenAI question and I'll answer it in plain language, any time.",
+    ask: "I live in the bottom right corner. Curious about something outside the lesson? Type your question and I'll answer it.",
   },
 };
 
@@ -25,43 +19,49 @@ function introKindForPath(pathname: string): IntroKind | null {
   return pathname === "/learning-lab" ? "module" : null;
 }
 
-function storageKey(kind: IntroKind): string {
-  return `asu_genai_wave_intro_${kind}_${getUserData()?.username ?? "guest"}`;
+// The intro shows once per sign-in: we remember the sign-in it was shown for. A new sign-in
+// (Supabase's last_sign_in_at changes; token refreshes do not change it) shows it again.
+function storageKey(kind: IntroKind, userKey: string): string {
+  return `asu_genai_wave_intro_${kind}_${userKey}`;
 }
 
-function hasSeen(kind: IntroKind): boolean {
-  if (SHOW_EVERY_TIME) return false;
+function hasSeen(kind: IntroKind, userKey: string, signInMarker: string): boolean {
   try {
-    return localStorage.getItem(storageKey(kind)) === "1";
+    return localStorage.getItem(storageKey(kind, userKey)) === signInMarker;
   } catch {
     return true; // if storage is unavailable, don't nag on every page
   }
 }
 
-function markSeen(kind: IntroKind): void {
-  if (SHOW_EVERY_TIME) return;
+function markSeen(kind: IntroKind, userKey: string, signInMarker: string): void {
   try {
-    localStorage.setItem(storageKey(kind), "1");
+    localStorage.setItem(storageKey(kind, userKey), signInMarker);
   } catch {
     /* ignore */
   }
 }
 
 /**
- * When a learner opens the Learning Lab, Wave introduces himself over a blurred backdrop. Normally shown once per kind per user (see SHOW_EVERY_TIME).
+ * When a learner opens the Learning Lab, Wave introduces himself (and the Ask Wave chat) over a blurred backdrop.
+ * Shown once each time the learner signs in. The Guide Wave intro is separate: it appears once, on a learner's first module (see ModuleLearning).
  */
 export function WaveIntro() {
   const { colors } = useTheme();
   const { pathname } = useLocation();
+  const { session, loading } = useAuth();
   const [kind, setKind] = useState<IntroKind | null>(null);
 
+  const userKey = session?.user?.id ?? getUserData()?.username ?? "guest";
+  const signInMarker = session?.user?.last_sign_in_at ?? getUserData()?.loginDate ?? "";
+
   useEffect(() => {
+    if (loading) return;
     const k = introKindForPath(pathname);
-    setKind(k && !hasSeen(k) ? k : null);
-  }, [pathname]);
+    setKind(k && !hasSeen(k, userKey, signInMarker) ? k : null);
+  }, [pathname, loading, userKey, signInMarker]);
 
   const dismiss = () => {
-    if (kind) markSeen(kind);
+    if (kind) markSeen(kind, userKey, signInMarker);
     setKind(null);
   };
 
@@ -142,7 +142,7 @@ export function WaveIntro() {
               <p className="text-sm font-extrabold tracking-widest mt-1" style={{ color: colors.accentGold }}>
                 WAVE
               </p>
-              <p className="text-xs" style={{ color: colors.textSecondary }}>your GenAI guide</p>
+              <p className="text-xs" style={{ color: colors.textSecondary }}>your GenAI helper</p>
             </div>
 
             {/* Side description */}
@@ -150,34 +150,16 @@ export function WaveIntro() {
               <h2 className="text-2xl md:text-3xl font-bold mb-1" style={{ color: colors.textPrimary }}>
                 {copy.greeting}
               </h2>
-              <p className="mb-4 text-sm" style={{ color: colors.textSecondary }}>
-                I help you in <strong style={{ color: colors.accentGold }}>two different ways</strong>:
-              </p>
-
-              <div className="space-y-3 mb-5">
-                <div
-                  className="rounded-xl p-3 border"
-                  style={{ borderColor: "rgba(255,198,39,0.5)", backgroundColor: "rgba(255,198,39,0.08)" }}
-                >
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-extrabold text-sm" style={{ color: colors.accentGold }}>
-                      🧭 Guide Wave
-                    </span>
-                  </div>
-                  <p className="text-sm leading-snug" style={{ color: colors.textPrimary }}>{copy.guide}</p>
+              <div
+                className="rounded-xl p-3 border mb-5"
+                style={{ borderColor: "rgba(75,183,196,0.55)", backgroundColor: "rgba(75,183,196,0.08)" }}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-extrabold text-sm" style={{ color: colors.accentTeal }}>
+                    💬 Ask Wave
+                  </span>
                 </div>
-
-                <div
-                  className="rounded-xl p-3 border"
-                  style={{ borderColor: "rgba(75,183,196,0.55)", backgroundColor: "rgba(75,183,196,0.08)" }}
-                >
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-extrabold text-sm" style={{ color: colors.accentTeal }}>
-                      💬 Ask Wave
-                    </span>
-                  </div>
-                  <p className="text-sm leading-snug" style={{ color: colors.textPrimary }}>{copy.ask}</p>
-                </div>
+                <p className="text-sm leading-snug" style={{ color: colors.textPrimary }}>{copy.ask}</p>
               </div>
               <button
                 onClick={dismiss}
