@@ -2392,11 +2392,11 @@ export function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any;
           </div>
         </AnimatePresence>
 
-        {/* Empty lower half: balances the stack above so the active frame sits in the middle */}
-        <div className="flex-1 min-h-0" aria-hidden />
-
+        {/* Lower half: same size as the stack above so the frame stays centred; the dots and
+            Back/Continue sit right under the frame instead of at the bottom of the screen */}
+        <div className="flex-1 min-h-0 flex flex-col">
         {/* Progress dots + back/advance buttons — aligned with bubble column */}
-        <div className="flex-shrink-0 flex items-center justify-between pt-1">
+        <div className="flex-shrink-0 flex items-center justify-between pt-3">
           <div className="flex gap-2 items-center" style={{ marginLeft: 'calc(7rem + 1rem)' }}>
             {messages.map((_, idx) => (
               <motion.button
@@ -2434,6 +2434,7 @@ export function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any;
               <ArrowRight size={18} />
             </button>
           </div>
+        </div>
         </div>
       </div>
     </div>

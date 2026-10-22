@@ -164,7 +164,9 @@ export function HeroStudent({ subtitle, character }: { subtitle: string; charact
       <div className="relative flex flex-col md:flex-row items-center gap-6 md:gap-4">
         {/* text */}
         <div className="flex-1 text-center md:text-left z-10">
-          <p className="text-sm md:text-base font-bold tracking-[0.5em] uppercase mb-1" style={{ color: "#F0E0E4" }}>
+          {/* ASU sits centred over the title; the extra left padding offsets the trailing letter-spacing */}
+          <div className="inline-block text-center">
+          <p className="text-sm md:text-base font-bold tracking-[0.5em] uppercase mb-1 pl-[0.5em]" style={{ color: "#F0E0E4" }}>
             ASU
           </p>
           <h1
@@ -181,6 +183,7 @@ export function HeroStudent({ subtitle, character }: { subtitle: string; charact
           >
             GenAI Lab
           </h1>
+          </div>
           <p className="text-lg md:text-xl font-semibold max-w-xl mx-auto md:mx-0" style={{ color: "#F0E0E4" }}>
             {subtitle}
           </p>

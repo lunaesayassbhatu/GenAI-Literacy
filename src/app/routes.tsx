@@ -31,8 +31,9 @@ function RootLayout() {
   return (
     <>
       <ScrollToTop />
-      {hasUser && <ProgressStrip />}
       <Outlet />
+      {/* After the page, so its spacer sits below the content and the fixed footer never covers it */}
+      {hasUser && <ProgressStrip />}
       {hasUser && <AskWaveChat />}
       {hasUser && <WaveIntro />}
     </>

@@ -3,6 +3,7 @@ import { Header } from "./Header";
 import { HeroTitle } from "./HeroTitle";
 import { HeroBeacon, HeroCircuit } from "./HeroVariants";
 import { HeroStudent } from "./HeroStudent";
+import { HeroBrain, HeroRobot, HeroPrompt } from "./HeroAI";
 import { useTheme } from "../utils/themeContext";
 import { getUserData } from "../utils/userData";
 import { getCharacterInfo } from "../data/charactersData";
@@ -12,14 +13,15 @@ import { BookOpen, Gamepad2, Target, Award, ArrowRight } from "lucide-react";
 // Banner style: "classic" (default, the original plain card), or the vote candidates "ocean", "beacon",
 // "circuit", "student". Preview any of them without editing code by opening /home?hero=beacon (etc.).
 // After the banner vote, set DEFAULT_HERO_STYLE to the winner.
-type HeroStyle = "classic" | "ocean" | "beacon" | "circuit" | "student";
+type HeroStyle = "classic" | "ocean" | "beacon" | "circuit" | "student" | "brain" | "robot" | "prompt";
+const HERO_STYLES: HeroStyle[] = ["classic", "ocean", "beacon", "circuit", "student", "brain", "robot", "prompt"];
 const DEFAULT_HERO_STYLE: HeroStyle = "classic";
 const HERO_SUBTITLE = "An interactive learning platform helping the ASU community use Generative AI responsibly and effectively.";
 
 export function HomePage() {
   const { colors } = useTheme();
   const heroParam = new URLSearchParams(window.location.search).get("hero");
-  const heroStyle = heroParam === "beacon" || heroParam === "circuit" || heroParam === "student" || heroParam === "ocean" || heroParam === "classic" ? heroParam : DEFAULT_HERO_STYLE;
+  const heroStyle: HeroStyle = HERO_STYLES.find((h) => h === heroParam) ?? DEFAULT_HERO_STYLE;
   const selectedCharacter = getUserData()?.selectedCharacter;
   const characterName = selectedCharacter ? getCharacterInfo(selectedCharacter).name : null;
 
@@ -40,9 +42,31 @@ export function HomePage() {
             transition={{ delay: 0.15, duration: 0.5 }}
             className="mb-4"
           >
-            {heroStyle === "classic" ? (
-              <div className="rounded-2xl p-10 text-center" style={{ background: "#6B1530" }}>
-                <h1 className="text-4xl md:text-5xl font-bold mb-3" style={{ color: "#FFC627" }}>
+            {heroStyle === "brain" ? (
+              <HeroBrain subtitle={HERO_SUBTITLE} />
+            ) : heroStyle === "robot" ? (
+              <HeroRobot subtitle={HERO_SUBTITLE} />
+            ) : heroStyle === "prompt" ? (
+              <HeroPrompt subtitle={HERO_SUBTITLE} />
+            ) : heroStyle === "classic" ? (
+              <div
+                className="rounded-2xl p-10 text-center"
+                style={{
+                  background: "linear-gradient(180deg, #7E1A3A 0%, #6B1530 55%, #5A1228 100%)",
+                  boxShadow: "0 8px 0 #3A0A1A, 0 14px 24px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.2)",
+                  border: "1px solid rgba(255,198,39,0.25)",
+                }}
+              >
+                <h1
+                  className="font-extrabold mb-3 tracking-tight"
+                  style={{
+                    fontSize: "clamp(2.5rem, 6vw, 4.25rem)",
+                    lineHeight: 1.1,
+                    color: "#FFC627",
+                    textShadow:
+                      "0 1px 0 #E0A800, 0 2px 0 #C99700, 0 3px 0 #B38600, 0 4px 0 #9C7400, 0 5px 0 #856200, 0 12px 16px rgba(0,0,0,0.55)",
+                  }}
+                >
                   ASU GenAI Lab
                 </h1>
                 <p className="text-2xl font-semibold max-w-2xl mx-auto" style={{ color: "#F0E0E4" }}>
@@ -91,20 +115,25 @@ export function HomePage() {
             <hr className="mb-10" style={{ borderColor: colors.cardBorder }} />
 
             {/* Primary CTAs — direct entry points into modules and games */}
-            <div className="mb-10 grid md:grid-cols-2 gap-6">
+            <div className="mb-12 pb-2 grid md:grid-cols-2 gap-6">
               <Link to="/learning-lab" style={{ textDecoration: "none", display: "block" }}>
                 <motion.div
                   whileHover={{ y: -3 }}
-                  whileTap={{ y: 5, boxShadow: '0 1px 0 #A87800, 0 3px 8px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.4)' }}
+                  whileTap={{ y: 8, boxShadow: '0 2px 0 #8F6500, 0 4px 8px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.4)' }}
                   className="rounded-2xl p-8 text-center h-full cursor-pointer"
                   style={{
                     background: 'linear-gradient(180deg, #FFDE74 0%, #FFC627 55%, #E3A700 100%)',
                     color: '#0D0508',
-                    boxShadow: '0 6px 0 #A87800, 0 12px 20px rgba(0,0,0,0.45), inset 0 2px 0 rgba(255,255,255,0.55)'
+                    boxShadow: '0 10px 0 #8F6500, 0 18px 24px rgba(0,0,0,0.5), inset 0 3px 0 rgba(255,255,255,0.6), inset 0 -4px 0 rgba(160,110,0,0.35)'
                   }}
                 >
                   <BookOpen size={36} className="mx-auto mb-3" />
-                  <h3 className="text-2xl font-bold mb-2">Start Learning!</h3>
+                  <h3
+                    className="text-3xl font-extrabold mb-2"
+                    style={{ textShadow: "0 1px 0 rgba(255,255,255,0.6), 0 2px 0 #C99700, 0 3px 0 #A87800, 0 5px 6px rgba(80,50,0,0.45)" }}
+                  >
+                    Start Learning!
+                  </h3>
                   <p className="text-sm font-medium opacity-80">
                     Dive into short, interactive modules that clear up things people are often wrong or
                     unsure about when it comes to GenAI.
@@ -115,17 +144,22 @@ export function HomePage() {
               <Link to="/games" style={{ textDecoration: "none", display: "block" }}>
                 <motion.div
                   whileHover={{ y: -3 }}
-                  whileTap={{ y: 5, boxShadow: '0 1px 0 #7A5A00, 0 3px 8px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,198,39,0.2)' }}
+                  whileTap={{ y: 8, boxShadow: '0 2px 0 #9A7400, 0 4px 8px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,198,39,0.3)' }}
                   className="rounded-2xl p-8 text-center h-full cursor-pointer"
                   style={{
-                    background: `linear-gradient(180deg, ${colors.cardBackground} 0%, rgba(20,6,10,0.95) 100%)`,
+                    background: 'linear-gradient(180deg, #4A1B2A 0%, #2A1018 55%, #170609 100%)',
                     border: `2px solid ${colors.accentGold}`,
                     color: colors.textPrimary,
-                    boxShadow: '0 6px 0 #7A5A00, 0 12px 20px rgba(0,0,0,0.45), inset 0 2px 0 rgba(255,198,39,0.25)'
+                    boxShadow: '0 10px 0 #9A7400, 0 18px 24px rgba(0,0,0,0.5), inset 0 3px 0 rgba(255,198,39,0.4), inset 0 -4px 0 rgba(0,0,0,0.4)'
                   }}
                 >
                   <Gamepad2 size={36} className="mx-auto mb-3" style={{ color: colors.accentGold }} />
-                  <h3 className="text-2xl font-bold mb-2">Play to Reinforce Learning!</h3>
+                  <h3
+                    className="text-3xl font-extrabold mb-2"
+                    style={{ textShadow: "0 1px 0 #E0A800, 0 2px 0 #B38600, 0 3px 0 #856200, 0 6px 8px rgba(0,0,0,0.6)" }}
+                  >
+                    Play to Reinforce Learning!
+                  </h3>
                   <p className="text-sm" style={{ color: colors.textSecondary }}>
                     {/* TEMP placeholder names ("Lumina" the world, "the Beacon" the tech) — swap once the real names are decided */}
                     {characterName

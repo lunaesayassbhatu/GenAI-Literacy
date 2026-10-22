@@ -53,6 +53,18 @@ export function WaveMascot({
     setIsBubbleOpen(!compactHintMode);
   }, [compactHintMode, stepKey]);
 
+  // A new message from Wave opens the bubble; it then tucks itself away so it never sits over the
+  // answers for long. Click the dolphin (or the chat badge) to bring it back.
+  useEffect(() => {
+    if (!compactHintMode) setIsBubbleOpen(true);
+  }, [message]);
+
+  useEffect(() => {
+    if (!isBubbleOpen || compactHintMode) return;
+    const timer = setTimeout(() => setIsBubbleOpen(false), 8000);
+    return () => clearTimeout(timer);
+  }, [isBubbleOpen, message, compactHintMode]);
+
   // Even on steps with hints (which collapse the bubble to a "Need a hint?"
   // pill), pop the message open whenever XP is awarded so the amount is
   // actually visible, then let it collapse back down.
@@ -113,7 +125,7 @@ export function WaveMascot({
   useEffect(() => registerAskWaveHost(), []);
 
   return (
-    <div className="fixed bottom-14 right-6 z-50 flex flex-col items-end gap-3">
+    <div className="fixed bottom-12 right-40 z-50 flex flex-col items-end gap-3">
       {/* Speech Bubble */}
       <AnimatePresence mode="wait">
         {isBubbleOpen ? (
@@ -278,7 +290,7 @@ export function WaveMascot({
           title={isBubbleOpen ? undefined : "Show Wave's message"}
         >
           <DolphinMascot
-            size={80}
+            size={64}
             animate={currentMood === "default"}
             expression={
               currentMood === "celebrate" ? "celebrate"
