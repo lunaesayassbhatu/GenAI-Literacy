@@ -14,7 +14,7 @@ const CARD_SHADOW = "0 8px 0 #1A0A12, 0 14px 24px rgba(0,0,0,0.5), inset 0 2px 0
 function AIFrame({ subtitle, background, art }: { subtitle: string; background: string; art: ReactNode }) {
   return (
     <div
-      className="relative overflow-hidden rounded-2xl px-6 py-10 md:py-8"
+      className="relative overflow-hidden rounded-2xl px-6 py-10 md:py-12"
       style={{ background, boxShadow: CARD_SHADOW, border: "1px solid rgba(255,198,39,0.25)" }}
     >
       <style>{`
@@ -25,48 +25,55 @@ function AIFrame({ subtitle, background, art }: { subtitle: string; background: 
         @keyframes aiGrow { 0% { transform: scaleX(0); } 55%,100% { transform: scaleX(1); } }
         @keyframes aiBlink { 0%,90%,100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
       `}</style>
-      <div className="relative flex flex-col md:flex-row items-center gap-6 md:gap-4">
-        <div className="flex-1 text-center md:text-left z-10">
-          {/* inline styles on purpose: ASU must stay centred over the title in every layout */}
-          <div style={{ display: "grid", width: "fit-content", justifyItems: "center", textAlign: "center" }}>
-            <p
-              className="text-sm md:text-base font-bold tracking-[0.5em] uppercase mb-1"
-              style={{ color: "#F0E0E4", textAlign: "center", paddingLeft: "0.5em", width: "100%" }}
-            >
-              ASU
-            </p>
-            <h1
-              className="text-5xl md:text-7xl font-extrabold tracking-tight mb-4"
-              style={{
-                backgroundImage: "linear-gradient(100deg, #FFC627 0%, #FFE9A0 22%, #FFC627 44%, #FF9A3C 66%, #FFC627 100%)",
-                backgroundSize: "200% 100%",
-                WebkitBackgroundClip: "text",
-                backgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                animation: "aiShine 5s linear infinite",
-                filter: "drop-shadow(0 3px 0 rgba(58,10,26,0.9)) drop-shadow(0 8px 14px rgba(0,0,0,0.4))",
-              }}
-            >
-              GenAI Lab
-            </h1>
-          </div>
-          <p className="text-lg md:text-xl font-semibold max-w-xl mx-auto md:mx-0" style={{ color: "#F0E0E4" }}>
+      {/* Title block sits in the middle of the banner; the illustration is tucked to the right on wide
+          screens and goes underneath the text on narrow ones, so the two never overlap. */}
+      <div className="relative lg:flex lg:items-center" style={{ minHeight: undefined }}>
+        <div className="relative z-10 mx-auto w-full text-center lg:min-h-[260px] lg:flex lg:flex-col lg:justify-center" style={{ maxWidth: 460 }}>
+          <p
+            className="text-sm md:text-base font-bold tracking-[0.5em] uppercase mb-1"
+            style={{ color: "#F0E0E4", textAlign: "center", paddingLeft: "0.5em" }}
+          >
+            ASU
+          </p>
+          <h1
+            className="text-5xl md:text-7xl font-extrabold tracking-tight mb-4"
+            style={{
+              textAlign: "center",
+              backgroundImage: "linear-gradient(100deg, #FFC627 0%, #FFE9A0 22%, #FFC627 44%, #FF9A3C 66%, #FFC627 100%)",
+              backgroundSize: "200% 100%",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              animation: "aiShine 5s linear infinite",
+              filter: "drop-shadow(0 3px 0 rgba(58,10,26,0.9)) drop-shadow(0 8px 14px rgba(0,0,0,0.4))",
+            }}
+          >
+            GenAI Lab
+          </h1>
+          {subtitle && (
+<p className="text-lg md:text-xl font-semibold mx-auto" style={{ color: "#F0E0E4" }}>
             {subtitle}
           </p>
+)}
         </div>
-        <div className="relative flex-shrink-0" style={{ width: 340, height: 270 }}>
-          <div
-            aria-hidden
-            className="absolute rounded-full"
-            style={{
-              left: 40,
-              top: 0,
-              width: 260,
-              height: 260,
-              background: "radial-gradient(circle, rgba(255,198,39,0.45) 0%, rgba(255,154,60,0.2) 45%, rgba(255,198,39,0) 70%)",
-            }}
-          />
-          {art}
+        <div
+          className="relative mx-auto mt-6 lg:mt-0 lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2"
+          style={{ width: 340, height: 270, maxWidth: "100%" }}
+        >
+          <div className="relative lg:scale-[0.82] lg:origin-right" style={{ width: 340, height: 270 }}>
+            <div
+              aria-hidden
+              className="absolute rounded-full"
+              style={{
+                left: 40,
+                top: 0,
+                width: 260,
+                height: 260,
+                background: "radial-gradient(circle, rgba(255,198,39,0.45) 0%, rgba(255,154,60,0.2) 45%, rgba(255,198,39,0) 70%)",
+              }}
+            />
+            {art}
+          </div>
         </div>
       </div>
     </div>

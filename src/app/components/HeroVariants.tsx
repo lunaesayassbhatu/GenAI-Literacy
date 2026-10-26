@@ -82,9 +82,11 @@ export function HeroBeacon({ subtitle }: { subtitle: string }) {
       >
         GenAI Lab
       </h1>
-      <p className="relative text-xl md:text-2xl font-semibold max-w-2xl mx-auto" style={{ color: "#F0E0E4" }}>
+      {subtitle && (
+<p className="relative text-xl md:text-2xl font-semibold max-w-2xl mx-auto" style={{ color: "#F0E0E4" }}>
         {subtitle}
       </p>
+)}
 
       {/* dark sea */}
       <div className="absolute left-0 right-0 bottom-0 h-16 pointer-events-none overflow-hidden" aria-hidden>
@@ -209,9 +211,11 @@ export function HeroCircuit({ subtitle }: { subtitle: string }) {
           style={{ width: 6, height: "0.8em", backgroundColor: "#8FE3EE", animation: "caret 1s steps(1) infinite" }}
         />
       </h1>
-      <p className="relative text-xl md:text-2xl font-semibold max-w-2xl mx-auto" style={{ color: "#F0E0E4" }}>
+      {subtitle && (
+<p className="relative text-xl md:text-2xl font-semibold max-w-2xl mx-auto" style={{ color: "#F0E0E4" }}>
         {subtitle}
       </p>
+)}
     </div>
   );
 }

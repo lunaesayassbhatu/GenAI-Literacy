@@ -91,9 +91,11 @@ export function HeroTitle({ subtitle }: { subtitle: string }) {
         GenAI Lab
       </h1>
 
-      <p className="relative text-xl md:text-2xl font-semibold max-w-2xl mx-auto" style={{ color: "#F0E0E4" }}>
+      {subtitle && (
+<p className="relative text-xl md:text-2xl font-semibold max-w-2xl mx-auto" style={{ color: "#F0E0E4" }}>
         {subtitle}
       </p>
+)}
 
       {/* animated ocean waves along the bottom edge */}
       <div className="absolute left-0 right-0 bottom-0 h-14 pointer-events-none" aria-hidden>

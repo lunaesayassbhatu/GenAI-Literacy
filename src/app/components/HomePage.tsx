@@ -43,11 +43,11 @@ export function HomePage() {
             className="mb-4"
           >
             {heroStyle === "brain" ? (
-              <HeroBrain subtitle={HERO_SUBTITLE} />
+              <HeroBrain subtitle="" />
             ) : heroStyle === "robot" ? (
-              <HeroRobot subtitle={HERO_SUBTITLE} />
+              <HeroRobot subtitle="" />
             ) : heroStyle === "prompt" ? (
-              <HeroPrompt subtitle={HERO_SUBTITLE} />
+              <HeroPrompt subtitle="" />
             ) : heroStyle === "classic" ? (
               <div
                 className="rounded-2xl p-10 text-center"
@@ -58,7 +58,7 @@ export function HomePage() {
                 }}
               >
                 <h1
-                  className="font-extrabold mb-3 tracking-tight"
+                  className="font-extrabold mb-1 tracking-tight"
                   style={{
                     fontSize: "clamp(2.5rem, 6vw, 4.25rem)",
                     lineHeight: 1.1,
@@ -69,18 +69,15 @@ export function HomePage() {
                 >
                   ASU GenAI Lab
                 </h1>
-                <p className="text-2xl font-semibold max-w-2xl mx-auto" style={{ color: "#F0E0E4" }}>
-                  {HERO_SUBTITLE}
-                </p>
               </div>
             ) : heroStyle === "beacon" ? (
-              <HeroBeacon subtitle={HERO_SUBTITLE} />
+              <HeroBeacon subtitle="" />
             ) : heroStyle === "circuit" ? (
-              <HeroCircuit subtitle={HERO_SUBTITLE} />
+              <HeroCircuit subtitle="" />
             ) : heroStyle === "student" ? (
-              <HeroStudent subtitle={HERO_SUBTITLE} character={selectedCharacter} />
+              <HeroStudent subtitle="" character={selectedCharacter} />
             ) : (
-              <HeroTitle subtitle={HERO_SUBTITLE} />
+              <HeroTitle subtitle="" />
             )}
           </motion.div>
         </section>
@@ -104,6 +101,9 @@ export function HomePage() {
               <h2 className="text-3xl font-bold mb-3 text-center" style={{ color: colors.textPrimary }}>
                 Built With Purpose
               </h2>
+              <p className="text-xl font-semibold text-center max-w-3xl mx-auto mb-4" style={{ color: colors.accentGold }}>
+                {HERO_SUBTITLE}
+              </p>
               <p className="text-lg text-center max-w-3xl mx-auto" style={{ color: colors.textPrimary }}>
                 Generative AI is part of everyday academic life, and yet there are many misconceptions about
                 how it works, when it does not work, how to use it responsibly, and when one should not use

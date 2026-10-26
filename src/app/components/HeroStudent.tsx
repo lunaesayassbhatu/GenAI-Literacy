@@ -184,9 +184,11 @@ export function HeroStudent({ subtitle, character }: { subtitle: string; charact
             GenAI Lab
           </h1>
           </div>
-          <p className="text-lg md:text-xl font-semibold max-w-xl mx-auto md:mx-0" style={{ color: "#F0E0E4" }}>
+          {subtitle && (
+<p className="text-lg md:text-xl font-semibold max-w-xl mx-auto md:mx-0" style={{ color: "#F0E0E4" }}>
             {subtitle}
           </p>
+)}
         </div>
 
         {/* scene */}
