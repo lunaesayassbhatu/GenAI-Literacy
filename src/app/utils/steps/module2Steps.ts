@@ -59,10 +59,10 @@ export const module2Steps: Step[] = [
       number: "1",
       question: "A student gets a detailed, well-structured AI explanation to study from. What should they do before relying on it?",
       options: [
-        { text: "Nothing. Continue using it to study", correct: false },
+        { text: "Nothing. Continue using it to study", correct: false, feedback: "A detailed, well-structured explanation can still contain mistakes. It's worth checking before you rely on it." },
         { text: "Cross-check it with the course's textbook", correct: true },
-        { text: "Share it with a classmate to see if it sounds right", correct: false },
-        { text: "Ask the AI if it's accurate", correct: false }
+        { text: "Share it with a classmate to see if it sounds right", correct: false, feedback: "A classmate reading it can't confirm the facts any better than you can. Check it against a trusted, independent source." },
+        { text: "Ask the AI if it's accurate", correct: false, feedback: "The AI can't reliably check its own accuracy. It may confidently repeat the same mistake. Use an independent source instead." }
       ],
       hints: [
         "A well-structured response doesn't mean it's correct.",
@@ -97,17 +97,12 @@ export const module2Steps: Step[] = [
         },
         {
           text: "In a study by Cheng and colleagues (2026), researchers looked at Reddit discussions and advice boards where the poster was deemed to be in the wrong, and compared human judgments to GenAI judgments. Every GenAI model tested affirmed the poster's position more often than humans did — supporting the user's position 49% more than humans on average.",
-          mood: "default"
+          mood: "default",
+          link: "https://www.science.org/doi/10.1126/science.aec8352?referrer=https%3A%2F%2Fwww.google.com%2F#editor-abstract"
         },
         {
           text: "*Sycophancy is a safety risk.* When people use GenAI as a source of advice and support, they risk receiving responses that cater to their position regardless of a reasoning process about the actual situation. GenAI is like a mirror: it reflects back to you what you put in it. This can lead to the decline of important relationships, or the encouragement of harmful thoughts — potentially leading to harmful actions.",
-          mood: "hint",
-          link: "https://news.stanford.edu/stories/2026/03/ai-advice-sycophantic-models-research"
-        },
-        {
-          text: "Want to go deeper? Here's the full research study.",
-          mood: "default",
-          link: "https://www.science.org/doi/10.1126/science.aec8352?referrer=https%3A%2F%2Fwww.google.com%2F#editor-abstract"
+          mood: "hint"
         },
         {
           text: "On one Reddit board, a poster asked if they were in the wrong for leaving trash on a tree branch in a park with no trash cans. The AI blamed the park for not having any trash cans, and called the litterer \"commendable\" for looking for one. 🗑️",
@@ -143,10 +138,10 @@ export const module2Steps: Step[] = [
       number: "2",
       question: "A friend tells you, \"I asked an AI if my plan to confront my roommate was a good idea, and it said I was totally justified and my roommate sounds awful.\" What would you tell your friend about how to interpret that response?",
       options: [
-        { text: "If the AI agreed with you, it probably looked at both sides fairly. You must be in the right.", correct: false },
+        { text: "If the AI agreed with you, it probably looked at both sides fairly. You must be in the right.", correct: false, feedback: "Agreement from the AI isn't proof you're right. It only heard your side, and it tends to be agreeable by design." },
         { text: "The AI's response might just be reflecting back what you said rather than giving an objective judgment. It's worth getting another perspective, like from a friend or family member who knows the full situation, before confronting your roommate.", correct: true },
-        { text: "AI responses are always more objective than what a friend would tell you, since it doesn't have personal bias or feelings about your roommate.", correct: false },
-        { text: "You shouldn't have asked the AI at all. It's never appropriate to use GenAI for any kind of advice.", correct: false }
+        { text: "AI responses are always more objective than what a friend would tell you, since it doesn't have personal bias or feelings about your roommate.", correct: false, feedback: "GenAI isn't automatically objective. It tends to mirror the way you describe things, so it can't replace another person's perspective." },
+        { text: "You shouldn't have asked the AI at all. It's never appropriate to use GenAI for any kind of advice.", correct: false, feedback: "GenAI can be helpful in some situations, but it should not be overly relied on for personal advice." }
       ],
       hints: [
         "Think about whose side of the story the AI actually heard.",
@@ -185,6 +180,7 @@ export const module2Steps: Step[] = [
           link: "https://blogs.deakin.edu.au/article/spotting-ai-hallucinations-a-guide-for-students-and-researchers/"
         },
         {
+          scenario: true,
           text: "Jane had several disagreements with her friend. She asked a GenAI chatbot for advice and felt validated in her frustrations. But she noticed it was consistently agreeing with her, and realized it only had one side of the story. She closed the tool and talked to her roommate instead, who agreed on some points but offered another perspective on others. Jane ended up talking to her friend directly, and they each explained their side and apologized. 🤝",
           mood: "celebrate"
         },
@@ -206,11 +202,11 @@ export const module2Steps: Step[] = [
       number: "3",
       question: "A GenAI response is well-written and detailed. What does that tell you about its accuracy?",
       options: [
-        { text: "It is reliable", correct: false },
-        { text: "It was fact-checked", correct: false },
+        { text: "It is reliable", correct: false, feedback: "Polished writing isn't a sign of reliability. GenAI writes fluently whether or not the content is true." },
+        { text: "It was fact-checked", correct: false, feedback: "GenAI has no built-in fact-checking step, so a well-written answer hasn't necessarily been checked." },
         { text: "Nothing. Quality of writing doesn't guarantee correctness", correct: true },
-        { text: "It came from a credible source", correct: false },
-        { text: "It is definitely inaccurate or made-up", correct: false }
+        { text: "It came from a credible source", correct: false, feedback: "A response can read like it came from an expert, but GenAI generates text from patterns. It doesn't cite or check a source on its own." },
+        { text: "It is definitely inaccurate or made-up", correct: false, feedback: "Not necessarily. A well-written answer can be right or wrong. The quality of the writing just doesn't tell you which, so you still need to verify it." }
       ],
       hints: [
         "GenAI is trained on writing patterns — fluency is its default, not a signal of truth.",

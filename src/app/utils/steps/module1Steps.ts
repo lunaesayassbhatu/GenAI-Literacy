@@ -73,18 +73,19 @@ export const module1Steps: Step[] = [
       multiSelect: true,
       question: "Which of these options is an example of Generative AI? (Select all that apply)",
       options: [
-        { text: "A newly-created image based on a prompt", correct: true },
-        { text: "Filtering search results to show only specific years", correct: false },
-        { text: "A coding assistant that helps to write and debug code on demand", correct: true },
-        { text: "An email draft based on a prompt", correct: true },
-        { text: "A voice assistant that handles only basic commands", correct: false },
-        { text: "A bank algorithm that flags suspicious credit card activity", correct: false }
+        { text: "A newly-created image based on a prompt", correct: true, partialFeedback: "Yes! GenAI creates images from a prompt. But there are some other examples of GenAI here, too." },
+        { text: "Filtering search results to show only specific years", correct: false, feedback: "Filtering follows a set rule to sort information that already exists. It doesn't create anything new, so it's traditional AI, not generative." },
+        { text: "A coding assistant that helps to write and debug code on demand", correct: true, partialFeedback: "Yes! GenAI can write and debug code on demand. But there are some other examples of GenAI here, too." },
+        { text: "An email draft based on a prompt", correct: true, partialFeedback: "Yes! GenAI creates text based on a prompt. But there are some other examples of GenAI here, too." },
+        { text: "A voice assistant that handles only basic commands", correct: false, feedback: "A voice assistant that only handles basic commands responds with pre-set actions. It isn't generating new content." },
+        { text: "A bank algorithm that flags suspicious credit card activity", correct: false, feedback: "Flagging suspicious activity applies programmed checks to data that already exists. It doesn't create anything new." }
       ],
       hints: [
         "Ask yourself: did this create brand-new content, or just sort/flag existing information?",
         "Filtering, flagging, and command-following all follow pre-set rules — that's traditional AI, not generative.",
         "Pick the options where new text, code, or images were created from a prompt."
       ],
+      partialFeedback: "You're on the right track! Those are all generative, but there's still one more example to find. Look through the options again.",
       correctFeedback: "Exactly! Generating a new image, code, or email draft all involve creating something new from a prompt — that's generative AI.",
       wrongFeedback: "Filtering, flagging, and handling basic commands all follow pre-set rules rather than generating anything new — those are traditional AI, not generative.",
       xpReward: 40
@@ -216,24 +217,28 @@ export const module1Steps: Step[] = [
         },
         {
           text: "*Text generators* (like chatbots) are powered by Large Language Models (LLMs) to write, summarize, and converse.",
-          mood: "default"
+          mood: "default",
+          emoji: "📝"
         },
         {
           text: "*Image generators* turn written descriptions into a picture. These may use Generative Adversarial Networks (GANs) or Variational Autoencoders (VAEs).",
-          mood: "default"
+          mood: "default",
+          emoji: "🖼️"
         },
         {
           text: "*Audio and music generators* can create new melodies, harmonize against existing ones, and create realistic sound effects.",
-          mood: "default"
+          mood: "default",
+          emoji: "🎵"
         },
         {
           text: "*Video generators* can create frames based on written descriptions or existing video data.",
-          mood: "default"
+          mood: "default",
+          emoji: "🎬"
         },
         {
           text: "*Code generators* can create code snippets or debug software.",
           mood: "default",
-          link: "https://tudublin.libguides.com/GenAI/typesofgenai"
+          emoji: "💻"
         },
         {
           text: "Aisha needed to create a multi-media presentation. She used a text generator to draft and iterate on her main points, an image generator for a picture that aligned with her topic, and an audio generator for some engaging sound effects. By matching the tool to the task, she created a fun, informative presentation. 🎤",
@@ -257,10 +262,10 @@ export const module1Steps: Step[] = [
       number: "3",
       question: "A student wants GenAI to generate new frames for a short clip, either from a written description or from existing footage. What kind of tool fits this need best?",
       options: [
-        { text: "Code generator", correct: false },
-        { text: "Image generator", correct: false },
+        { text: "Code generator", correct: false, feedback: "Code generators write and debug software, so they won't produce video frames." },
+        { text: "Image generator", correct: false, feedback: "Image generators make single still pictures, not the frames of a clip." },
         { text: "Video generator", correct: true },
-        { text: "Text generator", correct: false }
+        { text: "Text generator", correct: false, feedback: "Text generators write and summarize text, so they can't create video frames." }
       ],
       hints: [
         "Think about which type of GenAI tool was described as creating frames from a description or existing footage.",
@@ -268,7 +273,7 @@ export const module1Steps: Step[] = [
         "Pick the option built specifically for generating video content."
       ],
       correctFeedback: "Right! Video generators create frames from written descriptions or existing footage — exactly this use case.",
-      wrongFeedback: "Code and text generators don't produce video frames, and image generators make single still pictures, not clip frames. A video generator is built for exactly this.",
+      wrongFeedback: "Code and text generators don't produce video frames, and image generators make single still pictures, not clip frames.",
       xpReward: 40
     }
   },

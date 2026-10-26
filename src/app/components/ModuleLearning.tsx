@@ -242,6 +242,8 @@ function ModuleLearningInner() {
   );
   const xpEarnedRef = useRef(xpEarned);
   const [canProceed, setCanProceed] = useState(false);
+  // Furthest page reached: pages before it are already done, so going back to them doesn't award XP twice.
+  const furthestStepRef = useRef(currentStepIndex);
   const [waveMood, setWaveMood] = useState<WaveMood>("default");
   const [waveMessage, setWaveMessage] = useState("Questions about module content or quizzes? I'm your guy");
   const [hintClickCount, setHintClickCount] = useState(0);
@@ -288,7 +290,10 @@ function ModuleLearningInner() {
     // Update Wave message based on step
     updateWaveForStep(currentStep);
     // Reset proceed state
-    setCanProceed(currentStep.type === "intro" || currentStep.type === "reading" || currentStep.type === "transition" || currentStep.type === "pros-cons");
+    setCanProceed(
+      currentStepIndex < furthestStepRef.current ||
+      currentStep.type === "intro" || currentStep.type === "reading" || currentStep.type === "transition" || currentStep.type === "pros-cons"
+    );
     setHintClickCount(0);
   }, [currentStepIndex]);
 
@@ -372,10 +377,16 @@ function ModuleLearningInner() {
   const handleNext = () => {
     if (currentStepIndex < steps.length - 1) {
       const next = currentStepIndex + 1;
-      saveModuleProgress(moduleId ?? "", next, steps.length, variantIndex);
+      furthestStepRef.current = Math.max(furthestStepRef.current, next);
+      saveModuleProgress(moduleId ?? "", furthestStepRef.current, steps.length, variantIndex);
       setCurrentStepIndex(next);
       setCanProceed(false);
     }
+  };
+
+  // Go back one page (e.g. from a question to the material before it). Saved progress is not reduced.
+  const handleBack = () => {
+    if (currentStepIndex > 0) setCurrentStepIndex(currentStepIndex - 1);
   };
 
   const finishModule = () => {
@@ -398,6 +409,7 @@ function ModuleLearningInner() {
 
   const awardXP = (amount: number) => {
     if (isReviewMode || !moduleId) return;
+    if (currentStepIndex < furthestStepRef.current) return; // revisiting a finished page: no second XP
     setXpEarned((prev) => {
       const next = prev + amount;
       setModuleXP(moduleId, next);
@@ -640,6 +652,7 @@ function ModuleLearningInner() {
                   data={currentStep.data}
                   colors={colors}
                   onNext={handleNext}
+                  onBackStep={currentStepIndex > 0 ? handleBack : undefined}
                 />
               )}
 
@@ -668,7 +681,17 @@ function ModuleLearningInner() {
           className="fixed bottom-10 left-0 right-0 z-30 border-t"
           style={{ backgroundColor: colors.background, borderColor: colors.cardBorder }}
         >
-          <div className="max-w-4xl mx-auto px-6 py-4 flex justify-end">
+          <div className="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+            {currentStepIndex > 0 ? (
+              <button
+                onClick={handleBack}
+                className="flex items-center gap-2 px-5 py-3 rounded-xl font-bold transition-all hover:scale-105 border"
+                style={{ color: colors.accentGold, borderColor: 'rgba(255,198,39,0.4)' }}
+              >
+                <ArrowLeft size={20} />
+                <span>Back</span>
+              </button>
+            ) : <span />}
             <button
               onClick={handleNext}
               disabled={!canProceed}
@@ -1179,7 +1202,7 @@ function ScenarioStep({ data, colors, onProceed, onAwardXP, onWaveReaction }: an
   );
 }
 
-function KnowledgeCheckStep({ data, colors, onProceed, onAwardXP, onWaveReaction }: any) {
+export function KnowledgeCheckStep({ data, colors, onProceed, onAwardXP, onWaveReaction }: any) {
   const [pendingIndex, setPendingIndex] = useState<number | null>(null);
   const [submittedIndex, setSubmittedIndex] = useState<number | null>(null);
   const [triedWrong, setTriedWrong] = useState<Set<number>>(new Set());
@@ -1366,7 +1389,7 @@ function KnowledgeCheckStep({ data, colors, onProceed, onAwardXP, onWaveReaction
               ? `💡 Answer revealed: ${data.correctFeedback}`
               : data.options[submittedIndex].correct
                 ? data.correctFeedback
-                : data.wrongFeedback}
+                : (data.options[submittedIndex].feedback ?? data.wrongFeedback)}
           </p>
           {answerRevealed && (
             <p className="mt-2 text-sm" style={{ color: colors.textSecondary }}>
@@ -1379,7 +1402,7 @@ function KnowledgeCheckStep({ data, colors, onProceed, onAwardXP, onWaveReaction
   );
 }
 
-function MultiSelectKnowledgeCheck({ data, colors, onProceed, onAwardXP, onWaveReaction }: any) {
+export function MultiSelectKnowledgeCheck({ data, colors, onProceed, onAwardXP, onWaveReaction }: any) {
   const correctIndices = useMemo(
     () => data.options.map((o: any, i: number) => (o.correct ? i : null)).filter((i: any) => i !== null) as number[],
     [data]
@@ -1439,6 +1462,19 @@ function MultiSelectKnowledgeCheck({ data, colors, onProceed, onAwardXP, onWaveR
   };
 
   const wasWrongSubmit = submittedSelected !== null && !locked;
+
+  // What to say for a submitted answer that isn't fully right: if every pick was a correct one (just not all of
+  // them yet) say so, using the option's own note when only one was picked; any wrong pick gets the wrong message.
+  const partialMessage = (picked: Set<number>): string => {
+    const pickedList = [...picked];
+    const allPicksCorrect = pickedList.every((i) => data.options[i].correct);
+    if (!allPicksCorrect) {
+      const wrongPick = pickedList.map((i) => data.options[i]).find((o: any) => !o.correct && o.feedback);
+      return wrongPick?.feedback ?? data.wrongFeedback;
+    }
+    if (pickedList.length === 1 && data.options[pickedList[0]].partialFeedback) return data.options[pickedList[0]].partialFeedback;
+    return data.partialFeedback ?? "You're on the right track, but there are more correct answers here. Look through the options again.";
+  };
 
   return (
     <div
@@ -1552,7 +1588,7 @@ function MultiSelectKnowledgeCheck({ data, colors, onProceed, onAwardXP, onWaveR
               ? `💡 Answer revealed: ${data.correctFeedback}`
               : isCorrectSet(submittedSelected)
                 ? data.correctFeedback
-                : data.wrongFeedback}
+                : partialMessage(submittedSelected)}
           </p>
           {answerRevealed && (
             <p className="mt-2 text-sm" style={{ color: colors.textSecondary }}>
@@ -1571,7 +1607,10 @@ interface RankingItem {
   feedback?: string;
 }
 
-function RankingCheckStep({ data, colors, onProceed, onAwardXP, onWaveReaction }: any) {
+// One colour per rating, used in the instructions, the dropdown and the card edge so the 1/2/3 scale reads at a glance.
+const RANK_COLORS: Record<number, string> = { 1: "#10B981", 2: "#FFC627", 3: "#F2663B" };
+
+export function RankingCheckStep({ data, colors, onProceed, onAwardXP, onWaveReaction }: any) {
   const items: RankingItem[] = data.items;
   const scale: { value: number; label: string }[] = data.scale;
 
@@ -1618,14 +1657,20 @@ function RankingCheckStep({ data, colors, onProceed, onAwardXP, onWaveReaction }
         <p style={{ color: colors.textPrimary }}>{data.instructions}</p>
         <div className="pt-1 space-y-1">
           {scale.map((s) => (
-            <p key={s.value} className="text-sm italic" style={{ color: colors.textSecondary }}>
-              ({s.value}) {s.label}
+            <p key={s.value} className="text-sm flex items-center gap-2" style={{ color: colors.textPrimary }}>
+              <span
+                className="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-extrabold flex-shrink-0"
+                style={{ backgroundColor: RANK_COLORS[s.value], color: "#0D0508" }}
+              >
+                {s.value}
+              </span>
+              <span>{s.label}</span>
             </p>
           ))}
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="grid md:grid-cols-2 gap-4">
         {items.map((item: RankingItem, index: number) => {
           const value = answers[index];
           const isCorrect = submitted && value === item.correctValue;
@@ -1640,7 +1685,7 @@ function RankingCheckStep({ data, colors, onProceed, onAwardXP, onWaveReaction }
                 backgroundColor: isCorrect ? "rgba(16,185,129,0.08)" : isWrong ? "rgba(232,84,122,0.08)" : "transparent",
               }}
             >
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <p className="flex-1" style={{ color: colors.textPrimary }}>{item.prompt}</p>
                 <select
                   value={value ?? ""}
@@ -1648,14 +1693,16 @@ function RankingCheckStep({ data, colors, onProceed, onAwardXP, onWaveReaction }
                   disabled={locked}
                   className="px-3 py-2 rounded-lg font-bold disabled:cursor-not-allowed flex-shrink-0"
                   style={{
-                    backgroundColor: colors.background,
-                    color: colors.textPrimary,
-                    border: `2px solid ${colors.accentGold}`,
+                    backgroundColor: value ? RANK_COLORS[value] : colors.background,
+                    color: value ? "#0D0508" : colors.textPrimary,
+                    border: `2px solid ${value ? RANK_COLORS[value] : colors.accentGold}`,
                   }}
                 >
                   <option value="" disabled>Select...</option>
                   {scale.map((s) => (
-                    <option key={s.value} value={s.value}>{s.value}</option>
+                    <option key={s.value} value={s.value} style={{ backgroundColor: RANK_COLORS[s.value], color: "#0D0508" }}>
+                      {s.value}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -2184,19 +2231,31 @@ function CompletionStep({ data, colors, totalXP, onComplete, nextModule, onNextM
 // ── WaveTalkStep ──────────────────────────────────────────────────────────────
 // Wave appears at the same level as the active bubble, slides in from the left,
 // and faces right toward the speech bubble. Previous bubbles stack above faded.
-export function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any; onNext: () => void }) {
+export function WaveTalkStep({ data, colors, onNext, onBackStep }: { data: any; colors: any; onNext: () => void; onBackStep?: () => void }) {
   const [msgIndex, setMsgIndex] = useState(0);
   const [maxReached, setMaxReached] = useState(0);
-  const messages: { text: string; mood: string; link?: string }[] = data.messages;
+  const messages: { text: string; mood: string; link?: string; scenario?: boolean; emoji?: string }[] = data.messages;
   const isLast = msgIndex === messages.length - 1;
   const current = messages[msgIndex];
   const currentStoryCharacter = detectStoryCharacter(current.text);
   const currentCharacterInfo = currentStoryCharacter ? getCharacterInfo(currentStoryCharacter) : null;
   // Messages that carry a "learn more" link are real-world examples of a concept; character
   // stories are scenarios. Each gets its own highlight so learners can tell them apart.
-  const isRealWorldExample = !currentStoryCharacter && Boolean(current.link);
-  const EXAMPLE_COLOR = "#4BB7C4";
-  const bubbleColor = currentCharacterInfo ? currentCharacterInfo.color : isRealWorldExample ? EXAMPLE_COLOR : colors.accentGold;
+  // A scenario is a story about one of our characters, or any message marked `scenario: true` (e.g. a story
+  // about someone else). Scenarios and real-world examples must never share a colour, so the real-world colour
+  // is violet — none of the characters use it (Aisha pink, Dev teal, Jordan gold).
+  const isScenarioWithoutCharacter = !currentStoryCharacter && Boolean(current.scenario);
+  const isRealWorldExample = !currentStoryCharacter && !isScenarioWithoutCharacter && Boolean(current.link);
+  const EXAMPLE_COLOR = "#9B8CFF";
+  const SCENARIO_COLOR = "#FF8A5B";
+  const bubbleColor = currentCharacterInfo
+    ? currentCharacterInfo.color
+    : isScenarioWithoutCharacter
+      ? SCENARIO_COLOR
+      : isRealWorldExample
+        ? EXAMPLE_COLOR
+        : colors.accentGold;
+  const isHighlighted = Boolean(currentCharacterInfo) || isScenarioWithoutCharacter || isRealWorldExample;
 
   // Width of the dolphin column — used to indent previous messages so they align
   const DOLPHIN_COL = "w-28"; // ~112 px
@@ -2208,7 +2267,8 @@ export function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any;
       setMaxReached(m => Math.max(m, next));
     } else onNext();
   };
-  const goBack = () => setMsgIndex(i => Math.max(0, i - 1));
+  // Back steps through this page's messages, then on to the previous page once it reaches the first message.
+  const goBack = () => (msgIndex > 0 ? setMsgIndex(i => Math.max(0, i - 1)) : onBackStep?.());
 
   // Earlier messages fade into a small blurred stack behind the active one.
   const STACK_DEPTH = 3;
@@ -2313,11 +2373,11 @@ export function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any;
               transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               style={{
                 backgroundColor: colors.cardBackground,
-                backgroundImage: currentCharacterInfo || isRealWorldExample
+                backgroundImage: isHighlighted
                   ? `linear-gradient(${bubbleColor}26, ${bubbleColor}0D)`
                   : undefined,
                 border: `2px solid ${bubbleColor}`,
-                boxShadow: currentCharacterInfo || isRealWorldExample
+                boxShadow: isHighlighted
                   ? `0 0 32px ${bubbleColor}55`
                   : `0 0 24px rgba(255,198,39,0.08)`
               }}
@@ -2327,7 +2387,7 @@ export function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any;
                 className="absolute -left-[9px] top-6 w-4 h-4 rotate-45"
                 style={{
                   backgroundColor: colors.cardBackground,
-                  backgroundImage: currentCharacterInfo || isRealWorldExample
+                  backgroundImage: isHighlighted
                     ? `linear-gradient(${bubbleColor}26, ${bubbleColor}26)`
                     : undefined,
                   borderLeft: `2px solid ${bubbleColor}`,
@@ -2337,6 +2397,14 @@ export function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any;
               {currentStoryCharacter && (
                 <StoryHeader character={currentStoryCharacter} label="🎭 SCENARIO" />
               )}
+              {isScenarioWithoutCharacter && (
+                <span
+                  className="inline-block self-start px-2 py-0.5 mb-2 rounded-full text-[10px] font-extrabold tracking-widest"
+                  style={{ backgroundColor: SCENARIO_COLOR, color: "#0D0508" }}
+                >
+                  🎭 SCENARIO
+                </span>
+              )}
               {isRealWorldExample && (
                 <span
                   className="inline-block self-start px-2 py-0.5 mb-2 rounded-full text-[10px] font-extrabold tracking-widest"
@@ -2345,16 +2413,21 @@ export function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any;
                   🌍 REAL-WORLD EXAMPLE
                 </span>
               )}
-              <p
-                className="leading-relaxed text-lg overflow-y-auto min-h-0"
-                style={{ color: colors.textPrimary }}
-                dangerouslySetInnerHTML={{
-                  __html: highlightCharacterName(
-                    current.text.replace(/\*(.*?)\*/g, '<em>$1</em>'),
-                    currentStoryCharacter
-                  )
-                }}
-              />
+              <div className="flex items-center gap-4 min-h-0">
+                {current.emoji && (
+                  <span className="text-5xl flex-shrink-0" aria-hidden>{current.emoji}</span>
+                )}
+                <p
+                  className="leading-relaxed text-lg overflow-y-auto min-h-0"
+                  style={{ color: colors.textPrimary }}
+                  dangerouslySetInnerHTML={{
+                    __html: highlightCharacterName(
+                      current.text.replace(/\*(.*?)\*/g, '<em>$1</em>'),
+                      currentStoryCharacter
+                    )
+                  }}
+                />
+              </div>
 
               {/* "Learn more" magnifying glass — hover reveals a message with a link to the
                   related learning module, opening in a new tab. */}
@@ -2415,7 +2488,7 @@ export function WaveTalkStep({ data, colors, onNext }: { data: any; colors: any;
             ))}
           </div>
           <div className="flex items-center gap-3">
-            {msgIndex > 0 && (
+            {(msgIndex > 0 || onBackStep) && (
               <button
                 onClick={goBack}
                 className="flex items-center gap-2 px-4 py-3 rounded-xl font-bold transition-all hover:scale-105 border"

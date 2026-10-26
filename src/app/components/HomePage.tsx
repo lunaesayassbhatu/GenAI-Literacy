@@ -156,15 +156,12 @@ export function HomePage() {
                   <Gamepad2 size={36} className="mx-auto mb-3" style={{ color: colors.accentGold }} />
                   <h3
                     className="text-3xl font-extrabold mb-2"
-                    style={{ textShadow: "0 1px 0 #E0A800, 0 2px 0 #B38600, 0 3px 0 #856200, 0 6px 8px rgba(0,0,0,0.6)" }}
+                    style={{ color: "#FFFFFF", letterSpacing: "0.01em", textShadow: "0 2px 0 #000000, 0 4px 0 #000000, 0 7px 10px rgba(0,0,0,0.7)" }}
                   >
                     Play to Reinforce Learning!
                   </h3>
-                  <p className="text-sm" style={{ color: colors.textSecondary }}>
-                    {/* TEMP placeholder names ("Lumina" the world, "the Beacon" the tech) — swap once the real names are decided */}
-                    {characterName
-                      ? `Go on adventures with ${characterName} to help the world of Lumina learn more about the Beacon.`
-                      : "Choose a character, then go on adventures to help the world of Lumina learn more about the Beacon."}
+                  <p className="text-sm font-medium" style={{ color: "#EBDDE1" }}>
+                    Test what you've learned with short games on prompting, bias, ethics, fact-checking and AI's environmental impact.
                   </p>
                 </motion.div>
               </Link>

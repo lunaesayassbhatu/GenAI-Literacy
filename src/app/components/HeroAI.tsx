@@ -11,7 +11,8 @@ const DEEP = "#6B1530";
 const CARD_SHADOW = "0 8px 0 #1A0A12, 0 14px 24px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.12)";
 
 /** Shared layout: ASU + title + subtitle on the left, the illustration on the right. */
-function AIFrame({ subtitle, background, art }: { subtitle: string; background: string; art: ReactNode }) {
+/** stacked: title on top, illustration underneath (used by the Brain banner) */
+function AIFrame({ subtitle, background, art, stacked = false }: { subtitle: string; background: string; art: ReactNode; stacked?: boolean }) {
   return (
     <div
       className="relative overflow-hidden rounded-2xl px-6 py-10 md:py-12"
@@ -27,8 +28,11 @@ function AIFrame({ subtitle, background, art }: { subtitle: string; background: 
       `}</style>
       {/* Title block sits in the middle of the banner; the illustration is tucked to the right on wide
           screens and goes underneath the text on narrow ones, so the two never overlap. */}
-      <div className="relative lg:flex lg:items-center" style={{ minHeight: undefined }}>
-        <div className="relative z-10 mx-auto w-full text-center lg:min-h-[260px] lg:flex lg:flex-col lg:justify-center" style={{ maxWidth: 460 }}>
+      <div className={stacked ? "relative" : "relative lg:flex lg:items-center"}>
+        <div
+          className={stacked ? "relative z-10 mx-auto w-full text-center" : "relative z-10 mx-auto w-full text-center lg:-translate-x-14 lg:min-h-[260px] lg:flex lg:flex-col lg:justify-center"}
+          style={{ maxWidth: stacked ? 460 : 400 }}
+        >
           <p
             className="text-sm md:text-base font-bold tracking-[0.5em] uppercase mb-1"
             style={{ color: "#F0E0E4", textAlign: "center", paddingLeft: "0.5em" }}
@@ -57,10 +61,10 @@ function AIFrame({ subtitle, background, art }: { subtitle: string; background: 
 )}
         </div>
         <div
-          className="relative mx-auto mt-6 lg:mt-0 lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2"
+          className={stacked ? "relative mx-auto mt-4" : "relative mx-auto mt-6 lg:mt-0 lg:absolute lg:right-2 lg:top-1/2 lg:-translate-y-1/2"}
           style={{ width: 340, height: 270, maxWidth: "100%" }}
         >
-          <div className="relative lg:scale-[0.82] lg:origin-right" style={{ width: 340, height: 270 }}>
+          <div className={stacked ? "relative" : "relative lg:scale-[0.7] lg:origin-right"} style={{ width: 340, height: 270 }}>
             <div
               aria-hidden
               className="absolute rounded-full"
@@ -138,7 +142,7 @@ export function HeroBrain({ subtitle }: { subtitle: string }) {
       <path d="M170 112 l6 14 14 6 -14 6 -6 14 -6 -14 -14 -6 14 -6 z" fill={GOLD} style={{ animation: "aiNode 2s ease-in-out infinite" }} />
     </svg>
   );
-  return <AIFrame subtitle={subtitle} background="radial-gradient(ellipse at 20% 0%, #8C1D40 0%, #3E0C1C 70%)" art={art} />;
+  return <AIFrame stacked subtitle={subtitle} background="radial-gradient(ellipse at 20% 0%, #8C1D40 0%, #3E0C1C 70%)" art={art} />;
 }
 
 /* ───────────────────────── 2. Friendly robot helper ───────────────────────── */
