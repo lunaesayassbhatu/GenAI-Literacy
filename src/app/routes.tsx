@@ -21,6 +21,7 @@ import { BlackBoxMatchingGame } from "./components/games/BlackBoxMatchingGame";
 import { EnvironmentGame } from "./components/games/EnvironmentGame";
 import { BankPortalGame } from "./components/games/BankPortalGame";
 import { KingsNotebookGame } from "./components/games/KingsNotebookGame";
+import { ArgoniaCityGame } from "./components/games/ArgoniaCityGame";
 import { DungeonCrawlGame } from "./components/games/DungeonCrawlGame";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { ProgressStrip } from "./components/ProgressStrip";
@@ -235,6 +236,16 @@ export const router = createBrowserRouter([
       <ProtectedRoute>
         <CharacterRequiredRoute>
           <KingsNotebookGame />
+        </CharacterRequiredRoute>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/games/argonia/city",
+    element: (
+      <ProtectedRoute>
+        <CharacterRequiredRoute>
+          <ArgoniaCityGame />
         </CharacterRequiredRoute>
       </ProtectedRoute>
     )

@@ -5,6 +5,7 @@ import { useTheme } from "../utils/themeContext";
 import { getHighScore } from "../utils/userData";
 import { motion } from "motion/react";
 import { Gamepad2, Puzzle, Brain, Target, Zap, Wand2, Trophy, Scale, EyeOff, Leaf } from "lucide-react";
+import { CITY_SPOTS, loadCityProgress } from "../data/argoniaCityData";
 
 export interface GameOption {
   id: string;
@@ -146,6 +147,33 @@ const SHOWCASE_GAMES: ShowcaseOption[] = [
   },
 ];
 
+function CityFeature() {
+  const found = loadCityProgress().found.length;
+  const total = CITY_SPOTS.length;
+  return (
+    <Link
+      to="/games/argonia/city"
+      className="block mb-10 rounded-3xl p-5 md:p-6 transition-transform hover:scale-[1.01] shadow-xl"
+      style={{ background: "linear-gradient(135deg, #1b2a5e 0%, #3a2a86 55%, #8c3a5a 100%)", border: "2px solid #8b5cf6" }}
+    >
+      <div className="flex flex-col md:flex-row md:items-center gap-4">
+        <div className="text-5xl">🏙️</div>
+        <div className="flex-1">
+          <div className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: "#FFC627" }}>Click to explore · New</div>
+          <h3 className="text-xl md:text-2xl font-bold mb-1" style={{ color: "#ffffff" }}>Explore the City of Argonia</h3>
+          <p className="text-sm" style={{ color: "rgba(255,255,255,0.8)" }}>
+            Take a guided tour of the whole city, then click its buildings, people and objects to find stories, clues and quick questions.
+          </p>
+          <span className="text-xs font-semibold" style={{ color: "rgba(255,255,255,0.7)" }}>{found} of {total} found</span>
+        </div>
+        <div className="px-6 py-3 rounded-xl font-bold flex-shrink-0 text-center" style={{ backgroundColor: "#FFC627", color: "#0D0508" }}>
+          {found === 0 ? "Start exploring" : "Keep exploring"}
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 export function Games() {
   const { colors } = useTheme();
 
@@ -163,6 +191,11 @@ export function Games() {
             Test your knowledge and earn XP through interactive games
           </p>
         </div>
+
+        {/* Explore the city */}
+        <CityFeature />
+
+        <h2 className="text-xl font-semibold mb-4" style={{ color: colors.textPrimary }}>Practice games</h2>
 
         {/* Games Grid */}
         <div className="grid md:grid-cols-2 gap-6">
