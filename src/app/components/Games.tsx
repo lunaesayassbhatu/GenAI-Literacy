@@ -5,7 +5,10 @@ import { useTheme } from "../utils/themeContext";
 import { getHighScore } from "../utils/userData";
 import { motion } from "motion/react";
 import { Gamepad2, Puzzle, Brain, Target, Zap, Wand2, Trophy, Scale, EyeOff, Leaf } from "lucide-react";
+import worldPicture from "../assets/argonia-world.jpg";
+import { ARGONIA_LEVELS, WORLD, loadArgoniaProgress } from "../data/argoniaData";
 import { CITY_SPOTS, loadCityProgress } from "../data/argoniaCityData";
+import { WORKSHOP, LAB, loadInvestigationProgress } from "../data/argoniaInvestigations";
 
 export interface GameOption {
   id: string;
@@ -147,6 +150,59 @@ const SHOWCASE_GAMES: ShowcaseOption[] = [
   },
 ];
 
+function ArgoniaFeature() {
+  const done = loadArgoniaProgress();
+  const playable = ARGONIA_LEVELS.filter((l) => l.playable);
+  const finishedCount = playable.filter((l) => done.includes(l.id)).length;
+  const started = finishedCount > 0;
+  const allDone = finishedCount === playable.length;
+  return (
+    <Link
+      to="/games/argonia"
+      className="block mb-10 rounded-3xl p-6 md:p-8 transition-transform hover:scale-[1.01] shadow-xl"
+      style={{
+        background: "linear-gradient(135deg, #2b1a5e 0%, #4a2a86 55%, #7a1736 100%)",
+        border: "2px solid #8b5cf6",
+      }}
+    >
+      <div className="flex flex-col md:flex-row md:items-center gap-5">
+        <img
+          src={worldPicture}
+          alt="The kingdom of Argonia at sunset"
+          className="w-full md:w-40 h-28 md:h-24 rounded-2xl object-cover flex-shrink-0"
+          style={{ border: "2px solid rgba(255,198,39,0.6)" }}
+        />
+        <div className="flex-1">
+          <div className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: "#FFC627" }}>
+            Story quest · New
+          </div>
+          <h3 className="text-2xl md:text-3xl font-bold mb-1" style={{ color: "#ffffff" }}>
+            {WORLD.name}: {WORLD.questTitle}
+          </h3>
+          <p className="text-sm md:text-base" style={{ color: "rgba(255,255,255,0.8)" }}>
+            Climb the mountain, use your codex wisely, and solve the mystery. Each trial puts a module into practice.
+          </p>
+          <div className="flex items-center gap-3 mt-3">
+            <div className="h-2 w-40 rounded-full overflow-hidden" style={{ backgroundColor: "rgba(255,255,255,0.15)" }}>
+              <div className="h-full rounded-full" style={{ width: `${(finishedCount / playable.length) * 100}%`, backgroundColor: "#FFC627" }} />
+            </div>
+            <span className="text-xs font-semibold" style={{ color: "rgba(255,255,255,0.7)" }}>
+              {finishedCount} of {playable.length} trials
+            </span>
+          </div>
+        </div>
+        <div
+          className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold flex-shrink-0"
+          style={{ backgroundColor: "#FFC627", color: "#0D0508" }}
+        >
+          <Gamepad2 size={20} />
+          {allDone ? "Visit the map" : started ? "Continue the quest" : "Begin the quest"}
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 function CityFeature() {
   const found = loadCityProgress().found.length;
   const total = CITY_SPOTS.length;
@@ -162,7 +218,7 @@ function CityFeature() {
           <div className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: "#FFC627" }}>Click to explore · New</div>
           <h3 className="text-xl md:text-2xl font-bold mb-1" style={{ color: "#ffffff" }}>Explore the City of Argonia</h3>
           <p className="text-sm" style={{ color: "rgba(255,255,255,0.8)" }}>
-            Take a guided tour of the whole city, then click its buildings, people and objects to find stories, clues and quick questions.
+            One picture of the whole city. Click its buildings, people and objects to find stories, clues and quick questions.
           </p>
           <span className="text-xs font-semibold" style={{ color: "rgba(255,255,255,0.7)" }}>{found} of {total} found</span>
         </div>
@@ -171,6 +227,49 @@ function CityFeature() {
         </div>
       </div>
     </Link>
+  );
+}
+
+/** Two scripted text investigations from the Argonia document. No AI is called, so every player sees the same story. */
+function InvestigationFeature() {
+  const done = loadInvestigationProgress();
+  const cards = [
+    { game: WORKSHOP, to: "/games/argonia/workshop", emoji: "🛠️", kind: "Spot the difference" },
+    { game: LAB, to: "/games/argonia/lab", emoji: "📚", kind: "Feed the codex" },
+  ];
+  return (
+    <div className="mb-10">
+      <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: "#FFC627" }}>
+        Text investigations · New · Scripted, no AI
+      </div>
+      <div className="grid md:grid-cols-2 gap-4">
+        {cards.map(({ game, to, emoji, kind }) => {
+          const finished = done.includes(game.id);
+          return (
+            <Link
+              key={game.id}
+              to={to}
+              className="block rounded-3xl p-5 transition-transform hover:scale-[1.01] shadow-xl"
+              style={{ background: "linear-gradient(135deg, #1b2a5e 0%, #3a2a86 55%, #7a1736 100%)", border: "2px solid #8b5cf6" }}
+            >
+              <div className="flex items-start gap-4">
+                <div className="text-4xl">{emoji}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: "#FFC627" }}>
+                    {kind} · Module {game.moduleNumber}
+                  </div>
+                  <h3 className="text-xl font-bold mb-1" style={{ color: "#ffffff" }}>Argonia: {game.title}</h3>
+                  <p className="text-sm mb-3" style={{ color: "rgba(255,255,255,0.8)" }}>{game.teaser}</p>
+                  <span className="inline-block px-4 py-2 rounded-xl text-sm font-bold" style={{ backgroundColor: "#FFC627", color: "#0D0508" }}>
+                    {finished ? "Play again ✓" : "Start investigating"}
+                  </span>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -192,8 +291,10 @@ export function Games() {
           </p>
         </div>
 
-        {/* Explore the city */}
+        {/* Featured story quest */}
+        <ArgoniaFeature />
         <CityFeature />
+        <InvestigationFeature />
 
         <h2 className="text-xl font-semibold mb-4" style={{ color: colors.textPrimary }}>Practice games</h2>
 

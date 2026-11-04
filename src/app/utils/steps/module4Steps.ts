@@ -93,6 +93,29 @@ export const module4Steps: Step[] = [
     }
   },
   {
+    type: "web-map",
+    data: {
+      section: "2 of 3",
+      title: "Some of the ethical issues associated with Generative AI",
+      subtitle: "Every one of these issues connects back to how GenAI is built and used.",
+      center: "Generative AI",
+      // Listed clockwise from the top; colours just keep neighbouring circles apart.
+      nodes: [
+        { lines: ["Perpetuating", "Bias and", "Discrimination"], tone: "maroon" },
+        { lines: ["Misinformation", "(hallucinations", "& deep fakes)"], tone: "pink" },
+        { lines: ["Academic", "Integrity"], tone: "teal" },
+        { lines: ["Use of", "Intellectual", "Property"], tone: "gold" },
+        { lines: ["Human", "Labor"], tone: "maroon" },
+        { lines: ["Data Safety", "and Privacy", "Concerns"], tone: "teal" },
+        { lines: ["Environmental", "Impact"], tone: "gold" },
+        { lines: ["Personal", "Integrity"], tone: "pink" },
+        { lines: ["Sycophancy &", "encouraging", "harmful", "behavior"], tone: "gold" },
+        { lines: ["Black Box", "and", "Transparency"], tone: "maroon" },
+        { lines: ["AI", "Companies"], tone: "teal" }
+      ]
+    }
+  },
+  {
     type: "knowledge-check",
     data: {
       section: "2",

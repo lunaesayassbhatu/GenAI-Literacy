@@ -7,6 +7,8 @@ export type StepType =
   | "knowledge-check"
   | "ranking-check"
   | "pros-cons"
+  | "web-map"
+  | "video"
   | "drag-drop"
   | "wave-talk"
   | "completion";

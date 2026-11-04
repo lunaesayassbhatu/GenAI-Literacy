@@ -1,15 +1,20 @@
 import { useCallback, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { Check, Eye, EyeOff, Search, X, ScrollText } from "lucide-react";
 import { GameHeader } from "./GameHeader";
 import { ArgoniaCityScene } from "./ArgoniaCityScene";
+import { ArgoniaPortrait } from "./ArgoniaPortrait";
 import { ArgoniaCity3D } from "./ArgoniaCity3D";
 import { ArgoniaCityLife } from "./ArgoniaCityLife";
 import { ArgoniaCityVideo } from "./ArgoniaCityVideo";
-import { ArgoniaCityTour, ArgoniaCityTourPanel } from "./ArgoniaCityTour";
+import { ArgoniaCityTour, ArgoniaCityTourPanel, type TourResume } from "./ArgoniaCityTour";
 import { addXP } from "../../utils/userData";
 import {
   CITY_BACKGROUND_IMAGE,
   CITY_BACKGROUND_VIDEO,
+  CITY_TOUR,
+  CITY_ANIMATED_OVERLAY,
+  SHOW_CITY_TOUR,
   IMAGE_SPOT_POSITIONS,
   CITY_SPOTS,
   XP_LOOK,
@@ -17,6 +22,7 @@ import {
   loadCityProgress,
   saveCityProgress,
   type CitySpot,
+  type TourVersionId,
 } from "../../data/argoniaCityData";
 import { CITY_TRACK_DT, CITY_TRACKS } from "../../data/argoniaCityTracks";
 
@@ -64,7 +70,10 @@ function SpotPanel({
         </button>
       </div>
 
-      <p className="leading-relaxed mb-3" style={{ color: "rgba(255,255,255,0.88)", fontFamily: "Georgia, serif", fontSize: 16 }}>{spot.story}</p>
+      <div className={spot.portrait ? "flex items-start gap-4 mb-3" : undefined}>
+        {spot.portrait && <ArgoniaPortrait src={spot.portrait.src} alt={spot.portrait.alt} width={104} height={132} />}
+        <p className={spot.portrait ? "leading-relaxed flex-1" : "leading-relaxed mb-3"} style={{ color: "rgba(255,255,255,0.88)", fontFamily: "Georgia, serif", fontSize: 16 }}>{spot.story}</p>
+      </div>
 
       <div className="rounded-xl p-3 mb-3 text-sm" style={{ backgroundColor: "rgba(255,198,39,0.1)", border: "1px solid rgba(255,198,39,0.35)", color: "rgba(255,255,255,0.88)" }}>
         <span className="font-bold" style={{ color: GOLD }}>The idea: </span>{spot.idea}
@@ -118,9 +127,18 @@ export function ArgoniaCityGame() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [picks, setPicks] = useState<Record<string, number>>({});
   const [showAll, setShowAll] = useState(false);
-  const [view, setView] = useState<"tour" | "3d" | "picture">(CITY_BACKGROUND_IMAGE ? "picture" : "3d");
+  const [view, setView] = useState<"tour" | "3d" | "picture">(SHOW_CITY_TOUR ? "tour" : "picture");
   const tourRef = useRef<HTMLVideoElement>(null);
   const [tourTime, setTourTime] = useState(0);
+  const [tourVersion, setTourVersion] = useState<TourVersionId>("bach");
+  const resumeRef = useRef<TourResume | null>(null);
+
+  // changing the music keeps the tour where it is, playing or paused as it was
+  function pickTourVersion(id: TourVersionId) {
+    const v = tourRef.current;
+    if (v) resumeRef.current = { t: v.currentTime, playing: !v.paused };
+    setTourVersion(id);
+  }
   const markerRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const [hover, setHover] = useState<{ id: string; x: number; y: number } | null>(null);
 
@@ -182,7 +200,7 @@ export function ArgoniaCityGame() {
               <Search size={16} /> {found} of {total} found
             </div>
             <div className="flex rounded-xl overflow-hidden text-sm font-semibold" style={{ border: "1px solid rgba(255,255,255,0.25)" }} role="group" aria-label="View">
-              {(["tour", "picture", "3d"] as const).map((v) => (
+              {(SHOW_CITY_TOUR ? (["tour", "picture", "3d"] as const) : (["picture", "3d"] as const)).map((v) => (
                 <button key={v} onClick={() => setView(v)} aria-pressed={view === v} className="px-3 py-2" style={{ backgroundColor: view === v ? GOLD : "rgba(255,255,255,0.08)", color: view === v ? "#0D0508" : "#ffffff" }}>
                   {v === "tour" ? "Tour" : v === "3d" ? "3D city" : "Picture"}
                 </button>
@@ -198,6 +216,7 @@ export function ArgoniaCityGame() {
                 {showAll ? <EyeOff size={16} /> : <Eye size={16} />} {showAll ? "Hide hotspots" : "Show hotspots"}
               </button>
             )}
+            <Link to="/games/argonia" className="text-sm font-semibold underline" style={{ color: GOLD }}>The quest</Link>
           </div>
         </div>
 
@@ -205,7 +224,7 @@ export function ArgoniaCityGame() {
           {/* the picture */}
           <div className="relative rounded-3xl overflow-hidden shadow-2xl" style={{ border: `2px solid ${ACCENT}`, aspectRatio: view === "tour" ? "16 / 9" : "3 / 2" }}>
             {view === "tour" ? (
-              <ArgoniaCityTour videoRef={tourRef} onTime={setTourTime} />
+              <ArgoniaCityTour videoRef={tourRef} version={CITY_TOUR.versions.find((v) => v.id === tourVersion) ?? CITY_TOUR.versions[0]} resumeRef={resumeRef} onTime={setTourTime} />
             ) : view === "3d" ? (
               <ArgoniaCity3D
                 seen={progress.found}
@@ -221,7 +240,7 @@ export function ArgoniaCityGame() {
             ) : (
               <ArgoniaCityScene />
             )}
-            {view === "picture" && CITY_BACKGROUND_IMAGE && !CITY_BACKGROUND_VIDEO && <ArgoniaCityLife />}
+            {CITY_ANIMATED_OVERLAY && view === "picture" && CITY_BACKGROUND_IMAGE && !CITY_BACKGROUND_VIDEO && <ArgoniaCityLife />}
             {view === "3d" && hover && (
               <div className="pointer-events-none absolute rounded-md px-2 py-1 text-xs font-semibold whitespace-nowrap" style={{ left: hover.x + 12, top: hover.y + 12, backgroundColor: "rgba(13,5,8,0.92)", color: "#ffffff", zIndex: 4 }}>
                 {CITY_SPOTS.find((x) => x.id === hover.id)?.name}
@@ -266,7 +285,7 @@ export function ArgoniaCityGame() {
           {/* the panel */}
           <div className="lg:sticky lg:top-4">
             {view === "tour" ? (
-              <ArgoniaCityTourPanel videoRef={tourRef} time={tourTime} />
+              <ArgoniaCityTourPanel videoRef={tourRef} time={tourTime} versionId={tourVersion} onVersion={pickTourVersion} />
             ) : spot ? (
               <SpotPanel spot={spot} picked={picks[spot.id] ?? null} onPick={(i) => pick(spot, i)} onClose={() => setOpenId(null)} />
             ) : (

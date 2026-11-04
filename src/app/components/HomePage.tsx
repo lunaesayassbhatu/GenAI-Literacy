@@ -7,15 +7,16 @@ import { HeroBrain, HeroRobot, HeroPrompt } from "./HeroAI";
 import { useTheme } from "../utils/themeContext";
 import { getUserData } from "../utils/userData";
 import { getCharacterInfo } from "../data/charactersData";
+import { resolveStudentId } from "../data/studentsData";
 import { motion } from "motion/react";
 import { BookOpen, Gamepad2, Target, Award, ArrowRight } from "lucide-react";
 
-// Banner style: "classic" (default, the original plain card), or the vote candidates "ocean", "beacon",
-// "circuit", "student". Preview any of them without editing code by opening /home?hero=beacon (etc.).
-// After the banner vote, set DEFAULT_HERO_STYLE to the winner.
+// Banner style: the banner vote chose "student" (an ASU student drawn to match the learner's chosen
+// character). The other candidates ("classic", "ocean", "beacon", "circuit", "brain", "robot", "prompt")
+// can still be previewed without editing code by opening /home?hero=beacon (etc.).
 type HeroStyle = "classic" | "ocean" | "beacon" | "circuit" | "student" | "brain" | "robot" | "prompt";
 const HERO_STYLES: HeroStyle[] = ["classic", "ocean", "beacon", "circuit", "student", "brain", "robot", "prompt"];
-const DEFAULT_HERO_STYLE: HeroStyle = "classic";
+const DEFAULT_HERO_STYLE: HeroStyle = "student";
 const HERO_SUBTITLE = "An interactive learning platform helping the ASU community use Generative AI responsibly and effectively.";
 
 export function HomePage() {
@@ -23,6 +24,7 @@ export function HomePage() {
   const heroParam = new URLSearchParams(window.location.search).get("hero");
   const heroStyle: HeroStyle = HERO_STYLES.find((h) => h === heroParam) ?? DEFAULT_HERO_STYLE;
   const selectedCharacter = getUserData()?.selectedCharacter;
+  const selectedStudent = resolveStudentId(getUserData()?.selectedStudent, selectedCharacter);
   const characterName = selectedCharacter ? getCharacterInfo(selectedCharacter).name : null;
 
   return (
@@ -75,7 +77,7 @@ export function HomePage() {
             ) : heroStyle === "circuit" ? (
               <HeroCircuit subtitle="" />
             ) : heroStyle === "student" ? (
-              <HeroStudent subtitle="" character={selectedCharacter} />
+              <HeroStudent subtitle="" student={selectedStudent} />
             ) : (
               <HeroTitle subtitle="" />
             )}

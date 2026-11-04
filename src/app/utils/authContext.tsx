@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // pull fresh data from Supabase into localStorage once per session.
   useEffect(() => {
     if (!session?.user) return;
-    const alreadyHydrated = localStorage.getItem('hydrated_session') === session.user.id;
+    const alreadyHydrated = localStorage.getItem('hydrated_session') === session.user.id && Boolean(localStorage.getItem('asu_genai_user'));
     if (alreadyHydrated) return;
 
     hydrateLocalStorageFromSupabase(session.user.id, session.user.email ?? '').then(() => {

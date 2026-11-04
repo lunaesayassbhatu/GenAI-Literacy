@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import type { ItemSlot } from '../data/itemsData';
+import type { StudentId } from '../data/studentsData';
 
 export interface Badge {
   id: string;
@@ -28,6 +29,8 @@ export interface UserData {
   isReturningUser?: boolean;
   language?: string;
   selectedCharacter?: CharacterId;
+  /** The student shown on the home banner (see data/studentsData.ts). Saved on this device only, like equippedItems. */
+  selectedStudent?: StudentId;
   equippedItems?: Partial<Record<ItemSlot, string>>;
   /** Id of the chosen profile banner color preset — see BANNER_PRESETS in Profile.tsx. */
   bannerColor?: string;

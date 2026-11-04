@@ -7,24 +7,49 @@
 // AI-generated image of the city (use the same positions, or adjust x/y below to match the new picture).
 
 /** The picture of the city. Set to null to use the drawn scene instead. */
-import cityImage from "../assets/argonia-city.png";
-import cityVideo from "../assets/argonia-city.mp4";
+import cityImage from "../assets/argonia-world.jpg";
+import queenPortrait from "../assets/queen-portrait.jpg";
 import tourVideo from "../assets/argonia-tour.mp4";
+import tourVideoMeditation from "../assets/argonia-tour-meditation.mp4";
 import tourPoster from "../assets/argonia-tour-poster.jpg";
 
 export const CITY_BACKGROUND_IMAGE: string | null = cityImage;
 
-/** A short looping video of the same picture (people, rider and water move). Set to null to show only the still picture. */
-export const CITY_BACKGROUND_VIDEO: string | null = cityVideo;
+/** The game has no video: the picture is a still image. (To bring the looping video back, import "../assets/argonia-city.mp4" and set it here.) */
+export const CITY_BACKGROUND_VIDEO: string | null = null;
+
+/** Small animated extras drawn over the still picture (birds, smoke, people on the road). Off: the picture stays a calm still. */
+export const CITY_ANIMATED_OVERLAY = false;
+
+/** The guided tour video is kept in the project but is not shown in the game. */
+export const SHOW_CITY_TOUR = false;
 
 /**
- * The guided tour: about 78 seconds with music, climbing the city one place at a time and ending with the queen.
- * `chapters` are the places in the tour (seconds from the start), so a learner can jump straight to one.
- * Music: J. S. Bach, Violin Sonata No. 1 in G minor, BWV 1001, I. Adagio (CC0, public domain dedication), and a quiet murmur of people made for this project.
+ * The guided tour: about 78 seconds, with music and a quiet murmur of people, climbing the city one place at a time and ending with the queen.
+ * It comes in two music versions (the picture is the same); the learner picks one. `chapters` are the places in the tour
+ * (seconds from the start), so a learner can jump straight to one.
  */
-export const CITY_TOUR = {
-  video: tourVideo,
+export type TourVersionId = "bach" | "meditation";
+export interface TourVersion { id: TourVersionId; label: string; detail: string; video: string; credit: string }
+
+export const CITY_TOUR: { poster: string; versions: TourVersion[]; chapters: Array<{ label: string; at: number }> } = {
   poster: tourPoster,
+  versions: [
+    {
+      id: "bach",
+      label: "Bach",
+      detail: "solo violin",
+      video: tourVideo,
+      credit: "Music: J. S. Bach, Violin Sonata No. 1 in G minor, BWV 1001, I. Adagio (CC0, public domain dedication).",
+    },
+    {
+      id: "meditation",
+      label: "Méditation",
+      detail: "violin and piano",
+      video: tourVideoMeditation,
+      credit: "Music: “Meditation from Thaïs” by Jules Massenet, performed by Bomsori Kim and Pallavi Mahidhara. Recording by Premiere Performances of Hong Kong, licensed CC BY 3.0 (creativecommons.org/licenses/by/3.0/). Excerpt, with fades and a level change.",
+    },
+  ],
   chapters: [
     { label: "The whole city", at: 0 },
     { label: "The Eastgate", at: 7 },
@@ -38,21 +63,20 @@ export const CITY_TOUR = {
     { label: "The castle", at: 63 },
     { label: "The queen", at: 70 },
   ],
-  credit: "Music: J. S. Bach, Violin Sonata No. 1 in G minor, BWV 1001, I. Adagio (CC0).",
 };
 
 /** Hotspot positions (percent of the picture) for CITY_BACKGROUND_IMAGE. The x/y on each spot below are for the drawn scene. */
 export const IMAGE_SPOT_POSITIONS: Record<string, { x: number; y: number }> = {
-  "palace": { x: 23.7, y: 16.5 },
-  "pigeon-loft": { x: 8.7, y: 38.9 },
-  "eastgate": { x: 89.4, y: 73.1 },
-  "north-rider": { x: 40.7, y: 61.3 },
-  "rumor-board": { x: 45.1, y: 76.7 },
-  "workshop": { x: 65.7, y: 61.3 },
-  "university": { x: 26.9, y: 44.8 },
-  "market": { x: 57, y: 81.4 },
-  "scribes-hall": { x: 53.8, y: 51.9 },
-  "lake": { x: 72.8, y: 41.3 },
+  "palace": { x: 30, y: 14 }, // the queen on the palace balcony
+  "pigeon-loft": { x: 6, y: 36 },
+  "eastgate": { x: 85, y: 62 },
+  "north-rider": { x: 30.5, y: 69 },
+  "rumor-board": { x: 10, y: 71 },
+  "workshop": { x: 58, y: 62 }, // the mill by the waterfall
+  "university": { x: 24, y: 32 }, // the clock tower, with the professor sitting beside it
+  "market": { x: 63, y: 84 },
+  "scribes-hall": { x: 62.5, y: 44 },
+  "lake": { x: 74, y: 38 },
 };
 
 export interface CityQuestionOption { text: string; good: boolean; feedback: string }
@@ -75,6 +99,8 @@ export interface CitySpot {
   question?: CityQuestion;
   /** A clue for the mystery, if this spot holds one. */
   clue?: string;
+  /** A painted portrait of the person at this spot, shown beside the story. */
+  portrait?: { src: string; alt: string };
 }
 
 export const XP_LOOK = 5;
@@ -89,6 +115,7 @@ export const CITY_SPOTS: CitySpot[] = [
     y: 17.5,
     moduleNumber: 1,
     module: "What is Generative AI, really?",
+    portrait: { src: queenPortrait, alt: "The queen of Argonia in a burgundy velvet gown and jewelled crown" },
     story:
       "High above the clouds, the palace doors are closing to the people. Somewhere inside, the queen waits for you. The king's codex vanished along with him, but yours is in your bag, ready to write.",
     idea:

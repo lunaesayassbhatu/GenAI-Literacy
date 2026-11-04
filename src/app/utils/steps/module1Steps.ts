@@ -92,6 +92,18 @@ export const module1Steps: Step[] = [
     }
   },
 
+  // A short video, placed just before the "What is GenAI good at?" page.
+  {
+    type: "video",
+    data: {
+      section: "1 of 3",
+      title: "Generative AI explained in 2 minutes",
+      subtitle: "Watch this short video before we look at what GenAI does well.",
+      videoId: "rwF-X5STYks",
+      videoTitle: "Generative AI explained in 2 minutes"
+    }
+  },
+
   // ── SECTION 2 ──────────────────────────────────────────────────────────────
   {
     type: "wave-talk",

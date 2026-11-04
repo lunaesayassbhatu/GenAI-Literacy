@@ -195,7 +195,7 @@ export function AskWaveChat() {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         whileHover={{ scale: 1.05 }}
-        className={pos ? "fixed z-50 flex items-center gap-2 rounded-full pl-2 pr-4 py-2 shadow-lg" : "fixed bottom-14 right-6 z-50 flex items-center gap-2 rounded-full pl-2 pr-4 py-2 shadow-lg"}
+        className={pos ? "group fixed z-50 flex items-center rounded-full p-2 shadow-lg" : "group fixed bottom-14 right-4 z-50 flex items-center rounded-full p-2 shadow-lg"}
         style={{
           backgroundColor: colors.cardBackground,
           border: `2px solid ${colors.accentGold}`,
@@ -207,7 +207,11 @@ export function AskWaveChat() {
         title="Click to open — drag to move"
       >
         <DolphinMascot size={40} animate={false} />
-        <span className="text-sm font-semibold flex items-center gap-1" style={{ color: colors.textPrimary }}>
+        {/* Just the dolphin until you point at it (or tab to it), so it covers as little of the page as possible. */}
+        <span
+          className="text-sm font-semibold flex items-center gap-1 overflow-hidden whitespace-nowrap max-w-0 opacity-0 transition-all duration-200 group-hover:max-w-[9rem] group-hover:opacity-100 group-hover:px-2 group-focus-visible:max-w-[9rem] group-focus-visible:opacity-100 group-focus-visible:px-2"
+          style={{ color: colors.textPrimary }}
+        >
           <MessageCircle size={16} />
           Ask Wave
         </span>

@@ -24,6 +24,8 @@ import type { CharacterId } from "../utils/userData";
 import { getCharacterInfo } from "../data/charactersData";
 import { personalizeSteps } from "../utils/personalizeStory";
 import { GuideWaveIntro, hasSeenGuideWaveIntro } from "./GuideWaveIntro";
+import { WebMapStep } from "./WebMapStep";
+import { VideoStep } from "./VideoStep";
 
 type WaveMood = "default" | "thinking" | "celebrate" | "hint" | "spin";
 
@@ -292,7 +294,7 @@ function ModuleLearningInner() {
     // Reset proceed state
     setCanProceed(
       currentStepIndex < furthestStepRef.current ||
-      currentStep.type === "intro" || currentStep.type === "reading" || currentStep.type === "transition" || currentStep.type === "pros-cons"
+      currentStep.type === "intro" || currentStep.type === "reading" || currentStep.type === "transition" || currentStep.type === "pros-cons" || currentStep.type === "web-map" || currentStep.type === "video"
     );
     setHintClickCount(0);
   }, [currentStepIndex]);
@@ -342,6 +344,12 @@ function ModuleLearningInner() {
           break;
         case "pros-cons":
           setWaveMessage("Here's a quick look at where GenAI shines, and where it doesn't.");
+          break;
+        case "web-map":
+          setWaveMessage("Every one of these circles connects back to GenAI. Take a moment to look at how many there are!");
+          break;
+        case "video":
+          setWaveMessage("Here's a quick video. Press play, and take your time. It's only a couple of minutes!");
           break;
         case "completion":
           setWaveMessage("Amazing work! You've learned so much!");
@@ -444,6 +452,8 @@ function ModuleLearningInner() {
         .filter(({ step, idx }) =>
           (step.type === "wave-talk" ||
            step.type === "reading" ||
+           step.type === "web-map" ||
+           step.type === "video" ||
            step.type === "knowledge-check" ||
            step.type === "scenario" ||
            step.type === "drag-drop") &&
@@ -632,6 +642,20 @@ function ModuleLearningInner() {
 
               {currentStep.type === "pros-cons" && (
                 <ProsConsStep
+                  data={currentStep.data}
+                  colors={colors}
+                />
+              )}
+
+              {currentStep.type === "web-map" && (
+                <WebMapStep
+                  data={currentStep.data}
+                  colors={colors}
+                />
+              )}
+
+              {currentStep.type === "video" && (
+                <VideoStep
                   data={currentStep.data}
                   colors={colors}
                 />
@@ -2550,7 +2574,7 @@ function ReviewModeContent({
   }
 
   const { step } = questions[currentIdx];
-  const isConceptStep = step.type === "wave-talk" || step.type === "reading";
+  const isConceptStep = step.type === "wave-talk" || step.type === "reading" || step.type === "web-map" || step.type === "video";
 
   return (
     <div className="space-y-6">
@@ -2573,7 +2597,7 @@ function ReviewModeContent({
       {/* Progress dots — gold for concepts, teal for questions */}
       <div className="flex gap-2 items-center">
         {questions.map(({ step: s }, idx) => {
-          const isConcept = s.type === "wave-talk" || s.type === "reading";
+          const isConcept = s.type === "wave-talk" || s.type === "reading" || s.type === "web-map" || s.type === "video";
           const isActive = idx === currentIdx;
           const isPast = idx < currentIdx;
           return (
@@ -2604,6 +2628,12 @@ function ReviewModeContent({
         )}
         {step.type === "reading" && (
           <ReviewReading data={step.data} colors={colors} />
+        )}
+        {step.type === "web-map" && (
+          <WebMapStep data={step.data} colors={colors} />
+        )}
+        {step.type === "video" && (
+          <VideoStep data={step.data} colors={colors} />
         )}
         {step.type === "knowledge-check" && (
           <ReviewKnowledgeCheck data={step.data} colors={colors} />

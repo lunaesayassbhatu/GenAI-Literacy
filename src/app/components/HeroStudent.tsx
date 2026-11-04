@@ -1,5 +1,7 @@
 import { motion } from "motion/react";
-import type { CharacterId } from "../utils/userData";
+import { Link } from "react-router-dom";
+import type { StudentId } from "../data/studentsData";
+import { GearLayer, STUDENT_RIG, isEyewearItem } from "./AvatarGear";
 
 const CHIPS = [
   { text: "💡 Write a clear prompt", left: "-18%", top: "6%", delay: 0 },
@@ -15,27 +17,45 @@ interface Look {
   blush: boolean;
 }
 
-// The learner's chosen character decides which student we draw.
-const LOOKS: Record<CharacterId, Look> = {
-  aisha: { skin: "#C68642", hair: "#2A1810", style: "long", glasses: false, blush: true },
-  dev: { skin: "#8D5524", hair: "#141414", style: "curly", glasses: true, blush: false },
-  jordan: { skin: "#E3B27A", hair: "#5B3A29", style: "short", glasses: false, blush: false },
+// The student the learner picked on the character screen decides who we draw.
+const LOOKS: Record<StudentId, Look> = {
+  maya: { skin: "#C68642", hair: "#2A1810", style: "long", glasses: false, blush: true },
+  malik: { skin: "#8D5524", hair: "#141414", style: "curly", glasses: true, blush: false },
+  sam: { skin: "#E3B27A", hair: "#5B3A29", style: "short", glasses: false, blush: false },
 };
 
 const HOODIE = "#8C1D40";
 const HOODIE_DARK = "#6B1530";
 const GOLD = "#FFC627";
 
-function Student({ look }: { look: Look }) {
+// "scene" is the whole banner picture (laptop, desk, books, mug). "badge" is a tight head-and-shoulders crop for the
+// round pictures on the character screen. "bust" is a roomier crop with space above for hats; it wears the equipped accessories.
+type StudentView = "scene" | "badge" | "bust";
+
+const VIEW_BOX: Record<Exclude<StudentView, "scene">, string> = {
+  badge: "103 22 134 134",
+  bust: "60 0 220 220",
+};
+
+function Student({ look, view = "scene", equipped = [] }: { look: Look; view?: StudentView; equipped?: string[] }) {
   const { skin, hair, style, glasses, blush } = look;
+  const scene = view === "scene";
+  const wearsEyewear = equipped.some(isEyewearItem);
   return (
-    <svg className="absolute left-0 top-0" width="340" height="270" viewBox="0 0 340 270" aria-hidden>
+    <svg
+      className={scene ? "absolute left-0 top-0" : "block w-full h-full"}
+      {...(scene ? { width: 340, height: 270, viewBox: "0 0 340 270" } : { viewBox: VIEW_BOX[view] })}
+      aria-hidden
+    >
       <defs>
         <linearGradient id="deskGrad" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#3A1522" />
           <stop offset="100%" stopColor="#24101A" />
         </linearGradient>
       </defs>
+
+      {/* back-slot gear (capes) sits behind the student */}
+      {equipped.length > 0 && <GearLayer rig={STUDENT_RIG} ids={equipped} behind />}
 
       {/* hair that sits behind the head and shoulders */}
       {style === "long" && (
@@ -53,10 +73,14 @@ function Student({ look }: { look: Look }) {
       <circle cx="182" cy="174" r="3" fill={GOLD} />
 
       {/* arms reaching to the keyboard (hands tuck behind the laptop) */}
-      <path d="M118 146 Q92 184 128 222" stroke={HOODIE} strokeWidth="24" strokeLinecap="round" fill="none" />
-      <path d="M222 146 Q248 184 212 222" stroke={HOODIE} strokeWidth="24" strokeLinecap="round" fill="none" />
-      <circle cx="124" cy="220" r="10" fill={skin} />
-      <circle cx="216" cy="220" r="10" fill={skin} />
+      {scene && (
+        <>
+          <path d="M118 146 Q92 184 128 222" stroke={HOODIE} strokeWidth="24" strokeLinecap="round" fill="none" />
+          <path d="M222 146 Q248 184 212 222" stroke={HOODIE} strokeWidth="24" strokeLinecap="round" fill="none" />
+          <circle cx="124" cy="220" r="10" fill={skin} />
+          <circle cx="216" cy="220" r="10" fill={skin} />
+        </>
+      )}
 
       {/* long hair falling in front of the shoulders */}
       {style === "long" && (
@@ -99,7 +123,7 @@ function Student({ look }: { look: Look }) {
           <circle cx="192" cy="98" r="5" fill="#FF8FA3" opacity="0.35" />
         </>
       )}
-      {glasses && (
+      {glasses && !wearsEyewear && (
         <g stroke="#1A1A1A" strokeWidth="2.2" fill="rgba(255,255,255,0.12)">
           <circle cx="157" cy="86" r="10" />
           <circle cx="183" cy="86" r="10" />
@@ -107,45 +131,78 @@ function Student({ look }: { look: Look }) {
         </g>
       )}
 
-      {/* laptop: we see the back of the lid, with a gold sparkle sticker */}
-      <rect x="116" y="160" width="108" height="62" rx="7" fill="#241730" stroke="#3B2A44" strokeWidth="2" />
-      <path d="M170 176 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4 z" fill={GOLD} />
-      <path d="M96 222 H244 L256 232 H84 Z" fill="#3A2A44" />
+      {scene && (
+        <>
+          {/* laptop: we see the back of the lid, with a gold sparkle sticker */}
+          <rect x="116" y="160" width="108" height="62" rx="7" fill="#241730" stroke="#3B2A44" strokeWidth="2" />
+          <path d="M170 176 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4 z" fill={GOLD} />
+          <path d="M96 222 H244 L256 232 H84 Z" fill="#3A2A44" />
 
-      {/* desk */}
-      <rect x="0" y="232" width="340" height="38" rx="6" fill="url(#deskGrad)" />
-      <rect x="0" y="232" width="340" height="5" fill={GOLD} opacity="0.85" />
+          {/* desk */}
+          <rect x="0" y="232" width="340" height="38" rx="6" fill="url(#deskGrad)" />
+          <rect x="0" y="232" width="340" height="5" fill={GOLD} opacity="0.85" />
 
-      {/* stack of books */}
-      <rect x="20" y="218" width="64" height="14" rx="2" fill={GOLD} />
-      <rect x="26" y="206" width="56" height="12" rx="2" fill="#F3E7D8" />
-      <rect x="22" y="194" width="60" height="12" rx="2" fill={HOODIE} />
+          {/* stack of books */}
+          <rect x="20" y="218" width="64" height="14" rx="2" fill={GOLD} />
+          <rect x="26" y="206" width="56" height="12" rx="2" fill="#F3E7D8" />
+          <rect x="22" y="194" width="60" height="12" rx="2" fill={HOODIE} />
 
-      {/* coffee mug with steam */}
-      <rect x="276" y="208" width="26" height="24" rx="4" fill={GOLD} />
-      <path d="M302 213 q9 0 9 8 q0 8 -9 8" fill="none" stroke={GOLD} strokeWidth="3" />
-      <rect x="276" y="208" width="26" height="5" rx="2" fill="#7A1736" />
-      {[282, 289, 296].map((x, i) => (
-        <path
-          key={x}
-          d={`M${x} 204 q-3 -5 0 -10`}
-          fill="none"
-          stroke="#FFF4D6"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-          style={{ animation: `steam 2.4s ${i * 0.5}s infinite` }}
-        />
-      ))}
+          {/* coffee mug with steam */}
+          <rect x="276" y="208" width="26" height="24" rx="4" fill={GOLD} />
+          <path d="M302 213 q9 0 9 8 q0 8 -9 8" fill="none" stroke={GOLD} strokeWidth="3" />
+          <rect x="276" y="208" width="26" height="5" rx="2" fill="#7A1736" />
+          {[282, 289, 296].map((x, i) => (
+            <path
+              key={x}
+              d={`M${x} 204 q-3 -5 0 -10`}
+              fill="none"
+              stroke="#FFF4D6"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              style={{ animation: `steam 2.4s ${i * 0.5}s infinite` }}
+            />
+          ))}
+        </>
+      )}
+
+      {/* everything else the student is wearing or holding */}
+      {equipped.length > 0 && <GearLayer rig={STUDENT_RIG} ids={equipped} behind={false} />}
     </svg>
   );
 }
 
+/** The student on their own, head and shoulders in a round badge (shown on the "Choose your character" cards). */
+export function StudentPortrait({ student, size = 96 }: { student: StudentId; size?: number }) {
+  return (
+    <div
+      className="overflow-hidden rounded-full flex-shrink-0"
+      style={{
+        width: size,
+        height: size,
+        background: "radial-gradient(circle at 50% 35%, #A02450 0%, #7A1736 55%, #5A1228 100%)",
+        border: "3px solid rgba(255,198,39,0.55)",
+      }}
+    >
+      <Student look={LOOKS[student]} view="badge" />
+    </div>
+  );
+}
+
+/** The student wearing whatever accessories are equipped (profile picture and the zoomable preview). Square, `size` px. */
+export function StudentBust({ student, size = 120, equipped = [] }: { student: StudentId; size?: number; equipped?: string[] }) {
+  return (
+    <div style={{ width: size, height: size }}>
+      <Student look={LOOKS[student]} view="bust" equipped={equipped} />
+    </div>
+  );
+}
+
 /**
- * "Student" banner: an illustrated ASU student (drawn to match the learner's chosen character)
+ * "Student" banner: an illustrated ASU student (the one the learner picked on the character screen)
  * works on a laptop, with a sunrise glowing behind and study-tip chips floating around.
  */
-export function HeroStudent({ subtitle, character }: { subtitle: string; character?: CharacterId }) {
-  const look = LOOKS[character ?? "aisha"] ?? LOOKS.aisha;
+export function HeroStudent({ subtitle, student }: { subtitle: string; student?: StudentId }) {
+  const look = LOOKS[student ?? "maya"] ?? LOOKS.maya;
   return (
     <div
       className="relative overflow-hidden rounded-2xl px-6 py-10 md:py-8"
@@ -161,16 +218,18 @@ export function HeroStudent({ subtitle, character }: { subtitle: string; charact
         @keyframes typeDot { 0%,80%,100% { opacity: .25; } 40% { opacity: 1; } }
       `}</style>
 
-      <div className="relative flex flex-col md:flex-row items-center gap-6 md:gap-4">
+      {/* The title sits in the true centre of the banner (above the student on phones). From tablet width up the
+          student sits on the right and shrinks a little on smaller screens so it never runs into the title. */}
+      <div className="relative flex flex-col items-center gap-6 md:block md:min-h-[270px]">
         {/* text */}
-        <div className="flex-1 text-center md:text-left z-10">
+        <div className="text-center z-10 md:absolute md:inset-0 md:flex md:items-center md:justify-center md:pointer-events-none">
           {/* ASU sits centred over the title; the extra left padding offsets the trailing letter-spacing */}
-          <div style={{ display: "grid", width: "fit-content", justifyItems: "center", textAlign: "center" }}>
+          <div className="md:-translate-x-6 xl:-translate-x-10" style={{ display: "grid", width: "fit-content", margin: "0 auto", justifyItems: "center", textAlign: "center" }}>
           <p className="text-sm md:text-base font-bold tracking-[0.5em] uppercase mb-1" style={{ color: "#F0E0E4", textAlign: "center", paddingLeft: "0.5em", width: "100%" }}>
             ASU
           </p>
           <h1
-            className="text-5xl md:text-7xl font-extrabold tracking-tight mb-4"
+            className="text-5xl lg:text-7xl font-extrabold tracking-tight"
             style={{
               backgroundImage: "linear-gradient(100deg, #FFC627 0%, #FFE9A0 22%, #FFC627 44%, #FF9A3C 66%, #FFC627 100%)",
               backgroundSize: "200% 100%",
@@ -185,12 +244,17 @@ export function HeroStudent({ subtitle, character }: { subtitle: string; charact
           </h1>
           </div>
           {subtitle && (
-<p className="text-lg md:text-xl font-semibold max-w-xl mx-auto md:mx-0" style={{ color: "#F0E0E4" }}>
+<p className="text-lg md:text-xl font-semibold max-w-xl mx-auto" style={{ color: "#F0E0E4" }}>
             {subtitle}
           </p>
 )}
         </div>
 
+        {/* student, with the link to pick a different one underneath */}
+        <div
+          className="flex flex-col items-center gap-3 md:ml-auto md:origin-right md:scale-[0.6] lg:scale-[0.8] xl:scale-100"
+          style={{ width: 340 }}
+        >
         {/* scene */}
         <div className="relative flex-shrink-0" style={{ width: 340, height: 270 }}>
           <div
@@ -248,6 +312,15 @@ export function HeroStudent({ subtitle, character }: { subtitle: string; charact
               {c.text}
             </motion.div>
           ))}
+        </div>
+
+        <Link
+          to="/choose-character"
+          className="text-xs font-bold px-3 py-1.5 rounded-full transition-opacity hover:opacity-80"
+          style={{ backgroundColor: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,198,39,0.45)", color: "#FFF4D6" }}
+        >
+          Change my student
+        </Link>
         </div>
       </div>
     </div>

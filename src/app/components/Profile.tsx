@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Header } from "./Header";
-import { CharacterMascot } from "./CharacterMascot";
 import { getUserData, updateUserData, type UserType } from "../utils/userData";
 import { getCurrentLevel, getXPProgress, getXPToNextLevel } from "../utils/xpSystem";
 import { MODULES, getCurrentLesson, type Module, type Lesson } from "../utils/modulesData";
@@ -11,18 +10,25 @@ import { useTheme } from "../utils/themeContext";
 import { motion } from "motion/react";
 import {
   Edit2, Save, X, ArrowRight, Calendar, Award, Target,
-  Trophy, Users, Crown, TrendingUp, Sparkles, Sun, Moon, Lock, Shirt, Palette, ChevronDown, ChevronUp
+  Trophy, Users, Crown, TrendingUp, Sparkles, Sun, Moon, Lock, Shirt, Palette, ChevronDown, ChevronUp, ZoomIn
 } from "lucide-react";
 import { ITEMS, describeUnlock, type CosmeticItem, type ItemSlot } from "../data/itemsData";
 import { isItemUnlocked, equipItem, unequipSlot, getEquippedMap, getEquippedItemIds } from "../utils/itemsSystem";
+import { GearIcon } from "./AvatarGear";
+import { AvatarPreview, AvatarZoomModal } from "./AvatarPreview";
+import { StudentBust } from "./HeroStudent";
+import { resolveStudentId } from "../data/studentsData";
 
-const SLOT_LABELS: Record<ItemSlot, string> = {
-  hat: "Hat",
-  cape: "Cape",
-  accessory: "Accessory",
-  face: "Face",
-  frame: "Frame",
-};
+// The list is grouped the way the design reference groups it (Hats / Face /
+// Back / Accessories). Each item is still worn in its own slot, so a necklace,
+// earrings and a staff can be worn together with a chest piece.
+const ITEM_GROUPS: { label: string; slots: ItemSlot[] }[] = [
+  { label: "Hat", slots: ["hat"] },
+  { label: "Face", slots: ["face"] },
+  { label: "Back", slots: ["cape"] },
+  { label: "Accessories", slots: ["accessory", "neck", "ears", "held"] },
+  { label: "Frame", slots: ["frame"] },
+];
 
 // Frames aren't drawn onto the character SVG like hats/capes — they're a
 // border around the avatar bubble itself, so each one just needs a color.
@@ -91,6 +97,7 @@ export function Profile() {
   const [selectedBadge, setSelectedBadge] = useState<{ name: string; icon: string; description: string; earnedDate?: string } | null>(null);
   const [showBannerPicker, setShowBannerPicker] = useState(false);
   const [avatarSectionOpen, setAvatarSectionOpen] = useState(false);
+  const [avatarZoomOpen, setAvatarZoomOpen] = useState(false);
 
   useEffect(() => {
     getFriends().then(setFriends);
@@ -134,6 +141,8 @@ export function Profile() {
   const xpToNext = getXPToNextLevel(xp);
   const equippedItemIds = getEquippedItemIds();
   const equippedMap = getEquippedMap();
+  // The profile shows the student the learner picked (never the animal character).
+  const studentId = resolveStudentId(userData.selectedStudent, userData.selectedCharacter);
 
   const handleToggleEquip = (item: CosmeticItem) => {
     if (equippedMap[item.slot] === item.id) {
@@ -201,6 +210,14 @@ export function Profile() {
     <div className="min-h-screen" style={{ backgroundColor: colors.background }}>
       <Header />
 
+      <AvatarZoomModal
+        open={avatarZoomOpen}
+        onClose={() => setAvatarZoomOpen(false)}
+        student={studentId}
+        equipped={equippedItemIds}
+        colors={colors}
+      />
+
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-6">
 
         {/* ── Profile Header ───────────────────────────────────── */}
@@ -208,24 +225,35 @@ export function Profile() {
           style={{ background: getBannerGradient(userData.bannerColor) }}>
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div className="flex items-center gap-6 flex-wrap">
-              <Link
-                to="/choose-character"
-                className="w-24 h-24 rounded-full flex items-end justify-center overflow-hidden transition-transform hover:scale-105"
-                style={{
-                  backgroundColor: "rgba(255,255,255,0.2)",
-                  border: equippedMap.frame
-                    ? `4px solid ${FRAME_BORDER_COLORS[equippedMap.frame]}`
-                    : "4px solid transparent",
-                  boxShadow: equippedMap.frame === "gold-frame" ? "0 0 12px rgba(255,198,39,0.6)" : "none",
-                }}
-                title="Change your character"
-              >
-                {userData.selectedCharacter ? (
-                  <CharacterMascot character={userData.selectedCharacter} variant="portrait" size={88} animate={false} equipped={equippedItemIds} />
-                ) : (
-                  <span className="text-4xl m-auto">👤</span>
-                )}
-              </Link>
+              <div className="relative flex-shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setAvatarZoomOpen(true)}
+                  className="w-24 h-24 rounded-full flex items-end justify-center overflow-hidden transition-transform hover:scale-105"
+                  style={{
+                    backgroundColor: "rgba(255,255,255,0.2)",
+                    border: equippedMap.frame
+                      ? `4px solid ${FRAME_BORDER_COLORS[equippedMap.frame]}`
+                      : "4px solid transparent",
+                    boxShadow: equippedMap.frame === "gold-frame" ? "0 0 12px rgba(255,198,39,0.6)" : "none",
+                  }}
+                  title="Zoom in on your avatar"
+                  aria-label="Zoom in on your avatar"
+                >
+                  {studentId ? (
+                    <StudentBust student={studentId} size={88} equipped={equippedItemIds} />
+                  ) : (
+                    <span className="text-4xl m-auto">👤</span>
+                  )}
+                </button>
+                <span
+                  aria-hidden
+                  className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full shadow-md"
+                  style={{ backgroundColor: "#FFC627", color: "#0D0508" }}
+                >
+                  <ZoomIn size={15} />
+                </span>
+              </div>
               <div>
                 <h1 className="text-3xl font-bold mb-1" style={{ color: "#F0E0E4" }}>{username}</h1>
                 <p className="mb-1" style={{ color: "rgba(240,224,228,0.8)" }}>
@@ -763,16 +791,27 @@ export function Profile() {
           </button>
 
           {avatarSectionOpen && (
-            <div className="mt-5">
-              {(["hat", "face", "cape", "accessory", "frame"] as ItemSlot[]).map((slot) => (
-                <div key={slot} className="mb-6 last:mb-0">
+            <div className="mt-5 md:grid md:grid-cols-[320px_1fr] md:gap-8 md:items-start">
+              {/* live preview: change what you wear on the right and watch it here, then zoom in */}
+              <div className="mb-6 md:mb-0 md:sticky md:top-24">
+                <AvatarPreview
+                  student={studentId}
+                  equipped={equippedItemIds}
+                  colors={colors}
+                  baseSize={260}
+                  viewportHeight={340}
+                />
+              </div>
+              <div>
+              {ITEM_GROUPS.map((group) => (
+                <div key={group.label} className="mb-6 last:mb-0">
                   <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: colors.textSecondary }}>
-                    {SLOT_LABELS[slot]}
+                    {group.label}
                   </p>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {ITEMS.filter((item) => item.slot === slot).map((item) => {
+                    {ITEMS.filter((item) => group.slots.includes(item.slot)).map((item) => {
                       const unlocked = isItemUnlocked(item);
-                      const isEquipped = equippedMap[slot] === item.id;
+                      const isEquipped = equippedMap[item.slot] === item.id;
                       return (
                         <button
                           key={item.id}
@@ -793,7 +832,7 @@ export function Profile() {
                               <Lock size={12} style={{ color: colors.textSecondary }} />
                             </div>
                           )}
-                          <div className="mb-2 flex items-center justify-center" style={{ height: 24 }}>
+                          <div className="mb-2 flex items-center justify-center" style={{ height: 56 }}>
                             {item.slot === "frame" ? (
                               <span
                                 className="inline-block w-5 h-5 rounded-full"
@@ -803,11 +842,12 @@ export function Profile() {
                                 }}
                               />
                             ) : (
+                              // Light tile so the dark outlines of the artwork stay readable in dark mode too.
                               <span
-                                className="text-xl"
-                                style={{ color: unlocked ? colors.accentGold : colors.textSecondary }}
+                                className="flex items-center justify-center rounded-2xl"
+                                style={{ width: 56, height: 56, backgroundColor: "rgba(255,255,255,0.92)" }}
                               >
-                                ✦
+                                <GearIcon id={item.id} size={44} locked={!unlocked} />
                               </span>
                             )}
                           </div>
@@ -821,6 +861,7 @@ export function Profile() {
                   </div>
                 </div>
               ))}
+              </div>
             </div>
           )}
         </div>

@@ -61,13 +61,18 @@ export async function hydrateLocalStorageFromSupabase(userId: string, userEmail:
     ...localBadges.filter((lb) => !supabaseBadges.some((sb: { id: string }) => sb.id === lb.id)),
   ];
 
+  // The learner may have changed something while the data above was loading (for example chosen a character): keep that.
+  const latestLocal = (() => {
+    try { return JSON.parse(localStorage.getItem("asu_genai_user") || "{}"); } catch { return {}; }
+  })();
+
   // Build merged user object, preserving any local fields not covered by Supabase
   const mergedUser = {
     ...existingLocal,
     email: userEmail,
     username: profile?.username ?? existingLocal.username ?? "",
     language: profile?.language ?? existingLocal.language ?? "en",
-    selectedCharacter: profile?.selected_character ?? existingLocal.selectedCharacter ?? undefined,
+    selectedCharacter: profile?.selected_character ?? latestLocal.selectedCharacter ?? existingLocal.selectedCharacter ?? undefined,
     userType: profile?.user_type ?? existingLocal.userType ?? "student",
     year: profile?.year ?? existingLocal.year ?? "",
     major: profile?.major ?? existingLocal.major ?? "",

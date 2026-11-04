@@ -1,7 +1,8 @@
 import { motion } from "motion/react";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { CharacterId } from "../utils/userData";
 import { getCharacterInfo } from "../data/charactersData";
+import { CHARACTER_RIGS, FISH_RIG, GearLayer, hasBackItem, isHatItem } from "./AvatarGear";
 import aishaArt from "../assets/characters/aisha.png";
 import devArt from "../assets/characters/dev.png";
 import jordanArt from "../assets/characters/jordan.png";
@@ -43,58 +44,21 @@ interface CharacterMascotProps {
   /** "full" renders the whole fish (body to tail); "portrait" crops to a
    *  head-on view for tight spaces like the nav bar. */
   variant?: "full" | "portrait";
-  /** Ids of currently-equipped cosmetic items (see data/itemsData.ts), layered on top of the fish art. */
+  /** Ids of currently-equipped cosmetic items (see data/itemsData.ts), layered on top of the character art. */
   equipped?: string[];
 }
 
-// Simple SVG gear layered over the base fish art, positioned relative to the
-// head (eye at ~30,40) on the left and the back/dorsal area (~x70-110) on the
-// right toward the tail. Capes render behind the body (drawn first); hats and
-// accessories render in front (drawn last), keyed by item id.
-const BACK_SLOT_ITEMS = new Set(["scholars-cape", "masters-cloak"]);
-
-function GearOverlay({ itemId }: { itemId: string }) {
-  switch (itemId) {
-    case "explorer-cap":
-      return <path d="M 14 26 L 30 6 L 46 26 Z" fill="#FFC627" stroke="#0D0508" strokeWidth="1.5" strokeLinejoin="round" />;
-    case "champions-crown":
-      return (
-        <path
-          d="M 10 26 L 16 8 L 24 20 L 30 4 L 36 20 L 44 8 L 50 26 Z"
-          fill="#FFC627"
-          stroke="#8B1A2E"
-          strokeWidth="1.5"
-          strokeLinejoin="round"
-        />
-      );
-    case "scholars-cape":
-      return <path d="M 95 18 Q 128 38 108 70 Q 88 55 90 28 Z" fill="#8B1A2E" opacity="0.85" />;
-    case "masters-cloak":
-      return <path d="M 92 12 Q 135 32 112 78 Q 84 60 86 24 Z" fill="#FFC627" opacity="0.9" />;
-    case "insight-badge":
-      return <circle cx="62" cy="60" r="8" fill="#4AB7C4" stroke="#0D0508" strokeWidth="1.2" />;
-    case "game-medal":
-      return <circle cx="62" cy="60" r="8" fill="#E8547A" stroke="#0D0508" strokeWidth="1.2" />;
-    case "champion-sash":
-      return <path d="M 32 28 L 88 66 M 84 28 L 36 66" stroke="#FFC627" strokeWidth="6" strokeLinecap="round" opacity="0.85" />;
-    case "cool-shades":
-      return (
-        <>
-          <ellipse cx="28" cy="40" rx="14" ry="11" fill="#1a1a2e" stroke="#0D0508" strokeWidth="2" opacity="0.9" />
-          <path d="M 42 38 L 52 34" stroke="#0D0508" strokeWidth="2.5" strokeLinecap="round" />
-        </>
-      );
-    case "scholars-mustache":
-      return (
-        <path
-          d="M 6 50 Q 14 44 20 50 Q 26 44 34 50 Q 26 54 20 50 Q 14 54 6 50 Z"
-          fill="#4a3728"
-        />
-      );
-    default:
-      return null;
-  }
-}
+// Accessories are drawn by AvatarGear.tsx. On the character art they sit in an
+// SVG laid over the picture that uses the picture's own pixel grid and the same
+// fit/alignment as the <img>, so they stay lined up at any size.
+const OVERLAY_STYLE: CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  width: "100%",
+  height: "100%",
+  overflow: "visible",
+  pointerEvents: "none",
+};
 
 export function CharacterMascot({ character, size = 80, animate = true, variant = "full", equipped = [] }: CharacterMascotProps) {
   const info = getCharacterInfo(character);
@@ -113,19 +77,43 @@ export function CharacterMascot({ character, size = 80, animate = true, variant 
   const tailTransition = { duration: 1.1, repeat: 0, repeatType: "mirror" as const, ease: "easeInOut" as const };
 
   if (frames) {
+    const rig = CHARACTER_RIGS[info.id];
+    const hasGear = equipped.length > 0;
+    const hasBack = hasBackItem(equipped);
+    const gearLayer = (behind: boolean, align: string) => (
+      <svg viewBox={`0 0 ${rig.width} ${rig.height}`} preserveAspectRatio={align} style={OVERLAY_STYLE} aria-hidden="true">
+        <GearLayer rig={rig} ids={equipped} behind={behind} />
+      </svg>
+    );
+
     if (variant === "portrait") {
       // Crop in on the head for tight circular/square spots (nav bar, profile).
+      // A hat sticks up above the head, so when one is worn the picture drops a
+      // little and shrinks to leave room for it inside the crop.
+      const wearsHat = equipped.some(isHatItem);
       return (
         <motion.div
           style={{ width: size, height: size, overflow: "hidden", display: "block", transformOrigin: "bottom center" }}
           animate={animate ? waveRockMotionSmall : undefined}
           transition={waveRockTransition}
         >
-          <img
-            src={frames.default}
-            alt={`${info.name} character`}
-            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center" }}
-          />
+          <div
+            style={{
+              position: "relative",
+              width: "100%",
+              height: "100%",
+              transformOrigin: "top center",
+              transform: wearsHat ? "translateY(16%) scale(0.84)" : undefined,
+            }}
+          >
+            {hasBack && gearLayer(true, "xMidYMin slice")}
+            <img
+              src={frames.default}
+              alt={`${info.name} character`}
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center" }}
+            />
+            {hasGear && gearLayer(false, "xMidYMin slice")}
+          </div>
         </motion.div>
       );
     }
@@ -133,15 +121,21 @@ export function CharacterMascot({ character, size = 80, animate = true, variant 
       // The three art files have different aspect ratios (Aisha is much taller
       // than Dev/Jordan), so fit each into the same box, anchored to the feet,
       // instead of letting width set a different height per character.
-      <motion.img
-        src={frames.default}
-        alt={`${info.name} character`}
-        width={size}
-        height={Math.round(size * 1.15)}
-        style={{ width: size, height: Math.round(size * 1.15), objectFit: "contain", objectPosition: "bottom center", display: "block", transformOrigin: "bottom center" }}
+      <motion.div
+        style={{ position: "relative", width: size, height: Math.round(size * 1.15), display: "block", transformOrigin: "bottom center" }}
         animate={animate ? waveRockMotion : undefined}
         transition={waveRockTransition}
-      />
+      >
+        {hasBack && gearLayer(true, "xMidYMax meet")}
+        <img
+          src={frames.default}
+          alt={`${info.name} character`}
+          width={size}
+          height={Math.round(size * 1.15)}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", objectPosition: "bottom center", display: "block" }}
+        />
+        {hasGear && gearLayer(false, "xMidYMax meet")}
+      </motion.div>
     );
   }
 
@@ -189,9 +183,7 @@ export function CharacterMascot({ character, size = 80, animate = true, variant 
         </motion.g>
 
         {/* back-slot gear (e.g. capes) — drawn behind the body so it peeks out from the back */}
-        {equipped.filter((id) => BACK_SLOT_ITEMS.has(id)).map((id) => (
-          <GearOverlay key={id} itemId={id} />
-        ))}
+        <GearLayer rig={FISH_RIG} ids={equipped} behind />
 
         {/* dorsal fin */}
         <path d="M 62 22 Q 78 2 92 20 Q 80 24 62 22 Z" fill={accent} opacity="0.85" />
@@ -229,9 +221,7 @@ export function CharacterMascot({ character, size = 80, animate = true, variant 
         <path d="M 12 52 Q 18 58 26 55" stroke="#000" strokeOpacity="0.35" strokeWidth="2" strokeLinecap="round" fill="none" />
 
         {/* front-slot gear (hats, accessories) — drawn on top of everything else */}
-        {equipped.filter((id) => !BACK_SLOT_ITEMS.has(id)).map((id) => (
-          <GearOverlay key={id} itemId={id} />
-        ))}
+        <GearLayer rig={FISH_RIG} ids={equipped} behind={false} />
       </svg>
     </motion.div>
   );

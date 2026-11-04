@@ -21,7 +21,10 @@ import { BlackBoxMatchingGame } from "./components/games/BlackBoxMatchingGame";
 import { EnvironmentGame } from "./components/games/EnvironmentGame";
 import { BankPortalGame } from "./components/games/BankPortalGame";
 import { KingsNotebookGame } from "./components/games/KingsNotebookGame";
+import { ArgoniaGame } from "./components/games/ArgoniaGame";
 import { ArgoniaCityGame } from "./components/games/ArgoniaCityGame";
+import { ArgoniaWorkshopGame } from "./components/games/ArgoniaWorkshopGame";
+import { ArgoniaCodexLabGame } from "./components/games/ArgoniaCodexLabGame";
 import { DungeonCrawlGame } from "./components/games/DungeonCrawlGame";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { ProgressStrip } from "./components/ProgressStrip";
@@ -241,11 +244,41 @@ export const router = createBrowserRouter([
     )
   },
   {
+    path: "/games/argonia",
+    element: (
+      <ProtectedRoute>
+        <CharacterRequiredRoute>
+          <ArgoniaGame />
+        </CharacterRequiredRoute>
+      </ProtectedRoute>
+    )
+  },
+  {
     path: "/games/argonia/city",
     element: (
       <ProtectedRoute>
         <CharacterRequiredRoute>
           <ArgoniaCityGame />
+        </CharacterRequiredRoute>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/games/argonia/workshop",
+    element: (
+      <ProtectedRoute>
+        <CharacterRequiredRoute>
+          <ArgoniaWorkshopGame />
+        </CharacterRequiredRoute>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/games/argonia/lab",
+    element: (
+      <ProtectedRoute>
+        <CharacterRequiredRoute>
+          <ArgoniaCodexLabGame />
         </CharacterRequiredRoute>
       </ProtectedRoute>
     )

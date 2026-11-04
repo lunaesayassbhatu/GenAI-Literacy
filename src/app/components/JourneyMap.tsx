@@ -252,7 +252,8 @@ export function JourneyMap() {
       <Header />
 
       <main className="max-w-3xl mx-auto px-4 py-12">
-        <div className="text-center mb-12">
+        {/* mb-24 leaves room for the "You are here" marker above the first stop, so it doesn't sit on the subtitle */}
+        <div className="text-center mb-24">
           <h1 className="text-3xl font-bold mb-2" style={{ color: colors.textPrimary }}>
             Your Path
           </h1>

@@ -1,4 +1,7 @@
-export type ItemSlot = "hat" | "cape" | "accessory" | "face" | "frame";
+// "accessory" holds the chest pieces (badge, medal, sash); "neck", "ears" and
+// "held" are separate slots so a necklace, earrings and a staff can be worn
+// together with them.
+export type ItemSlot = "hat" | "cape" | "accessory" | "face" | "frame" | "neck" | "ears" | "held";
 
 export type UnlockCondition =
   | { type: "level"; level: number }
@@ -20,6 +23,27 @@ export const ITEMS: CosmeticItem[] = [
     name: "Explorer Cap",
     description: "Reach Level 2",
     unlock: { type: "level", level: 2 },
+  },
+  {
+    id: "beanie",
+    slot: "hat",
+    name: "Cozy Beanie",
+    description: "Complete 1 learning module",
+    unlock: { type: "modulesCompleted", count: 1 },
+  },
+  {
+    id: "hair-bow",
+    slot: "hat",
+    name: "Party Bow",
+    description: "Complete 3 games",
+    unlock: { type: "gamesCompleted", count: 3 },
+  },
+  {
+    id: "flower-crown",
+    slot: "hat",
+    name: "Flower Crown",
+    description: "Reach Level 5",
+    unlock: { type: "level", level: 5 },
   },
   {
     id: "champions-crown",
@@ -62,6 +86,41 @@ export const ITEMS: CosmeticItem[] = [
     name: "Champion's Sash",
     description: "Complete all 7 games",
     unlock: { type: "gamesCompleted", count: 7 },
+  },
+  {
+    id: "gem-necklace",
+    slot: "neck",
+    name: "Gem Necklace",
+    description: "Complete 5 learning modules",
+    unlock: { type: "modulesCompleted", count: 5 },
+  },
+  {
+    id: "gem-earrings",
+    slot: "ears",
+    name: "Gem Earrings",
+    description: "Complete 4 learning modules",
+    unlock: { type: "modulesCompleted", count: 4 },
+  },
+  {
+    id: "flower-bouquet",
+    slot: "held",
+    name: "Flower Bouquet",
+    description: "Complete 5 games",
+    unlock: { type: "gamesCompleted", count: 5 },
+  },
+  {
+    id: "wizard-staff",
+    slot: "held",
+    name: "Wizard's Staff",
+    description: "Reach Level 6",
+    unlock: { type: "level", level: 6 },
+  },
+  {
+    id: "reading-glasses",
+    slot: "face",
+    name: "Reading Glasses",
+    description: "Complete 1 game",
+    unlock: { type: "gamesCompleted", count: 1 },
   },
   {
     id: "cool-shades",

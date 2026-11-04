@@ -19,23 +19,23 @@ function introKindForPath(pathname: string): IntroKind | null {
   return pathname === "/learning-lab" ? "module" : null;
 }
 
-// The intro shows once per sign-in: we remember the sign-in it was shown for. A new sign-in
-// (Supabase's last_sign_in_at changes; token refreshes do not change it) shows it again.
+// The intro shows once, the first time a learner opens the Learning Lab, and never again after they close it.
+// (Anyone who already dismissed the older once-per-sign-in version has a stored value, so they won't see it again either.)
 function storageKey(kind: IntroKind, userKey: string): string {
   return `asu_genai_wave_intro_${kind}_${userKey}`;
 }
 
-function hasSeen(kind: IntroKind, userKey: string, signInMarker: string): boolean {
+function hasSeen(kind: IntroKind, userKey: string): boolean {
   try {
-    return localStorage.getItem(storageKey(kind, userKey)) === signInMarker;
+    return localStorage.getItem(storageKey(kind, userKey)) !== null;
   } catch {
     return true; // if storage is unavailable, don't nag on every page
   }
 }
 
-function markSeen(kind: IntroKind, userKey: string, signInMarker: string): void {
+function markSeen(kind: IntroKind, userKey: string): void {
   try {
-    localStorage.setItem(storageKey(kind, userKey), signInMarker);
+    localStorage.setItem(storageKey(kind, userKey), "seen");
   } catch {
     /* ignore */
   }
@@ -43,7 +43,7 @@ function markSeen(kind: IntroKind, userKey: string, signInMarker: string): void 
 
 /**
  * When a learner opens the Learning Lab, Wave introduces himself (and the Ask Wave chat) over a blurred backdrop.
- * Shown once each time the learner signs in. The Guide Wave intro is separate: it appears once, on a learner's first module (see ModuleLearning).
+ * Shown once, the first time the learner uses the Learning Lab. The Guide Wave intro is separate: it appears once, on a learner's first module (see ModuleLearning).
  */
 export function WaveIntro() {
   const { colors } = useTheme();
@@ -52,16 +52,15 @@ export function WaveIntro() {
   const [kind, setKind] = useState<IntroKind | null>(null);
 
   const userKey = session?.user?.id ?? getUserData()?.username ?? "guest";
-  const signInMarker = session?.user?.last_sign_in_at ?? getUserData()?.loginDate ?? "";
 
   useEffect(() => {
     if (loading) return;
     const k = introKindForPath(pathname);
-    setKind(k && !hasSeen(k, userKey, signInMarker) ? k : null);
-  }, [pathname, loading, userKey, signInMarker]);
+    setKind(k && !hasSeen(k, userKey) ? k : null);
+  }, [pathname, loading, userKey]);
 
   const dismiss = () => {
-    if (kind) markSeen(kind, userKey, signInMarker);
+    if (kind) markSeen(kind, userKey);
     setKind(null);
   };
 
