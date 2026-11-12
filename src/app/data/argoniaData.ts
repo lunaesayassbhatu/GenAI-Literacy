@@ -372,7 +372,7 @@ export const ARGONIA_LEVELS: ArgoniaLevel[] = [
   // ── LEVELS 4–7 · coming soon ───────────────────────────────────────────────
   {
     id: "university-hall",
-    module: "Using GenAI Responsibly",
+    module: "GenAI Literacy",
     moduleNumber: 4,
     place: "The University Hall",
     title: "The University Hall",

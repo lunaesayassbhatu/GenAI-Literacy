@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { WaveDolphin3D } from "./WaveDolphin3D";
+import { GuideMascot } from "./GuideMascot";
 import { useTheme } from "../utils/themeContext";
 import { getUserData } from "../utils/userData";
 import { useAuth } from "../utils/authContext";
@@ -106,7 +106,7 @@ export function WaveIntro() {
                 boxShadow: "0 0 32px rgba(255,198,39,0.25)",
               }}
             >
-              {/* Underwater scene with a real 3D Wave swimming laps (three.js) */}
+              {/* Underwater scene with Wave, drawn as the animal the learner picked */}
               <div
                 className="relative overflow-hidden rounded-xl"
                 style={{
@@ -134,8 +134,8 @@ export function WaveIntro() {
                     transition={{ duration: 4 + i * 0.7, repeat: Infinity, delay: i * 0.8, ease: "easeOut" }}
                   />
                 ))}
-                <div className="absolute inset-0">
-                  <WaveDolphin3D width={280} height={220} />
+                <div className="absolute inset-0 flex items-end justify-center pb-2">
+                  <GuideMascot size={170} />
                 </div>
               </div>
               <p className="text-sm font-extrabold tracking-widest mt-1" style={{ color: colors.accentGold }}>

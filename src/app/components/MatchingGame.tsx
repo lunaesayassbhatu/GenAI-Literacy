@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Header } from "./Header";
-import { DolphinMascot } from "./DolphinMascot";
+import { GuideMascot } from "./GuideMascot";
 import { FloatingWave } from "./FloatingWave";
-import { CharacterMascot } from "./CharacterMascot";
+import { PlayerAvatar } from "./PlayerAvatar";
 import { CheckCircle2, XCircle, RotateCcw, Trophy } from "lucide-react";
 import { awardBadge, addXP, saveHighScore, getUserData } from "../utils/userData";
 import { getEquippedItemIds } from "../utils/itemsSystem";
@@ -215,7 +215,7 @@ export function MatchingGame() {
         >
           <div className="flex items-center justify-between flex-wrap gap-6">
             <div className="flex items-center gap-4">
-              <DolphinMascot size={80} />
+              <GuideMascot size={80} />
               <div>
                 <h1 className="text-3xl mb-2" style={{ color: '#F0E0E4' }}>
                   AI Usage Matching Game 🎮
@@ -388,7 +388,7 @@ export function MatchingGame() {
         className="fixed top-24 right-6 z-40 block hover:opacity-80 transition-opacity"
         title="Change your character"
       >
-        <CharacterMascot character={getUserData()?.selectedCharacter} size={64} equipped={getEquippedItemIds()} />
+        <PlayerAvatar size={64} />
       </Link>
     </div>
   );

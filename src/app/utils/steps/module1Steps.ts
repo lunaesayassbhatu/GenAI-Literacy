@@ -29,37 +29,37 @@ export const module1Steps: Step[] = [
     data: {
       section: "1 of 3",
       title: "What is generative AI?",
-      subtitle: "AI isn't always generative, and it isn't only a chatbot.",
+      subtitle: "AI isn't always generative and it isn't only a chatbot.",
       messages: [
         {
           text: "You hear that AI is everywhere. It's in your phone, your streaming services, and your search bar. You might have professors warning you against using it for homework and others encouraging you to offload some of your busy work. How are you supposed to know if you should use GenAI or not? And how do you use it effectively?",
           mood: "thinking"
         },
         {
-          text: "One of the first things to understand is that AI has been around for a while. *Traditional AI* refers to earlier types of AI that rely on programmed rules and human-defined knowledge. It follows the rules that a human wrote, like the spam filter in your email.",
+          text: "One of the first things to understand is that AI has been around for a while. *Traditional conceptualizations of AI* refer to earlier types of AI that rely on programmed rules and human-defined knowledge. It follows the rules that a human wrote, like the spam filter in your email.",
           mood: "default",
           link: "https://hai.stanford.edu/ai-definitions/what-is-traditional-ai"
         },
         {
-          text: "Comparatively, *Generative AI* is … generative. Every time it receives a prompt, it creates new content (text, images, code, audio, etc.) that didn't exist before you asked. Through techniques like machine learning, natural language processing, and deep learning, AI learns from data, recognizes patterns, and completes difficult tasks.",
+          text: "Comparatively, *Generative AI* is … generative. Every time it receives a prompt, it creates new content (text, images, code, audio, etc.) that didn't exist before you asked. Through a variety of techniques (such as machine learning, natural language processing, and deep learning), AI gains the ability to learn from data, recognize patterns, make predictions, and complete difficult tasks.",
           mood: "default",
           link: "https://www.sciencedirect.com/science/article/pii/S1472811723000605"
         },
         {
-          text: "Some GenAI (like ChatGPT or Claude) rely mostly on Large Language Models (LLMs) to generate linguistic content like answers to questions. Other types of GenAI focus on images, audio, and even protein structures.",
+          text: "Some GenAI (like ChatGPT or Claude, for example) rely mostly on Large Language Models (LLMs) to generate linguistic content like answers to questions. Other types of GenAI focus on images, audio, and even protein structures.",
           mood: "default"
         },
         {
-          text: "GenAI does not pull from the internet like search engines used to. Instead, it builds from scratch — using the information available to it, it predicts the most likely word, over and over, until it forms a full response.",
+          text: "GenAI does not search through sources on the internet and find the most relevant answer. Instead, it builds from scratch. Using the information available to it, it predicts the most likely word, over and over, until it forms a full response.",
           mood: "thinking"
         },
         {
-          text: "New capabilities are emerging all the time to allow for more sophisticated processing of your question. One example is *Model Context Protocol (MCP)*, which lets AI applications communicate with external services and tools — resulting in more specialized, self-checking responses.",
+          text: "Now, new capabilities are emerging all the time to allow for an even more sophisticated processing of your question. One example is Model Context Protocol (MCP) which allows AI applications to communicate with external services and tools, resulting in more specialized and self-checking responses for relevant topics.",
           mood: "celebrate",
           link: "https://www.ibm.com/think/topics/model-context-protocol"
         },
         {
-          text: "Dev used a grammar checker and a GenAI chatbot in the same afternoon. One flagged errors using pre-programmed rules of grammar, while the other generated a paragraph from scratch. Later, he gave a GenAI tool an image of his friend and prompted it to create a birthday card image of the friend in outer space. All three are examples of AI — but only the last two are generative. 🎂",
+          text: "Dev used a grammar checker and a GenAI chatbot in the same afternoon. One flagged errors using pre-programmed rules of grammar, while the other generated a paragraph from scratch. In the evening, he gave a GenAI tool an image of his friend and prompted it to create a birthday card image of the friend in outer space. These three examples are all examples of AI, but only the last two are generative. 🎂",
           mood: "celebrate"
         }
       ]
@@ -113,7 +113,7 @@ export const module1Steps: Step[] = [
       subtitle: "Knowing its strengths (and weaknesses!) can help you learn to use it better.",
       messages: [
         {
-          text: "GenAI can be useful for some tasks, but other tasks are probably better suited for different tools. What is it good at? And where is it lacking? The following isn't exhaustive, but should give you a better idea of where to start.",
+          text: "GenAI can be useful for some tasks, but other tasks are probably better suited for different tools. What is it good at? And where is it lacking? The following list is not exhaustive, but should give you a better idea of where to start.",
           mood: "default"
         }
       ]
@@ -136,7 +136,7 @@ export const module1Steps: Step[] = [
       ],
       sources: [
         { label: "The pros and cons of generative AI — AWS Builder", url: "https://builder.aws.com/content/2p12gt8r9e3SEgc0yPeEuwzj2XF/the-pros-and-cons-of-generative-ai-a-simple-guide" },
-        { label: "Bender, E. M., Gebru, T., McMillan-Major, A., & Shmitchell, S. (2021). On the dangers of stochastic parrots: Can language models be too big? In Proceedings of the 2021 ACM Conference on Fairness, Accountability, and Transparency (pp. 610–623)." }
+        { label: "Bender, E. M., Gebru, T., McMillan-Major, A., & Shmitchell, S. (2021, March). On the dangers of stochastic parrots: Can language models be too big?🦜. In Proceedings of the 2021 ACM conference on fairness, accountability, and transparency (pp. 610-623)." }
       ]
     }
   },
@@ -148,11 +148,11 @@ export const module1Steps: Step[] = [
       subtitle: "Match the task to the tool.",
       messages: [
         {
-          text: "GenAI is capable of helping in many different domains. But it's important to consider whether GenAI is actually the tool best suited for the task.",
+          text: "GenAI is capable of many tasks that can help you in many different domains. But, it is important to consider whether or not GenAI is the tool best suited for the task.",
           mood: "default"
         },
         {
-          text: "Jordan wrote an essay using his own research and his own words. When it came to titling the essay, he got stuck — so he used AI to generate 10 possible essay titles, then used his own judgment from there. He used GenAI to help inspire him, not to do all the work. ✍️",
+          text: "Jordan wrote an essay using his own research and his own words. When it came to titling the essay, he got stuck. So, he used AI to generate 10 possible essay titles and then used his own judgement from there. He used GenAI to help inspire him, not to do all the work. ✍️",
           mood: "celebrate"
         }
       ]
@@ -220,11 +220,11 @@ export const module1Steps: Step[] = [
     type: "wave-talk",
     data: {
       section: "3 of 3",
-      title: "Not all instances of GenAI do the same thing",
-      subtitle: "\"Generative AI\" can include a lot more than just chatbots.",
+      title: "Not all instances of GenAI do the same thing. What tools will you actually run into?",
+      subtitle: "“Generative AI” can include a lot more than just chatbots.",
       messages: [
         {
-          text: "Not all GenAI tools do the same thing — here are the main types you'll run into.",
+          text: "Types of GenAI:",
           mood: "default"
         },
         {
@@ -250,18 +250,20 @@ export const module1Steps: Step[] = [
         {
           text: "*Code generators* can create code snippets or debug software.",
           mood: "default",
-          emoji: "💻"
+          emoji: "💻",
+          link: "https://tudublin.libguides.com/GenAI/typesofgenai"
         },
         {
-          text: "Aisha needed to create a multi-media presentation. She used a text generator to draft and iterate on her main points, an image generator for a picture that aligned with her topic, and an audio generator for some engaging sound effects. By matching the tool to the task, she created a fun, informative presentation. 🎤",
+          text: "Aisha needs to create a multi-media presentation. She used a text generator to draft and iterate on her main points. She used an image generator to create a picture that aligned with her topic. And she used an audio generator for some engaging sound effects. By matching the tool to the task, she was able to create a fun and informative presentation. 🎤",
           mood: "celebrate"
         },
         {
-          text: "Dev needed to code a basic website from scratch. He asked GenAI to create all of the code, but it didn't run quite right. On his next try, he attempted the code himself and asked GenAI questions as he progressed — this time, it ran how he wanted. He used GenAI to help when he got stuck, not to do all the work for him. 💻",
+          scenario: true,
+          text: "John needs to code a basic website from scratch. He asks GenAI to create all of the code, but it does not run quite right. On his next try, he attempts the code himself, and asks GenAI questions as he progresses. This time, the code runs how he wanted it to. He used GenAI to help him when he got stuck, not to do all the work for him. 💻",
           mood: "celebrate"
         },
         {
-          text: "When you know what tools are available to you, what kind of data they've been trained on, and what their recommended uses are, you can decide which tool is best for your goals. 🎯",
+          text: "When you know what tools are available to you, what kind of data they have been trained on, and what their recommended uses are, you can decide which tool is best for your goals. 🎯",
           mood: "hint"
         }
       ]
@@ -299,10 +301,10 @@ export const module1Steps: Step[] = [
       highlightWord: "Complete!",
       subtitle: "You now know what generative AI is, how it generally works, and what it can (and cannot) do.",
       takeaways: [
-        "GenAI is one category of AI — the kind that creates new content rather than following strict rules.",
+        "GenAI is one category of AI, the kind that creates new content rather than following strict rules.",
         "GenAI generates from patterns, it does not retrieve answers from the internet.",
         "GenAI is suitable for some tasks but not for others. Think critically about your specific goals and GenAI's abilities to determine if it's the right tool.",
-        "GenAI comes in several forms. Knowing which tool fits the task — and what GenAI may not be good at — is the first step to leveraging AI to your advantage."
+        "GenAI comes in several forms. Knowing which tool fits the task and what GenAI may not be good at is the first step to leveraging AI to your advantage."
       ],
       badges: [
         { emoji: "🥇", name: "First Steps" },

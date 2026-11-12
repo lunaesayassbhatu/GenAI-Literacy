@@ -3,6 +3,8 @@ import type { CharacterId } from "../utils/userData";
 export interface CharacterInfo {
   id: CharacterId;
   name: string;
+  /** The animal this character is drawn as. Learners pick one of these to be Wave's look (their guide). */
+  animal: string;
   color: string;
   tagline: string;
   story: string;
@@ -12,6 +14,7 @@ export const CHARACTERS: CharacterInfo[] = [
   {
     id: "aisha",
     name: "Aisha",
+    animal: "Otter",
     color: "#E8547A",
     tagline: "Sophomore Psychology Student at ASU",
     story:
@@ -20,6 +23,7 @@ export const CHARACTERS: CharacterInfo[] = [
   {
     id: "dev",
     name: "Dev",
+    animal: "Octopus",
     color: "#4AB7C4",
     tagline: "Senior Data Science Student at ASU",
     story:
@@ -28,6 +32,7 @@ export const CHARACTERS: CharacterInfo[] = [
   {
     id: "jordan",
     name: "Jordan",
+    animal: "Sea turtle",
     color: "#FFC627",
     tagline: "Master's Computer Science Student at ASU",
     story:

@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useState } from "react";
 import { X, MessageCircle } from "lucide-react";
 import { openAskWave, registerAskWaveHost } from "./askWaveBridge";
-import { DolphinMascot } from "./DolphinMascot";
+import { GuideMascot } from "./GuideMascot";
 import { useTheme } from "../utils/themeContext";
 
 type MoodType = "default" | "thinking" | "celebrate" | "hint" | "spin";
@@ -289,7 +289,7 @@ export function WaveMascot({
           style={{ cursor: isBubbleOpen ? "default" : "pointer" }}
           title={isBubbleOpen ? undefined : "Show Wave's message"}
         >
-          <DolphinMascot
+          <GuideMascot
             size={64}
             animate={currentMood === "default"}
             expression={

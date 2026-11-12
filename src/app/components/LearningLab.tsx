@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Header } from "./Header";
-import { CharacterMascot } from "./CharacterMascot";
+import { PlayerAvatar } from "./PlayerAvatar";
 import { MODULES } from "../utils/modulesData";
 import { useTheme } from "../utils/themeContext";
 import { motion } from "motion/react";
@@ -310,7 +310,7 @@ export function LearningLab() {
         className="fixed top-24 right-6 z-40 block hover:opacity-80 transition-opacity"
         title="Change your character"
       >
-        <CharacterMascot character={getUserData()?.selectedCharacter} size={64} equipped={getEquippedItemIds()} />
+        <PlayerAvatar size={64} />
       </Link>
     </div>
   );

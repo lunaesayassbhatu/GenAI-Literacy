@@ -8,6 +8,8 @@ export type StepType =
   | "ranking-check"
   | "pros-cons"
   | "web-map"
+  | "process"
+  | "framework-table"
   | "video"
   | "drag-drop"
   | "wave-talk"
@@ -25,19 +27,9 @@ import { module1Steps } from "./steps/module1Steps";
 
 import { module2Steps } from "./steps/module2Steps";
 
-import {
-  module3Steps,
-  module3Section1Variants,
-  module3Section2Variants,
-  module3Section3Variants,
-} from "./steps/module3Steps";
+import { module3Steps } from "./steps/module3Steps";
 
-import {
-  module4Steps,
-  module4Section1Variants,
-  module4Section2Variants,
-  module4Section3Variants,
-} from "./steps/module4Steps";
+import { module4Steps } from "./steps/module4Steps";
 
 import {
   module5Steps,
@@ -86,30 +78,8 @@ export function getStepsForModule(moduleId: string, questionVariant: number = 0)
   const base = MODULE_STEPS[moduleId];
   if (!base) return [];
 
-  // Modules 1 and 2 now carry fixed, rewritten content (no rotating variants —
-  // the rewrite is shown the same way every time).
-
-  if (moduleId === "module-3") {
-    const idx = questionVariant % module3Section1Variants.length;
-    return base.map(step => {
-      const section = (step.data as any)?.section;
-      if (step.type === "knowledge-check" && section === "1") return module3Section1Variants[idx];
-      if (step.type === "knowledge-check" && section === "2") return module3Section2Variants[idx];
-      if (step.type === "knowledge-check" && section === "3") return module3Section3Variants[idx];
-      return step;
-    });
-  }
-
-  if (moduleId === "module-4") {
-    const idx = questionVariant % module4Section1Variants.length;
-    return base.map(step => {
-      const section = (step.data as any)?.section;
-      if (step.type === "knowledge-check" && section === "1") return module4Section1Variants[idx];
-      if (step.type === "knowledge-check" && section === "2") return module4Section2Variants[idx];
-      if (step.type === "knowledge-check" && section === "3") return module4Section3Variants[idx];
-      return step;
-    });
-  }
+  // Modules 1 to 4 now carry fixed content written to match the team's module document (no
+  // rotating variants — the same questions are shown every time).
 
   if (moduleId === "module-5") {
     const idx = questionVariant % module5Section1Variants.length;

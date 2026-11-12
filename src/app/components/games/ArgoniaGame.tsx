@@ -5,7 +5,7 @@ import { GameHeader } from "./GameHeader";
 import { ArgoniaFigure3D, type FigureKind } from "./ArgoniaFigure3D";
 import { ArgoniaPortrait } from "./ArgoniaPortrait";
 import worldPicture from "../../assets/argonia-world.jpg";
-import { CharacterMascot } from "../CharacterMascot";
+import { PlayerAvatar } from "../PlayerAvatar";
 import { FloatingWave } from "../FloatingWave";
 import { addXP, saveHighScore, getUserData } from "../../utils/userData";
 import { getEquippedItemIds } from "../../utils/itemsSystem";
@@ -622,7 +622,7 @@ export function ArgoniaGame() {
       `}</style>
 
       <Link to="/choose-character" className="fixed top-24 right-6 z-40 block hover:opacity-80 transition-opacity" title="Change your character">
-        <CharacterMascot character={getUserData()?.selectedCharacter} size={64} equipped={getEquippedItemIds()} />
+        <PlayerAvatar size={64} />
       </Link>
 
       <FloatingWave message={waveMessage} expression="default" />

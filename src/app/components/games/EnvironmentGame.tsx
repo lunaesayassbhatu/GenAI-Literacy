@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { GameHeader } from "./GameHeader";
 import { XPToast } from "./XPToast";
-import { CharacterMascot } from "../CharacterMascot";
+import { PlayerAvatar } from "../PlayerAvatar";
 import { ENV_STATEMENTS, Statement } from "../../data/gameData";
 import { addXP, awardBadge, saveHighScore, getHighScore, getUserData } from "../../utils/userData";
 import { getEquippedItemIds } from "../../utils/itemsSystem";
@@ -551,7 +551,7 @@ export function EnvironmentGame() {
         className="fixed top-24 right-6 z-40 block hover:opacity-80 transition-opacity"
         title="Change your character"
       >
-        <CharacterMascot character={getUserData()?.selectedCharacter} size={64} equipped={getEquippedItemIds()} />
+        <PlayerAvatar size={64} />
       </Link>
     </div>
   );

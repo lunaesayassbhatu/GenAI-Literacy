@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import { Lock, CheckCircle2 } from "lucide-react";
 import { Header } from "./Header";
-import { CharacterMascot } from "./CharacterMascot";
+import { PlayerAvatar } from "./PlayerAvatar";
 import { useTheme } from "../utils/themeContext";
 import { getUserData } from "../utils/userData";
 import { getEquippedItemIds } from "../utils/itemsSystem";
@@ -182,11 +182,7 @@ export function JourneyMap() {
       <div key={nodeKey(node)} className="relative flex flex-col items-center text-center" style={{ width: size + 24 }}>
         {flags.isYouAreHere && (
           <div className="absolute -top-16 left-1/2 -translate-x-1/2 z-10">
-            <CharacterMascot
-              character={getUserData()?.selectedCharacter}
-              size={48}
-              equipped={getEquippedItemIds()}
-            />
+            <PlayerAvatar size={48} />
             <div
               className="text-xs font-bold text-center mt-1 px-2 py-0.5 rounded-full whitespace-nowrap"
               style={{ backgroundColor: colors.accentGold, color: "#0D0508" }}

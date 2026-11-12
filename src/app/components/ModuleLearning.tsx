@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { ArrowLeft, Zap, ArrowRight, CheckCircle2, Search, X as XIcon } from "lucide-react";
 import { WaveMascot } from "./WaveMascot";
 import { CharacterMascot } from "./CharacterMascot";
+import { PlayerAvatar } from "./PlayerAvatar";
 import { useTheme } from "../utils/themeContext";
 import { getUserData, updateUserData, awardBadge } from "../utils/userData";
 import { getEquippedItemIds } from "../utils/itemsSystem";
@@ -19,12 +20,13 @@ import {
   setCommittedModuleXP,
   markModuleEverCompleted
 } from "../utils/moduleProgress";
-import { DolphinMascot } from "./DolphinMascot";
+import { GuideMascot } from "./GuideMascot";
 import type { CharacterId } from "../utils/userData";
 import { getCharacterInfo } from "../data/charactersData";
 import { personalizeSteps } from "../utils/personalizeStory";
 import { GuideWaveIntro, hasSeenGuideWaveIntro } from "./GuideWaveIntro";
 import { WebMapStep } from "./WebMapStep";
+import { ProcessStep, FrameworkTableStep } from "./ConceptVisuals";
 import { VideoStep } from "./VideoStep";
 
 type WaveMood = "default" | "thinking" | "celebrate" | "hint" | "spin";
@@ -32,6 +34,15 @@ type WaveMood = "default" | "thinking" | "celebrate" | "hint" | "spin";
 function normalizeHintText(value: unknown): string {
   if (typeof value !== "string") return "";
   return value.replace(/\s+/g, " ").trim();
+}
+
+/** Message text as HTML: *word* is italic and [label](url) is a link that opens in a new tab. */
+function richText(text: string, withLinks = true): string {
+  const linked = text.replace(
+    /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,
+    withLinks ? '<a href="$2" target="_blank" rel="noopener noreferrer" style="text-decoration:underline;font-weight:700">$1</a>' : "$1"
+  );
+  return linked.replace(/\*(.*?)\*/g, '<em>$1</em>');
 }
 
 /** Detects which recurring persona (if any) a message is telling a real-world story about. */
@@ -294,7 +305,7 @@ function ModuleLearningInner() {
     // Reset proceed state
     setCanProceed(
       currentStepIndex < furthestStepRef.current ||
-      currentStep.type === "intro" || currentStep.type === "reading" || currentStep.type === "transition" || currentStep.type === "pros-cons" || currentStep.type === "web-map" || currentStep.type === "video"
+      currentStep.type === "intro" || currentStep.type === "reading" || currentStep.type === "transition" || currentStep.type === "pros-cons" || currentStep.type === "web-map" || currentStep.type === "process" || currentStep.type === "framework-table" || currentStep.type === "video"
     );
     setHintClickCount(0);
   }, [currentStepIndex]);
@@ -347,6 +358,12 @@ function ModuleLearningInner() {
           break;
         case "web-map":
           setWaveMessage("Every one of these circles connects back to GenAI. Take a moment to look at how many there are!");
+          break;
+        case "process":
+          setWaveMessage("Here are the main stages. We'll look at each one in more detail next!");
+          break;
+        case "framework-table":
+          setWaveMessage("Take a look at the three main areas of GenAI literacy.");
           break;
         case "video":
           setWaveMessage("Here's a quick video. Press play, and take your time. It's only a couple of minutes!");
@@ -453,6 +470,8 @@ function ModuleLearningInner() {
           (step.type === "wave-talk" ||
            step.type === "reading" ||
            step.type === "web-map" ||
+           step.type === "process" ||
+           step.type === "framework-table" ||
            step.type === "video" ||
            step.type === "knowledge-check" ||
            step.type === "scenario" ||
@@ -654,6 +673,14 @@ function ModuleLearningInner() {
                 />
               )}
 
+              {currentStep.type === "process" && (
+                <ProcessStep data={currentStep.data} colors={colors} />
+              )}
+
+              {currentStep.type === "framework-table" && (
+                <FrameworkTableStep data={currentStep.data} colors={colors} />
+              )}
+
               {currentStep.type === "video" && (
                 <VideoStep
                   data={currentStep.data}
@@ -771,7 +798,7 @@ function ModuleLearningInner() {
         className="fixed top-24 right-6 z-40 block hover:opacity-80 transition-opacity"
         title="Change your character"
       >
-        <CharacterMascot character={userData?.selectedCharacter} size={64} equipped={getEquippedItemIds()} />
+        <PlayerAvatar size={64} />
       </Link>
     </div>
   );
@@ -2352,7 +2379,7 @@ export function WaveTalkStep({ data, colors, onNext, onBackStep }: { data: any; 
                     <p
                       className="text-sm leading-snug line-clamp-1"
                       style={{ color: colors.textPrimary }}
-                      dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*(.*?)\*/g, '<em>$1</em>') }}
+                      dangerouslySetInnerHTML={{ __html: richText(msg.text.split("\n")[0], false) }}
                     />
                   </div>
                 </motion.button>
@@ -2365,17 +2392,16 @@ export function WaveTalkStep({ data, colors, onNext, onBackStep }: { data: any; 
         <AnimatePresence mode="wait">
           <div key={msgIndex} className="flex items-center gap-4 h-[230px] flex-shrink-0">
 
-            {/* Dolphin — flipped so it faces right toward the bubble */}
+            {/* Wave, drawn as the animal the learner picked */}
             <motion.div
               className={`${DOLPHIN_COL} flex-shrink-0 flex flex-col items-center`}
               initial={{ x: -30, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ type: "spring", stiffness: 260, damping: 22 }}
             >
-              {/* scaleX(-1) flips the SVG horizontally without mirroring the label */}
-              <div style={{ transform: 'scaleX(-1)' }}>
-                <DolphinMascot
-                  size={100}
+              <div>
+                <GuideMascot
+                  size={96}
                   animate
                   expression={
                     current.mood === "celebrate" ? "celebrate"
@@ -2443,10 +2469,10 @@ export function WaveTalkStep({ data, colors, onNext, onBackStep }: { data: any; 
                 )}
                 <p
                   className="leading-relaxed text-lg overflow-y-auto min-h-0"
-                  style={{ color: colors.textPrimary }}
+                  style={{ color: colors.textPrimary, whiteSpace: "pre-line" }}
                   dangerouslySetInnerHTML={{
                     __html: highlightCharacterName(
-                      current.text.replace(/\*(.*?)\*/g, '<em>$1</em>'),
+                      richText(current.text),
                       currentStoryCharacter
                     )
                   }}
@@ -2574,7 +2600,7 @@ function ReviewModeContent({
   }
 
   const { step } = questions[currentIdx];
-  const isConceptStep = step.type === "wave-talk" || step.type === "reading" || step.type === "web-map" || step.type === "video";
+  const isConceptStep = step.type === "wave-talk" || step.type === "reading" || step.type === "web-map" || step.type === "process" || step.type === "framework-table" || step.type === "video";
 
   return (
     <div className="space-y-6">
@@ -2597,7 +2623,7 @@ function ReviewModeContent({
       {/* Progress dots — gold for concepts, teal for questions */}
       <div className="flex gap-2 items-center">
         {questions.map(({ step: s }, idx) => {
-          const isConcept = s.type === "wave-talk" || s.type === "reading" || s.type === "web-map" || s.type === "video";
+          const isConcept = s.type === "wave-talk" || s.type === "reading" || s.type === "web-map" || s.type === "process" || s.type === "framework-table" || s.type === "video";
           const isActive = idx === currentIdx;
           const isPast = idx < currentIdx;
           return (
@@ -2631,6 +2657,12 @@ function ReviewModeContent({
         )}
         {step.type === "web-map" && (
           <WebMapStep data={step.data} colors={colors} />
+        )}
+        {step.type === "process" && (
+          <ProcessStep data={step.data} colors={colors} />
+        )}
+        {step.type === "framework-table" && (
+          <FrameworkTableStep data={step.data} colors={colors} />
         )}
         {step.type === "video" && (
           <VideoStep data={step.data} colors={colors} />
@@ -2716,9 +2748,9 @@ function ReviewWaveTalk({ data, colors }: { data: any; colors: any }) {
             </span>
             <p
               className="leading-relaxed flex-1"
-              style={{ color: colors.textPrimary }}
+              style={{ color: colors.textPrimary, whiteSpace: "pre-line" }}
               dangerouslySetInnerHTML={{
-                __html: msg.text.replace(/\*(.*?)\*/g, '<em>$1</em>')
+                __html: richText(msg.text)
               }}
             />
           </div>

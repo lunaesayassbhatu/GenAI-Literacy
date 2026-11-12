@@ -179,6 +179,18 @@ export function WebMapStep({ data, colors }: { data: any; colors: any }) {
           ))}
         </ul>
       </div>
+
+      {Array.isArray(data.links) && data.links.length > 0 && (
+        <ul className="mt-4 space-y-1 text-sm break-all list-none p-0 m-0">
+          {data.links.map((l: { label: string; url: string }) => (
+            <li key={l.url}>
+              <a href={l.url} target="_blank" rel="noopener noreferrer" className="underline" style={{ color: colors.accentGold }}>
+                {l.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

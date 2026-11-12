@@ -69,16 +69,16 @@ export const MODULES: Module[] = [
   },
   {
     id: "module-4",
-    name: "Using GenAI Responsibly",
-    description: "AI literacy is for everyone — not just those with technical backgrounds",
+    name: "GenAI Literacy",
+    description: "AI literacy is becoming an increasingly important skillset for everyone to learn",
     icon: "🌍",
     iconColor: "#8B1A2E",
     xpReward: 150,
     timeEstimate: "10 min",
     lessons: [
-      { id: "m4-l1", title: "Who Gets to Understand AI?", completed: false },
+      { id: "m4-l1", title: "GenAI Literacy Is an Important Skill", completed: false },
       { id: "m4-l2", title: "What Happens When People Stay on the Sidelines?", completed: false },
-      { id: "m4-l3", title: "Building Your Own AI Literacy", completed: false },
+      { id: "m4-l3", title: "Building Your GenAI Literacy", completed: false },
       { id: "m4-l4", title: "Knowledge Check", completed: false },
     ],
     locked: false

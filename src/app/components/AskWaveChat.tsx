@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, type ReactNode } from "react";
 import { onOpenAskWave, useAskWaveHostPresent } from "./askWaveBridge";
 import { motion } from "motion/react";
 import { MessageCircle, Send } from "lucide-react";
-import { DolphinMascot } from "./DolphinMascot";
+import { GuideMascot } from "./GuideMascot";
 import { useTheme } from "../utils/themeContext";
 import {
   Sheet,
@@ -19,7 +19,7 @@ interface ChatMessage {
 
 const WELCOME_MESSAGE: ChatMessage = {
   role: "assistant",
-  content: "Hey there, I'm **Wave**! 🌊🐬 So happy you stopped by!\n\nAsk me anything about generative AI:\n- ✨ how it works\n- 📝 writing great prompts\n- ⚖️ AI ethics & academic integrity\n\nWhat are you curious about?",
+  content: "Hey there, I'm **Wave**! 🌊 So happy you stopped by!\n\nAsk me anything about generative AI:\n- ✨ how it works\n- 📝 writing great prompts\n- ⚖️ AI ethics & academic integrity\n\nWhat are you curious about?",
 };
 
 // Tiny, safe markdown renderer (**bold**, *italic*, "- " bullets). It builds React
@@ -206,8 +206,8 @@ export function AskWaveChat() {
         aria-label="Ask Wave — click to open, drag to move"
         title="Click to open — drag to move"
       >
-        <DolphinMascot size={40} animate={false} />
-        {/* Just the dolphin until you point at it (or tab to it), so it covers as little of the page as possible. */}
+        <GuideMascot size={40} animate={false} />
+        {/* Just Wave's face until you point at it (or tab to it), so it covers as little of the page as possible. */}
         <span
           className="text-sm font-semibold flex items-center gap-1 overflow-hidden whitespace-nowrap max-w-0 opacity-0 transition-all duration-200 group-hover:max-w-[9rem] group-hover:opacity-100 group-hover:px-2 group-focus-visible:max-w-[9rem] group-focus-visible:opacity-100 group-focus-visible:px-2"
           style={{ color: colors.textPrimary }}
@@ -226,7 +226,7 @@ export function AskWaveChat() {
         >
           <SheetHeader style={{ borderBottom: `1px solid ${colors.cardBorder}` }}>
             <div className="flex items-center gap-3">
-              <DolphinMascot size={36} animate={false} />
+              <GuideMascot size={36} animate={false} />
               <div>
                 <SheetTitle style={{ color: colors.textPrimary }}>Ask Wave</SheetTitle>
                 <SheetDescription style={{ color: colors.textSecondary }}>

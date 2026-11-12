@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { GameHeader } from "./GameHeader";
 import { XPToast } from "./XPToast";
-import { CharacterMascot } from "../CharacterMascot";
+import { PlayerAvatar } from "../PlayerAvatar";
 import { FloatingWave } from "../FloatingWave";
 import { STATEMENTS, Statement } from "../../data/gameData";
 import { addXP, awardBadge, saveHighScore, getHighScore, getUserData } from "../../utils/userData";
@@ -427,7 +427,7 @@ export function DungeonCrawlGame() {
                   style={{ width: TILE_PX, height: TILE_PX, backgroundColor: bg, border }}
                 >
                   {isPlayer ? (
-                    <CharacterMascot character={getUserData()?.selectedCharacter} size={34} equipped={getEquippedItemIds()} />
+                    <PlayerAvatar size={34} />
                   ) : isLiveEnemy ? (
                     <Ghost size={22} color="#ff6b6b" style={{ animation: "dungeonPulse 1.4s ease-in-out infinite" }} />
                   ) : isLiveItem ? (

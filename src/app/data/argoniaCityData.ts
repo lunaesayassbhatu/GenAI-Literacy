@@ -223,7 +223,7 @@ export const CITY_SPOTS: CitySpot[] = [
     x: 68.3,
     y: 47,
     moduleNumber: 4,
-    module: "Using GenAI Responsibly",
+    module: "GenAI Literacy",
     story:
       "Students argue under the clock tower. The professor smiles. “Do you need to be an engineer to use the codex well? Not at all. You need to ask good questions and keep your own judgment.”",
     idea: "AI literacy isn't about being technical. It's about knowing what it can and can't do, and staying in charge of your own decisions.",

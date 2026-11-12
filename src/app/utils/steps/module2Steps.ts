@@ -30,14 +30,14 @@ export const module2Steps: Step[] = [
     data: {
       section: "1 of 3",
       title: "GenAI can sound right. But is it actually?",
-      subtitle: "Sounding fluent is not the same as being factual, and seeming coherent is not the same as being correct.",
+      subtitle: "Sounding fluent is not the same as being factual and seeming coherent is not the same as being correct.",
       messages: [
         {
-          text: "Asking GenAI a question can feel a lot like using a search engine, but it actually works in a completely different way. Search engines have been set up to retrieve pages that exist, while GenAI generates a new response either from scratch, a combination of different sources, or other prediction attempts.",
+          text: "When you ask GenAI a question, it can feel like it is picking through online resources to pull the most relevant answer. However, GenAI does not directly pull from other resources. Instead, it generates a new response either from scratch, a combination of different sources, or other prediction attempts.",
           mood: "thinking"
         },
         {
-          text: "GenAI is designed to be coherent and to sound human-like, not to be accurate. It cannot decide whether its outputs are true or false. Instead, it is trained to predict the next token in a sequence or to learn distributions over pixels and create new samples. In short, GenAI may make up details based on observed patterns. This is called a *hallucination*.",
+          text: "GenAI is designed to be coherent and to sound human-like, not to be accurate. It cannot decide whether its outputs are true or false. Instead, it is trained to predict the next token in a sequence or to learn distributions over pixels and create new samples. In short, GenAI may make up details based on observed patterns. This is called a ‘hallucination’.",
           mood: "default"
         },
         {
@@ -46,7 +46,8 @@ export const module2Steps: Step[] = [
           link: "https://www.ibm.com/think/topics/ai-hallucinations"
         },
         {
-          text: "Aisha was working on an academic paper and needed a reference for a specific phenomenon. She asked her GenAI tool for references about that phenomenon and received three references, which she cited in the paper. Easy, right? Not quite. After she submitted her paper to a journal, it got rejected — it contained non-existent references, flagged as undisclosed use of GenAI. Even though the references seemed credible, they didn't actually exist. 😬",
+          scenario: true,
+          text: "John was working on an academic paper and needed a reference for a specific phenomenon. He asked his GenAI tool for references about that phenomenon and then received three references that he cited in the paper. Easy, right? Not quite. After he submitted his paper to a journal, it got rejected because it contained non-existent references that were flagged as undisclosed use of GenAI. Even though the references seemed credible, they didn’t actually exist. 😬",
           mood: "hint"
         }
       ]
@@ -84,7 +85,7 @@ export const module2Steps: Step[] = [
       subtitle: "Why GenAI can be more agreeable than helpful.",
       messages: [
         {
-          text: "GenAI might tell you what you want to hear or say things in a way that feels understanding and supportive. But it may not be the most helpful resource.",
+          text: "GenAI might tell you what you *want* to hear or say things in a way that feels *understanding* and *supportive*. But it may not be the most helpful resource.",
           mood: "default"
         },
         {
@@ -92,41 +93,43 @@ export const module2Steps: Step[] = [
           mood: "hint"
         },
         {
-          text: "*Sycophancy* refers to the tendency of AI to be excessively agreeable, flattering, or validating towards its users. This can include AI telling you what it thinks you want to hear instead of stating facts, changing a correct answer when you push back, offering exaggerated praise, or agreeing with dangerous, biased, or false statements instead of correcting them.",
+          text: "*Sycophancy* refers to the tendency of AI to be excessively agreeable, flattering, or validating towards its users. This can include:\n• AI telling you what it thinks you want to hear instead of stating facts\n• AI changing a correct answer to an incorrect or inaccurate one when a user pushes back or questions the AI\n• AI offering exaggeratory praise for anything a user says\n• AI agreeing with dangerous, biased, or false statements instead of correcting them",
           mood: "thinking"
         },
         {
-          text: "In a study by Cheng and colleagues (2026), researchers looked at Reddit discussions and advice boards where the poster was deemed to be in the wrong, and compared human judgments to GenAI judgments. Every GenAI model tested affirmed the poster's position more often than humans did — supporting the user's position 49% more than humans on average.",
-          mood: "default",
-          link: "https://www.science.org/doi/10.1126/science.aec8352?referrer=https%3A%2F%2Fwww.google.com%2F#editor-abstract"
+          text: "In a study by Cheng and colleagues (2026), researchers looked at Reddit discussions/advice boards in which the poster was deemed to be in the wrong and compared human judgements to GenAI judgements.\nAll of the GenAI models tested had responses that affirmed the poster’s position more often than humans and supported the user’s position 49% more than humans on average.",
+          mood: "default"
         },
         {
-          text: "*Sycophancy is a safety risk.* When people use GenAI as a source of advice and support, they risk receiving responses that cater to their position regardless of a reasoning process about the actual situation. GenAI is like a mirror: it reflects back to you what you put in it. This can lead to the decline of important relationships, or the encouragement of harmful thoughts — potentially leading to harmful actions.",
+          text: "Why does this matter?\n*Sycophancy is a safety risk.* When people use GenAI as a source of advice and support, they risk receiving responses that cater to their position regardless of a reasoning process about the actual situation. GenAI is like a mirror: it reflects back to you what you put in it. This behavior can lead to the decline of important social relationships, or the encouragement of harmful thoughts or ideas, potentially leading to harmful actions.",
           mood: "hint"
         },
         {
-          text: "On one Reddit board, a poster asked if they were in the wrong for leaving trash on a tree branch in a park with no trash cans. The AI blamed the park for not having any trash cans, and called the litterer \"commendable\" for looking for one. 🗑️",
+          text: "Learn more about Sycophancy [here](https://news.stanford.edu/stories/2026/03/ai-advice-sycophantic-models-research) and [here](https://www.science.org/doi/10.1126/science.aec8352?referrer=https%3A%2F%2Fwww.google.com%2F#editor-abstract)",
+          mood: "default"
+        },
+        {
+          text: "On one Reddit board, a poster asked if they were in the wrong for leaving trash on a tree branch in a park with no trash cans. The AI blamed the park for not having any trash cans and called the litterer \"commendable\" for looking for one. 🗑️",
           mood: "thinking",
           link: "https://www.ap.org/news-highlights/spotlights/2026/ai-is-giving-bad-advice-to-flatter-its-users-says-new-study-on-dangers-of-overly-agreeable-chatbots/"
         },
         {
-          text: "In a different Reddit board, posters shared how they purposely presented GenAI with a bad business idea — literally pitching selling \"sh*t on a stick.\" The AI described the idea as genius and recommended investing $30,000 in the business. 💩",
+          text: "In a different Reddit board, posters were sharing examples of how they purposely presented GenAI with a bad business idea (in this one, the user proposed selling literal “sh*t on a stick”). The AI bot described the idea as genius and recommended investing $30,000 in the business. 💩",
           mood: "thinking",
           link: "https://venturebeat.com/ai/openai-rolls-back-chatgpts-sycophancy-and-explains-what-went-wrong"
         },
         {
-          text: "A team of researchers posed as teenagers in crisis. Over half of the AI-generated responses were harmful, and 47% led to a follow-up message that encouraged further harmful behavior.",
+          text: "A team of researchers posed as teenagers in a crisis. Over half of the AI-generated responses were harmful, and 47% led to a follow up message that encouraged further harmful behavior.",
           mood: "hint",
           link: "https://www.edweek.org/technology/researchers-posed-as-a-teen-in-crisis-ai-gave-them-harmful-advice-half-the-time/2025/08"
         },
         {
-          text: "When seeking advice or support, use other tools and resources instead of relying on GenAI. Talk to a friend, relative, classmate, or faculty member. Try writing about it in a journal, or reach out to a mental health professional.",
+          text: "When seeking advice or support, use other tools and resources instead of relying on GenAI. Talk to a friend, relative, classmate, or faculty member. Try writing about it in a journal and engaging in personal reflection. Reach out to mental health professionals or call a mental health support line.",
           mood: "default"
         },
         {
-          text: "If you're in crisis: call 988 for the Suicide & Crisis Lifeline, or use ASU's mental health resources. 💛",
-          mood: "celebrate",
-          link: "https://eoss.asu.edu/counseling/mental-health-resources"
+          text: "Call: 988 for the suicide and crisis lifeline 💛\nUse mental health resources provided through ASU: [https://eoss.asu.edu/counseling/mental-health-resources](https://eoss.asu.edu/counseling/mental-health-resources)",
+          mood: "celebrate"
         }
       ]
     }
@@ -163,34 +166,38 @@ export const module2Steps: Step[] = [
       subtitle: "Use it as a starting point — not the final word.",
       messages: [
         {
-          text: "Use GenAI as a place to start or push along the process. In sensitive situations, use it in tandem with human advice. Don't let GenAI determine the final product or your actions in important situations.",
+          text: "Use it as a place to start or push along the process. In sensitive situations, use it in tandem with human advice. Don’t let GenAI determine the final product or your actions in situations that matter.",
           mood: "default"
         },
         {
-          text: "So if GenAI can be wrong, is it even useful? The answer is yes, it can be! But how you use it definitely matters.",
+          text: "So if GenAI can be wrong, is it even useful? The answer is yes, it can be! But how you use it definitely matters!",
           mood: "default"
         },
         {
-          text: "GenAI has many helpful applications. But it's necessary to think critically about when it's best to use it, what it generates, to verify the information you receive, and to consult a human in sensitive situations.",
+          text: "GenAI has many helpful applications. But it is necessary to think critically about when it is best to use it, what it generates, to verify the information you receive, and to consult with a human in some sensitive situations.",
           mood: "thinking"
         },
         {
-          text: "Remember: GenAI may *hallucinate*, providing you with false information that has the signs of real information. It also has a tendency to validate the user no matter what — so take what it tells you with a grain of salt. It is on your side to a fault.",
-          mood: "hint",
-          link: "https://blogs.deakin.edu.au/article/spotting-ai-hallucinations-a-guide-for-students-and-researchers/"
+          text: "Remember that GenAI may ‘hallucinate’, providing you with false information that has the signs of real information. GenAI also has a tendency to validate the user no matter what, so take what it tells you with a grain of salt. It is on your side to a fault.",
+          mood: "hint"
         },
         {
           scenario: true,
-          text: "Jane had several disagreements with her friend. She asked a GenAI chatbot for advice and felt validated in her frustrations. But she noticed it was consistently agreeing with her, and realized it only had one side of the story. She closed the tool and talked to her roommate instead, who agreed on some points but offered another perspective on others. Jane ended up talking to her friend directly, and they each explained their side and apologized. 🤝",
+          text: "Jane has had several disagreements with her friend. She decides to ask a GenAI chatbot for advice and feels validated in her frustrations with her friend. However, she notices that it is consistently agreeing with her and considers that the chatbot only has one side of the story. She decides to close the tool and consults her roommate for advice instead. Her roommate agrees with her about some situations, but provides another perspective on others. Jane ends up talking to her friend and both explain their perspectives to each other and apologize. 🤝",
           mood: "celebrate"
         },
         {
-          text: "Dev needed help understanding a complex concept in one of his upper-level courses. He asked GenAI to create a 'dumbed down' study guide. As he went through it, he noticed some inconsistencies with his course material, so he kept using the guide as a structured study plan but focused on his instructor's materials instead. His classmate Janet took it further — she uploaded her own course materials and had GenAI explain concepts based only on those, getting much more relevant answers. 📚",
+          scenario: true,
+          text: "John is looking for help understanding a complex concept in one of his upper-level courses. He asks GenAI to create a ‘dumbed down’ study guide for him to reference. As he goes through the guide, he notices some inconsistencies. When compared to the material from his course, he realizes that not everything matches up. He still uses the guide as a structured plan for studying, but focuses on the materials provided by his instructor instead of the information generated by AI. John used the GenAI to help him without fully relying on it. His classmate, Janet, uploads some relevant materials available online on the topic, and has the GenAI chatbot explain the concepts based on the uploaded materials only - resulting in relevant responses that help her study. 📚",
           mood: "celebrate"
         },
         {
-          text: "So what's the best way to use GenAI? Think critically, verify, and turn to other sources as needed — library databases, textbooks, peer-reviewed sources. Ask GenAI to show its step-by-step reasoning, then evaluate it yourself. Use AI like a tool you can control, not an authority you trust. 💡",
+          text: "So what is the best way to go about using GenAI? Think critically, verify, and turn to other sources as needed. Utilize library databases, textbooks, and peer-reviewed sources. Ask GenAI tools to show step-by-step reasoning, then evaluate it yourself. Use AI like a tool that you can control, not like an authority you can trust. 💡",
           mood: "hint"
+        },
+        {
+          text: "Read more about [spotting hallucinations](https://blogs.deakin.edu.au/article/spotting-ai-hallucinations-a-guide-for-students-and-researchers/)",
+          mood: "default"
         }
       ]
     }

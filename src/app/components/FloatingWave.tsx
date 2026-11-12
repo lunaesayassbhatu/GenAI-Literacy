@@ -1,4 +1,4 @@
-import { DolphinMascot } from "./DolphinMascot";
+import { GuideMascot } from "./GuideMascot";
 import { motion, AnimatePresence } from "motion/react";
 import { useTheme } from "../utils/themeContext";
 
@@ -53,9 +53,9 @@ export function FloatingWave({ message, expression = "default", show = true }: F
             />
           </motion.div>
 
-          {/* Dolphin */}
+          {/* Wave, drawn as the animal the learner picked */}
           <div className="flex justify-center">
-            <DolphinMascot size={100} expression={expression} />
+            <GuideMascot size={96} expression={expression} />
           </div>
         </motion.div>
       )}
