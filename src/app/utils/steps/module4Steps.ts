@@ -5,7 +5,7 @@ export const module4Steps: Step[] = [
     type: "intro",
     data: {
       emoji: "🌍",
-      badge: "Module 4 of 7",
+      badge: "Module 0",
       title: "What is GenAI literacy?",
       highlightWord: "GenAI literacy?",
       subtitle: "AI literacy is becoming an increasingly important skillset for everyone to learn.",
@@ -16,7 +16,7 @@ export const module4Steps: Step[] = [
         "🌱 How to build your own AI literacy over time"
       ],
       info: {
-        time: "~10 min",
+        time: "~15 min",
         sections: "3",
         maxXp: "150 XP",
         badges: "1"
@@ -314,7 +314,7 @@ export const module4Steps: Step[] = [
     type: "completion",
     data: {
       emoji: "🎉",
-      title: "Module 4 Complete!",
+      title: "Module 0 Complete!",
       highlightWord: "Complete!",
       subtitle: "You now have a better understanding of GenAI literacy and are more equipped to engage AI critically, regardless of your background.",
       takeaways: [

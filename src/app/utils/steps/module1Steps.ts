@@ -5,7 +5,7 @@ export const module1Steps: Step[] = [
     type: "intro",
     data: {
       emoji: "🤖",
-      badge: "Module 1 of 7",
+      badge: "Module 1",
       title: "What is Generative AI, really?",
       highlightWord: "really?",
       subtitle: "Understanding the basics can help you to use GenAI more responsibly and efficiently.",
@@ -15,7 +15,7 @@ export const module1Steps: Step[] = [
         "🎨 The different types of GenAI you might encounter and use"
       ],
       info: {
-        time: "~12 min",
+        time: "~15 min",
         sections: "3",
         maxXp: "160 XP",
         badges: "2"

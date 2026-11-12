@@ -13,12 +13,12 @@ const MODEL = "aws/claude4_5_haiku";
 
 // Kept inline (instead of importing src/app/utils/modulesData.ts) so this serverless
 // function has no cross-folder or extensionless imports, which crash Vercel's ESM runtime.
-// Keep in sync with MODULES in src/app/utils/modulesData.ts.
+// Keep in sync with MODULES in src/app/utils/modulesData.ts (Module 0 is GenAI Literacy, then Modules 1 to 6).
 const MODULE_TOPICS = [
-  ["What is GenAI?", "Learn the basics of Generative AI and how it works"],
-  ["Trust in GenAI", "Understand why GenAI can't be treated as a reliable source of truth"],
-  ["How does GenAI 'learn'?", "Understand how AI outputs are shaped by training data and what that means for quality"],
   ["GenAI Literacy", "AI literacy is becoming an increasingly important skillset for everyone to learn"],
+  ["What is GenAI?", "Understanding the basics can help you to use GenAI more responsibly and efficiently"],
+  ["Trust in GenAI", "Understand why GenAI can't be treated as a reliable source of truth or support"],
+  ["How does GenAI 'learn'?", "Understand how AI outputs are shaped by training data and what that means for quality and transparency"],
   ["GenAI and Bias", "Understand AI bias, unequal representation, and why trust in AI needs to be earned, not assumed"],
   ["Getting AI to Do What You Want", "Learn how to communicate with AI effectively so it actually helps you"],
   ["GenAI and the Environment", "Understand the real environmental impact of GenAI and what it means to be an intentional user"],

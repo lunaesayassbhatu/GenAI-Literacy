@@ -5,7 +5,7 @@ export const module2Steps: Step[] = [
     type: "intro",
     data: {
       emoji: "🔍",
-      badge: "Module 2 of 7",
+      badge: "Module 2",
       title: "Trust in GenAI",
       highlightWord: "Trust",
       subtitle: "Understand why GenAI can't be treated as a reliable source of truth or support.",

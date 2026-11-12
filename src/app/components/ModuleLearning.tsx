@@ -2285,7 +2285,7 @@ function CompletionStep({ data, colors, totalXP, onComplete, nextModule, onNextM
 export function WaveTalkStep({ data, colors, onNext, onBackStep }: { data: any; colors: any; onNext: () => void; onBackStep?: () => void }) {
   const [msgIndex, setMsgIndex] = useState(0);
   const [maxReached, setMaxReached] = useState(0);
-  const messages: { text: string; mood: string; link?: string; scenario?: boolean; emoji?: string }[] = data.messages;
+  const messages: { text: string; mood: string; link?: string; scenario?: boolean; emoji?: string; example?: boolean }[] = data.messages;
   const isLast = msgIndex === messages.length - 1;
   const current = messages[msgIndex];
   const currentStoryCharacter = detectStoryCharacter(current.text);
@@ -2296,7 +2296,8 @@ export function WaveTalkStep({ data, colors, onNext, onBackStep }: { data: any; 
   // about someone else). Scenarios and real-world examples must never share a colour, so the real-world colour
   // is violet — none of the characters use it (Aisha pink, Dev teal, Jordan gold).
   const isScenarioWithoutCharacter = !currentStoryCharacter && Boolean(current.scenario);
-  const isRealWorldExample = !currentStoryCharacter && !isScenarioWithoutCharacter && Boolean(current.link);
+  // `example: false` marks a bubble whose link is just a source for an explanation: it keeps the magnifying glass but not the real-world-example highlight.
+  const isRealWorldExample = !currentStoryCharacter && !isScenarioWithoutCharacter && Boolean(current.link) && current.example !== false;
   const EXAMPLE_COLOR = "#9B8CFF";
   const SCENARIO_COLOR = "#FF8A5B";
   const bubbleColor = currentCharacterInfo

@@ -71,10 +71,10 @@ function gameById(id: string): MapNode {
 // so the two show up together on the trail instead of in an arbitrary order.
 function buildLevels(): Level[] {
   return [
+    { module: moduleById("module-4"), games: [gameById("ethics")] }, // Module 0: GenAI literacy
     { module: moduleById("module-1"), games: [] },
     { module: moduleById("module-2"), games: [gameById("fact-or-myth")] }, // trust / misconceptions
     { module: moduleById("module-3"), games: [gameById("black-box")] }, // training data / black box
-    { module: moduleById("module-4"), games: [gameById("ethics")] }, // responsible use
     { module: moduleById("module-5"), games: [gameById("bias")] }, // bias
     { module: moduleById("module-6"), games: [gameById("build-a-prompt"), gameById("sandbox")] }, // prompting
     { module: moduleById("module-7"), games: [gameById("environment")] }, // environment

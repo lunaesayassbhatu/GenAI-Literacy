@@ -9,6 +9,7 @@ import { PlayerAvatar } from "../PlayerAvatar";
 import { FloatingWave } from "../FloatingWave";
 import { addXP, saveHighScore, getUserData } from "../../utils/userData";
 import { getEquippedItemIds } from "../../utils/itemsSystem";
+import { moduleNumberForTrial } from "../../utils/modulesData";
 import {
   ARGONIA_LEVELS,
   WORLD,
@@ -194,7 +195,7 @@ export function ArgoniaMap({
             Trial {level.moduleNumber} · {level.place}
           </div>
           <h3 className="text-xl font-bold mb-1" style={{ color: "#ffffff" }}>{level.title}</h3>
-          <p className="text-xs mb-2" style={{ color: "rgba(255,255,255,0.5)" }}>Module {level.moduleNumber}: {level.module}</p>
+          <p className="text-xs mb-2" style={{ color: "rgba(255,255,255,0.5)" }}>Module {moduleNumberForTrial(level.moduleNumber)}: {level.module}</p>
           <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.8)" }}>{level.playable ? level.teaser : "This trial opens in a future update."}</p>
           {level.playable && unlocked ? (
             <button

@@ -6,6 +6,8 @@ export interface Lesson {
 
 export interface Module {
   id: string;
+  /** The number shown to learners: Module 0 (GenAI Literacy) up to Module 6. The id stays the same so saved progress is kept. */
+  number: number;
   name: string;
   description: string;
   icon: string;
@@ -18,73 +20,76 @@ export interface Module {
 
 export const MODULES: Module[] = [
   {
-    id: "module-1",
-    name: "What is GenAI?",
-    description: "Learn the basics of Generative AI and how it works",
-    icon: "🤖",
-    iconColor: "#4AB7C4",
-    xpReward: 100,
+    id: "module-4",
+    number: 0,
+    name: "GenAI Literacy",
+    description: "AI literacy is becoming an increasingly important skillset for everyone to learn",
+    icon: "🌍",
+    iconColor: "#8B1A2E",
+    xpReward: 150,
     timeEstimate: "15 min",
     lessons: [
-      { id: "m1-l1", title: "Introduction to AI", completed: false },
-      { id: "m1-l2", title: "Types of GenAI", completed: false },
-      { id: "m1-l3", title: "How GenAI Works", completed: false },
-      { id: "m1-l4", title: "Common AI Tools", completed: false },
-      { id: "m1-l5", title: "AI Capabilities", completed: false },
-      { id: "m1-l6", title: "Knowledge Check", completed: false },
+      { id: "m4-l1", title: "GenAI literacy is an important skill", completed: false },
+      { id: "m4-l2", title: "What happens when people stay on the sidelines?", completed: false },
+      { id: "m4-l3", title: "Building your GenAI literacy", completed: false },
+      { id: "m4-l4", title: "Knowledge Check", completed: false },
+    ],
+    locked: false
+  },
+  {
+    id: "module-1",
+    number: 1,
+    name: "What is GenAI?",
+    description: "Understanding the basics can help you to use GenAI more responsibly and efficiently",
+    icon: "🤖",
+    iconColor: "#4AB7C4",
+    xpReward: 160,
+    timeEstimate: "15 min",
+    lessons: [
+      { id: "m1-l1", title: "What is generative AI?", completed: false },
+      { id: "m1-l2", title: "What is GenAI good at?", completed: false },
+      { id: "m1-l3", title: "Not all GenAI does the same thing", completed: false },
+      { id: "m1-l4", title: "Knowledge Check", completed: false },
     ],
     locked: false
   },
   {
     id: "module-2",
+    number: 2,
     name: "Trust in GenAI",
-    description: "Understand why GenAI can't be treated as a reliable source of truth",
+    description: "Understand why GenAI can't be treated as a reliable source of truth or support",
     icon: "🔍",
     iconColor: "#E8547A",
     xpReward: 150,
-    timeEstimate: "10 min",
+    timeEstimate: "15 min",
     lessons: [
-      { id: "m2-l1", title: "It Sounds Right. But Is It?", completed: false },
-      { id: "m2-l2", title: "Why Does It Get Things Wrong?", completed: false },
-      { id: "m2-l3", title: "So When Can You Trust It?", completed: false },
+      { id: "m2-l1", title: "GenAI can sound right. But is it actually?", completed: false },
+      { id: "m2-l2", title: "It might sound supportive. But should you trust it?", completed: false },
+      { id: "m2-l3", title: "So how should you use GenAI?", completed: false },
       { id: "m2-l4", title: "Knowledge Check", completed: false },
     ],
     locked: false
   },
   {
     id: "module-3",
+    number: 3,
     name: "How does GenAI 'learn'?",
-    description: "Understand how AI outputs are shaped by training data — and what that means for quality",
+    description: "Understand how AI outputs are shaped by training data and what that means for quality and transparency",
     icon: "🧬",
     iconColor: "#FFC627",
     xpReward: 150,
-    timeEstimate: "10 min",
+    timeEstimate: "20 min",
     lessons: [
-      { id: "m3-l1", title: "Where Does AI's Knowledge Come From?", completed: false },
-      { id: "m3-l2", title: "What's in the Black Box?", completed: false },
-      { id: "m3-l3", title: "Critically Assessing GenAI Outputs", completed: false },
+      { id: "m3-l1", title: "Where does AI's knowledge come from?", completed: false },
+      { id: "m3-l2", title: "What's in the black box?", completed: false },
+      { id: "m3-l3", title: "Critically assessing GenAI outputs", completed: false },
       { id: "m3-l4", title: "Knowledge Check", completed: false },
     ],
     locked: false
   },
   {
-    id: "module-4",
-    name: "GenAI Literacy",
-    description: "AI literacy is becoming an increasingly important skillset for everyone to learn",
-    icon: "🌍",
-    iconColor: "#8B1A2E",
-    xpReward: 150,
-    timeEstimate: "10 min",
-    lessons: [
-      { id: "m4-l1", title: "GenAI Literacy Is an Important Skill", completed: false },
-      { id: "m4-l2", title: "What Happens When People Stay on the Sidelines?", completed: false },
-      { id: "m4-l3", title: "Building Your GenAI Literacy", completed: false },
-      { id: "m4-l4", title: "Knowledge Check", completed: false },
-    ],
-    locked: false
-  },
-  {
     id: "module-5",
+    number: 4,
     name: "GenAI and Bias",
     description: "Understand AI bias, unequal representation, and why trust in AI needs to be earned — not assumed",
     icon: "⚖️",
@@ -101,6 +106,7 @@ export const MODULES: Module[] = [
   },
   {
     id: "module-6",
+    number: 5,
     name: "Getting AI to Do What You Want",
     description: "Learn how to communicate with AI effectively so it actually helps you",
     icon: "💬",
@@ -117,6 +123,7 @@ export const MODULES: Module[] = [
   },
   {
     id: "module-7",
+    number: 6,
     name: "GenAI and the Environment",
     description: "Understand the real environmental impact of GenAI — and what it means to be an intentional user",
     icon: "🌍",
@@ -132,6 +139,11 @@ export const MODULES: Module[] = [
     locked: false
   }
 ];
+
+/** The Argonia trials are numbered 1-7 like the module ids. This gives the number learners see for that module (Module 0 is GenAI Literacy). */
+export function moduleNumberForTrial(trial: number): number {
+  return MODULES.find((m) => m.id === `module-${trial}`)?.number ?? trial;
+}
 
 export function getModuleProgress(module: Module): { completed: number; total: number; percentage: number } {
   const completed = module.lessons.filter(l => l.completed).length;

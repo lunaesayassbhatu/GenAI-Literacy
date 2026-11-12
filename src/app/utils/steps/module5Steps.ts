@@ -5,7 +5,7 @@ export const module5Steps: Step[] = [
     type: "intro",
     data: {
       emoji: "⚖️",
-      badge: "Module 5 of 7",
+      badge: "Module 4",
       title: "GenAI and Bias",
       highlightWord: "Bias",
       subtitle: "Understand AI bias, unequal representation, and why trust in AI needs to be earned — not assumed.",
@@ -166,7 +166,7 @@ export const module5Steps: Step[] = [
     type: "completion",
     data: {
       emoji: "🎉",
-      title: "Module 5 Complete!",
+      title: "Module 4 Complete!",
       highlightWord: "Complete!",
       subtitle: "You can now spot bias, navigate the AI-in-education debate, and earn trust through evaluation.",
       takeaways: [

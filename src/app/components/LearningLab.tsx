@@ -97,7 +97,7 @@ export function LearningLab() {
                           className="text-xs font-bold uppercase tracking-wider"
                           style={{ color: module.locked ? colors.textSecondary : module.iconColor }}
                         >
-                          Module {moduleIndex + 1}
+                          Module {module.number}
                         </span>
                         <h3 className="text-2xl font-semibold mb-2" style={{ color: colors.textPrimary }}>
                           {module.name}

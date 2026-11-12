@@ -5,7 +5,7 @@ export const module6Steps: Step[] = [
     type: "intro",
     data: {
       emoji: "💬",
-      badge: "Module 6 of 7",
+      badge: "Module 5",
       title: "Getting AI to Do What You Want",
       highlightWord: "Want",
       subtitle: "GenAI doesn't understand you — it predicts you. Learn how to communicate with it so it actually helps.",
@@ -166,7 +166,7 @@ export const module6Steps: Step[] = [
     type: "completion",
     data: {
       emoji: "🎉",
-      title: "Module 6 Complete!",
+      title: "Module 5 Complete!",
       highlightWord: "Complete!",
       subtitle: "You're a Prompt Pro — you know how to communicate with AI so it actually works for you.",
       takeaways: [

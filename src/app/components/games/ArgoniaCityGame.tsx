@@ -9,6 +9,7 @@ import { ArgoniaCityLife } from "./ArgoniaCityLife";
 import { ArgoniaCityVideo } from "./ArgoniaCityVideo";
 import { ArgoniaCityTour, ArgoniaCityTourPanel, type TourResume } from "./ArgoniaCityTour";
 import { addXP } from "../../utils/userData";
+import { moduleNumberForTrial } from "../../utils/modulesData";
 import {
   CITY_BACKGROUND_IMAGE,
   CITY_BACKGROUND_VIDEO,
@@ -61,7 +62,7 @@ function SpotPanel({
           <div>
             <h3 className="text-xl font-bold" style={{ color: "#ffffff" }}>{spot.name}</h3>
             <div className="text-xs font-semibold" style={{ color: GOLD }}>
-              {spot.moduleNumber > 0 ? `Module ${spot.moduleNumber} · ${spot.module}` : "A clue for the mystery"}
+              {spot.moduleNumber > 0 ? `Module ${moduleNumberForTrial(spot.moduleNumber)} · ${spot.module}` : "A clue for the mystery"}
             </div>
           </div>
         </div>

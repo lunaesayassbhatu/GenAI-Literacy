@@ -5,7 +5,7 @@ export const module7Steps: Step[] = [
     type: "intro",
     data: {
       emoji: "🌍",
-      badge: "Module 7 of 7",
+      badge: "Module 6",
       title: "GenAI and the Environment",
       highlightWord: "Environment",
       subtitle: "Understand the real environmental impact of GenAI — and what it means to be an intentional user.",
@@ -166,7 +166,7 @@ export const module7Steps: Step[] = [
     type: "completion",
     data: {
       emoji: "🎉",
-      title: "Module 7 Complete!",
+      title: "Module 6 Complete!",
       highlightWord: "Complete!",
       subtitle: "You've finished all 7 modules. You're not just an AI user — you're an informed, critical one.",
       takeaways: [

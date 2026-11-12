@@ -5,7 +5,7 @@ export const module3Steps: Step[] = [
     type: "intro",
     data: {
       emoji: "🧬",
-      badge: "Module 3 of 7",
+      badge: "Module 3",
       title: "How does GenAI ‘learn’?",
       highlightWord: "‘learn’?",
       subtitle: "Understand how AI outputs are shaped by training data and what that means for quality and transparency.",
@@ -15,7 +15,7 @@ export const module3Steps: Step[] = [
         "🧐 How to critically assess AI responses"
       ],
       info: {
-        time: "~10 min",
+        time: "~20 min",
         sections: "3",
         maxXp: "150 XP",
         badges: "1"
@@ -94,7 +94,8 @@ export const module3Steps: Step[] = [
         {
           text: "*Implementation and monitoring:* Final model is implemented in a real world environment. It must be monitored and regularly updated until the next version comes out.",
           mood: "default",
-          link: "https://www.univio.com/blog/how-does-artificial-intelligence-learn/"
+          link: "https://www.univio.com/blog/how-does-artificial-intelligence-learn/",
+          example: false
         },
         {
           text: "What data are GenAI models trained on? The answer depends on the AI model. Many of the popular LLMs are trained on publicly available data. This includes anything you might be able to find on the internet, like information from articles, blogs, discussion forums, images, videos, and more.",
@@ -102,11 +103,13 @@ export const module3Steps: Step[] = [
         },
         {
           text: "Sometimes, AI companies have been found to source data through illegal means. For example, in 2025 Anthropic lost a lawsuit against authors and publishers for using “7 million digitized books that it ‘knew had been pirated’” to train its GenAI model.",
-          mood: "hint"
+          mood: "hint",
+          link: "https://www.npr.org/2025/09/05/g-s1-87367/anthropic-authors-settlement-pirated-chatbot-training-material"
         },
         {
-          text: "Now, GenAI companies are legally able to purchase one copy of a book to scan into their models without paying anything extra or acknowledging their use of someone else’s intellectual property. This raises ethical implications regarding “stealing” art and the ethical use of intellectual property.\n[NPR: Anthropic authors settlement](https://www.npr.org/2025/09/05/g-s1-87367/anthropic-authors-settlement-pirated-chatbot-training-material)\n[The New York Times: Claude pirated books](https://www.nytimes.com/2026/08/24/opinion/claude-pirated-books-ai.html)",
-          mood: "hint"
+          text: "Now, GenAI companies are legally able to purchase one copy of a book to scan into their models without paying anything extra or acknowledging their use of someone else’s intellectual property. This raises ethical implications regarding “stealing” art and the ethical use of intellectual property.",
+          mood: "hint",
+          link: "https://www.nytimes.com/2026/08/24/opinion/claude-pirated-books-ai.html"
         },
         {
           text: "As you have probably experienced first-hand, the internet or manual human search does not always provide accurate or helpful information; and even those types of information are often biased to highlight certain people and facts over others. If an AI model is trained on inaccurate, biased, or incomplete information, then its outputs risk the chance of being inaccurate, biased, or incomplete.",
@@ -201,12 +204,14 @@ export const module3Steps: Step[] = [
         {
           text: "When a human engages in reasoning and problem solving, they are able to explain how they came to a conclusion. They can trace back their thinking process and cite their sources. For most GenAI models, this is not the case.",
           mood: "thinking",
-          link: "https://www.gsb.stanford.edu/insights/explainer-black-box-problem"
+          link: "https://www.gsb.stanford.edu/insights/explainer-black-box-problem",
+          example: false
         },
         {
           text: "When using GenAI, we can see what goes in (the prompt) and what comes out (the response). What we can’t see is what happens in between. This is the black box. AI’s reasoning is not possible to trace, which also makes it difficult to verify.",
           mood: "default",
-          link: "https://www.ibm.com/think/topics/black-box-ai"
+          link: "https://www.ibm.com/think/topics/black-box-ai",
+          example: false
         },
         {
           text: "Why does the black box exist? How come humans can’t always understand how GenAI produces an output? One reason for this are parameters, which is an internal variable within an AI model that is learned and adjusted during the training phase. It represents the knowledge that the model has extracted from the training data and remains fixed even when the model makes predictions on new data. An AI model can have billions, or even trillions, of parameters that are interconnected to each other. The complexity of parameters and their relationships within the system makes it difficult to identify how an AI model produced an output.",
@@ -215,7 +220,8 @@ export const module3Steps: Step[] = [
         {
           text: "Most of today’s LLMs are black box AIs. These models train on massive data sets through complex learning processes. Often, even their own creators do not fully understand how they work. While it may be more difficult to assess internal processes, black box models are widely used because they deliver higher levels of accuracy and tend to outperform more transparent models.",
           mood: "default",
-          link: "https://www.ewsolutions.com/understanding-black-box-ai/"
+          link: "https://www.ewsolutions.com/understanding-black-box-ai/",
+          example: false
         },
         {
           text: "Another reason for the black box are the proprietary properties of LLMs from competing companies and their lack of desire for other companies to steal how they function (ironic).",
