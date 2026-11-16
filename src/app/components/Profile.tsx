@@ -9,11 +9,12 @@ import { getFriends, addFriend, removeFriend, type Friend } from "../utils/frien
 import { useTheme } from "../utils/themeContext";
 import { motion } from "motion/react";
 import {
-  Edit2, Save, X, ArrowRight, Calendar, Award, Target,
-  Trophy, Users, Crown, TrendingUp, Sparkles, Sun, Moon, Lock, Shirt, Palette, ChevronDown, ChevronUp, ZoomIn
+  Edit2, Save, X, ArrowRight, Calendar, Award,
+  Trophy, Users, Crown, TrendingUp, Sparkles, Sun, Moon, Lock, Shirt, Palette, ChevronDown, ChevronUp, ZoomIn, Gamepad2
 } from "lucide-react";
 import { ITEMS, describeUnlock, type CosmeticItem, type ItemSlot } from "../data/itemsData";
-import { isItemUnlocked, equipItem, unequipSlot, getEquippedMap, getEquippedItemIds } from "../utils/itemsSystem";
+import { isItemUnlocked, equipItem, unequipSlot, getEquippedMap, getEquippedItemIds, getGamesCompletedCount } from "../utils/itemsSystem";
+import { SWEATER_COLORS, AVATAR_BACKGROUNDS, getAvatarBackground } from "../data/avatarColors";
 import { GearIcon } from "./AvatarGear";
 import { AvatarPreview, AvatarZoomModal } from "./AvatarPreview";
 import { StudentBust } from "./HeroStudent";
@@ -133,8 +134,8 @@ export function Profile() {
   const {
     username, learningDays, badges, xp = 0,
     bestStreak = 0, userType, year, major,
-    assignmentsAnalyzed = 0,
   } = userData;
+  const gamesCompleted = getGamesCompletedCount();
 
   const level = getCurrentLevel(xp);
   const progress = getXPProgress(xp);
@@ -150,6 +151,16 @@ export function Profile() {
     } else {
       equipItem(item);
     }
+    setUserData(getUserData());
+  };
+
+  const handleSelectSweater = (id: string) => {
+    updateUserData({ sweaterColor: id });
+    setUserData(getUserData());
+  };
+
+  const handleSelectBackground = (id: string) => {
+    updateUserData({ avatarBackground: id });
     setUserData(getUserData());
   };
 
@@ -216,6 +227,8 @@ export function Profile() {
         student={studentId}
         equipped={equippedItemIds}
         colors={colors}
+        sweater={userData.sweaterColor}
+        background={userData.avatarBackground}
       />
 
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-6">
@@ -231,7 +244,7 @@ export function Profile() {
                   onClick={() => setAvatarZoomOpen(true)}
                   className="w-24 h-24 rounded-full flex items-end justify-center overflow-hidden transition-transform hover:scale-105"
                   style={{
-                    backgroundColor: "rgba(255,255,255,0.2)",
+                    background: studentId ? getAvatarBackground(userData.avatarBackground).css : "rgba(255,255,255,0.2)",
                     border: equippedMap.frame
                       ? `4px solid ${FRAME_BORDER_COLORS[equippedMap.frame]}`
                       : "4px solid transparent",
@@ -241,7 +254,7 @@ export function Profile() {
                   aria-label="Zoom in on your avatar"
                 >
                   {studentId ? (
-                    <StudentBust student={studentId} size={88} equipped={equippedItemIds} />
+                    <StudentBust student={studentId} size={88} equipped={equippedItemIds} sweater={userData.sweaterColor} />
                   ) : (
                     <span className="text-4xl m-auto">👤</span>
                   )}
@@ -453,13 +466,13 @@ export function Profile() {
               sub: "Complete challenges to earn more! 🏆",
             },
             {
-              icon: <Target size={28} className="text-white" />,
+              icon: <Gamepad2 size={28} className="text-white" />,
               iconBg: "linear-gradient(135deg, #22c55e, #16a34a)",
               border: "rgba(34,197,94,0.4)",
-              value: assignmentsAnalyzed,
+              value: gamesCompleted,
               valueColor: "#16a34a",
-              label: "Assignments Analyzed",
-              sub: "Analyze more to learn better! 📚",
+              label: "Games Completed",
+              sub: "of 7 games. Keep playing! 🎮",
             },
           ].map((card, i) => (
             <div key={i}
@@ -800,9 +813,68 @@ export function Profile() {
                   colors={colors}
                   baseSize={260}
                   viewportHeight={340}
+                  sweater={userData.sweaterColor}
+                  background={userData.avatarBackground}
                 />
               </div>
               <div>
+              {/* colours: the sweater and the picture behind the student */}
+              <div className="mb-6 grid sm:grid-cols-2 gap-5">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: colors.textSecondary }}>
+                    Sweater color
+                  </p>
+                  <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Sweater color">
+                    {SWEATER_COLORS.map((c) => {
+                      const selected = (userData.sweaterColor ?? SWEATER_COLORS[0].id) === c.id;
+                      return (
+                        <button
+                          key={c.id}
+                          type="button"
+                          role="radio"
+                          aria-checked={selected}
+                          aria-label={c.label}
+                          title={c.label}
+                          onClick={() => handleSelectSweater(c.id)}
+                          className="w-9 h-9 rounded-full transition-transform hover:scale-110"
+                          style={{
+                            backgroundColor: c.main,
+                            border: selected ? `3px solid ${colors.accentGold}` : `2px solid ${colors.cardBorder}`,
+                            boxShadow: selected ? `0 0 0 2px ${colors.cardBackground}` : "none",
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: colors.textSecondary }}>
+                    Background
+                  </p>
+                  <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Background color">
+                    {AVATAR_BACKGROUNDS.map((b) => {
+                      const selected = (userData.avatarBackground ?? AVATAR_BACKGROUNDS[0].id) === b.id;
+                      return (
+                        <button
+                          key={b.id}
+                          type="button"
+                          role="radio"
+                          aria-checked={selected}
+                          aria-label={b.label}
+                          title={b.label}
+                          onClick={() => handleSelectBackground(b.id)}
+                          className="w-9 h-9 rounded-lg transition-transform hover:scale-110"
+                          style={{
+                            backgroundColor: b.swatch,
+                            border: selected ? `3px solid ${colors.accentGold}` : `2px solid ${colors.cardBorder}`,
+                            boxShadow: selected ? `0 0 0 2px ${colors.cardBackground}` : "none",
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
               {ITEM_GROUPS.map((group) => (
                 <div key={group.label} className="mb-6 last:mb-0">
                   <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: colors.textSecondary }}>

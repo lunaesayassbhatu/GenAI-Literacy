@@ -47,12 +47,48 @@ export const module3Steps: Step[] = [
     data: {
       section: "1 of 3",
       title: "The process of AI learning",
+      subtitle: "Click each step to read how it works.",
       steps: [
-        "Training data collection and preparation",
-        "Model and algorithm selection",
-        "Model training",
-        "Validation and testing",
-        "Implementation and monitoring"
+        {
+          title: "Training data collection and preparation",
+          summary: "Gather lots of human-made content, then clean it and have people label it.",
+          paragraphs: [
+            "Data is the foundation of AI learning. First, relevant training data that models can learn language and information patterns from must be collected. This process requires a lot of time and resources, relying on the data that humans have created throughout history (e.g., books, catalogs, online resources, works of art). Then, the data must be processed and cleaned.",
+            "GenAI companies scrape the internet and history of content produced by humans to generate these datasets.",
+            "Even after the data is selected, the data must be annotated by human workers. Data annotators manually label data so that a computer can “understand” it. Unfortunately, many data annotator positions are created in a way that is harmful for its workers. Often sourced from countries in economic distress, data annotators tend to be underpaid, making between $1.46 and $3.74 an hour. Additionally, in some positions, like content moderation, workers are exposed to traumatic material, such as graphic violence, harassment or hate speech, and sexual behaviors (Hao, 2025)."
+          ],
+          citation: "Hao, K. (2025). *Empire of AI: Dreams and Nightmares in Sam Altman’s OpenAI*. Penguin Press, New York."
+        },
+        {
+          title: "Model and algorithm selection",
+          summary: "Choose the kind of model and learning method that fits the data and the goal.",
+          paragraphs: [
+            "Depending on the available data and expectations of the model, the appropriate model and algorithm for learning must be selected."
+          ]
+        },
+        {
+          title: "Model training",
+          summary: "Feed the data to the model and adjust it, round after round, until it spots patterns.",
+          paragraphs: [
+            "The model is then fed the training data and its prediction parameters are adjusted as needed. This is often an iterative process that requires large datasets. Training can differ depending on the goals of the model (i.e., linguistic, visual, auditory), but the general process is the same.",
+            "As models train, they map out categories of data, relationships between pieces of data, etc. Different models are likely to make different inferences about relationships between data."
+          ]
+        },
+        {
+          title: "Validation and testing",
+          summary: "Test the model on data it has never seen. If it falls short, train it again.",
+          paragraphs: [
+            "The chosen model must be tested on previously unseen data to ensure it works appropriately. Otherwise, additional iterations of training occur."
+          ]
+        },
+        {
+          title: "Implementation and monitoring",
+          summary: "Put the model to work in the real world, then keep watching and updating it.",
+          paragraphs: [
+            "Final model is implemented in a real world environment. It must be monitored and regularly updated until the next version comes out."
+          ],
+          link: "https://www.univio.com/blog/how-does-artificial-intelligence-learn/"
+        }
       ]
     }
   },
@@ -63,40 +99,6 @@ export const module3Steps: Step[] = [
       title: "Where does AI’s knowledge come from?",
       subtitle: "",
       messages: [
-        {
-          text: "*Training data collection and preparation:* Data is the foundation of AI learning. First, relevant training data that models can learn language and information patterns from must be collected. This process requires a lot of time and resources, relying on the data that humans have created throughout history (e.g., books, catalogs, online resources, works of art). Then, the data must be processed and cleaned.",
-          mood: "default"
-        },
-        {
-          text: "GenAI companies scrape the internet and history of content produced by humans to generate these datasets.",
-          mood: "default"
-        },
-        {
-          text: "Even after the data is selected, the data must be annotated by human workers. Data annotators manually label data so that a computer can “understand” it. Unfortunately, many data annotator positions are created in a way that is harmful for its workers. Often sourced from countries in economic distress, data annotators tend to be underpaid, making between $1.46 and $3.74 an hour. Additionally, in some positions, like content moderation, workers are exposed to traumatic material, such as graphic violence, harassment or hate speech, and sexual behaviors (Hao, 2025).\nHao, K. (2025). Empire of AI: Dreams and Nightmares in Sam Altman’s OpenAI. Penguin Press, New York.",
-          mood: "thinking"
-        },
-        {
-          text: "*Model and algorithm selection:* Depending on the available data and expectations of the model, the appropriate model and algorithm for learning must be selected.",
-          mood: "default"
-        },
-        {
-          text: "*Model training:* The model is then fed the training data and its prediction parameters are adjusted as needed. This is often an iterative process that requires large datasets. Training can differ depending on the goals of the model (i.e., linguistic, visual, auditory), but the general process is the same.",
-          mood: "default"
-        },
-        {
-          text: "As models train, they map out categories of data, relationships between pieces of data, etc. Different models are likely to make different inferences about relationships between data.",
-          mood: "default"
-        },
-        {
-          text: "*Validation and testing:* The chosen model must be tested on previously unseen data to ensure it works appropriately. Otherwise, additional iterations of training occur.",
-          mood: "default"
-        },
-        {
-          text: "*Implementation and monitoring:* Final model is implemented in a real world environment. It must be monitored and regularly updated until the next version comes out.",
-          mood: "default",
-          link: "https://www.univio.com/blog/how-does-artificial-intelligence-learn/",
-          example: false
-        },
         {
           text: "What data are GenAI models trained on? The answer depends on the AI model. Many of the popular LLMs are trained on publicly available data. This includes anything you might be able to find on the internet, like information from articles, blogs, discussion forums, images, videos, and more.",
           mood: "thinking"

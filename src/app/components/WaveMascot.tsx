@@ -54,14 +54,14 @@ export function WaveMascot({
   }, [compactHintMode, stepKey]);
 
   // A new message from Wave opens the bubble; it then tucks itself away so it never sits over the
-  // answers for long. Click the dolphin (or the chat badge) to bring it back.
+  // answers for long. Click Wave (or the chat button) to bring it back.
   useEffect(() => {
     if (!compactHintMode) setIsBubbleOpen(true);
   }, [message]);
 
   useEffect(() => {
     if (!isBubbleOpen || compactHintMode) return;
-    const timer = setTimeout(() => setIsBubbleOpen(false), 8000);
+    const timer = setTimeout(() => setIsBubbleOpen(false), 5000);
     return () => clearTimeout(timer);
   }, [isBubbleOpen, message, compactHintMode]);
 
@@ -125,7 +125,9 @@ export function WaveMascot({
   useEffect(() => registerAskWaveHost(), []);
 
   return (
-    <div className="fixed bottom-12 right-40 z-50 flex flex-col items-end gap-3">
+    // The wrapper lets clicks pass through, so the empty space around Wave never blocks the Next button or the page.
+    // Only the bubble, Wave and the chat button catch clicks.
+    <div className="fixed bottom-12 right-6 z-50 flex flex-col items-end gap-3 pointer-events-none">
       {/* Speech Bubble */}
       <AnimatePresence mode="wait">
         {isBubbleOpen ? (
@@ -135,7 +137,7 @@ export function WaveMascot({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3 }}
-            className="max-w-xs px-4 py-3 rounded-2xl shadow-lg relative"
+            className="max-w-xs px-4 py-3 rounded-2xl shadow-lg relative pointer-events-auto"
             style={{
               backgroundColor: colors.cardBackground,
               border: `2px solid ${getBorderColor()}`,
@@ -214,7 +216,7 @@ export function WaveMascot({
             )}
             {/* Speech bubble pointer */}
             <div
-              className="absolute -bottom-2 right-8 w-4 h-4 transform rotate-45"
+              className="absolute -bottom-2 right-[76px] w-4 h-4 transform rotate-45"
               style={{
                 backgroundColor: colors.cardBackground,
                 borderRight: `2px solid ${getBorderColor()}`,
@@ -235,7 +237,7 @@ export function WaveMascot({
                 onActionClick();
                 setIsBubbleOpen(true);
               }}
-              className="px-3 py-2 rounded-full text-xs font-semibold shadow-lg transition-all hover:scale-105"
+              className="px-3 py-2 rounded-full text-xs font-semibold shadow-lg transition-all hover:scale-105 pointer-events-auto"
               style={{
                 color: '#FFFFFF',
                 backgroundColor: colors.accentTeal,
@@ -248,7 +250,8 @@ export function WaveMascot({
         )}
       </AnimatePresence>
 
-      {/* Wave Dolphin */}
+      {/* Wave, with the chat button beside it (not on top of it) */}
+      <div className="flex items-center gap-3 pointer-events-auto">
       <div className="relative">
         {/* Sparkles for celebration */}
         <AnimatePresence>
@@ -299,17 +302,18 @@ export function WaveMascot({
             }
           />
         </motion.div>
-        {/* Chat badge: opens Ask Wave straight from the mascot */}
-        <button
-          type="button"
-          aria-label="Ask Wave a question"
-          title="Ask Wave a question"
-          onClick={openAskWave}
-          className="absolute -top-1 -left-1 w-8 h-8 rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-110"
-          style={{ backgroundColor: colors.accentGold, color: "#3A0A1A", border: "2px solid #fff" }}
-        >
-          <MessageCircle size={16} />
-        </button>
+      </div>
+      {/* Chat button: opens Ask Wave straight from here */}
+      <button
+        type="button"
+        aria-label="Ask Wave a question"
+        title="Ask Wave a question"
+        onClick={openAskWave}
+        className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-110"
+        style={{ backgroundColor: colors.accentGold, color: "#3A0A1A", border: "2px solid #fff" }}
+      >
+        <MessageCircle size={18} />
+      </button>
       </div>
     </div>
   );

@@ -25,7 +25,15 @@ export function ChooseCharacter() {
     return resolveStudentId(u?.selectedStudent, u?.selectedCharacter) ?? null;
   });
 
-  const from = (location.state as { from?: string } | null)?.from || "/home";
+  // Where Continue sends the learner. A page that sent them here on purpose says so (state.from); otherwise,
+  // if they clicked their avatar from somewhere in the app, go back to that page; only a first visit lands on Home.
+  const stateFrom = (location.state as { from?: string } | null)?.from;
+  const cameFromAppPage = ((window.history.state as { idx?: number } | null)?.idx ?? 0) > 0;
+  const goBackToWhereTheyWere = () => {
+    if (stateFrom) navigate(stateFrom, { replace: true });
+    else if (cameFromAppPage) navigate(-1);
+    else navigate("/home", { replace: true });
+  };
 
   const [saving, setSaving] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
@@ -46,7 +54,7 @@ export function ChooseCharacter() {
       }
       updateUserData({ selectedCharacter: guide, selectedStudent: student });
       if (getUserData()?.selectedCharacter === guide) {
-        navigate(from, { replace: true });
+        goBackToWhereTheyWere();
         return;
       }
       setSaveFailed(true);
@@ -160,10 +168,10 @@ export function ChooseCharacter() {
               style={{ backgroundColor: colors.cardBackground, border: `1px solid ${colors.cardBorder}` }}
             >
               <p className="font-bold mb-1" style={{ color: getCharacterInfo(guide).color }}>
-                Lesson stories will star {getCharacterInfo(guide).name}
+                Wave as {/^[aeiou]/i.test(getCharacterInfo(guide).animal) ? "an" : "a"} {getCharacterInfo(guide).animal.toLowerCase()}
               </p>
               <p style={{ color: colors.textSecondary }}>
-                {getCharacterInfo(guide).tagline}. {getCharacterInfo(guide).story}
+                Wave does the same job whichever animal you pick. Only the look changes. The people in the lesson stories (Aisha, Dev, Jordan and others) stay the same for everyone.
               </p>
             </div>
           )}

@@ -34,6 +34,10 @@ export interface UserData {
   equippedItems?: Partial<Record<ItemSlot, string>>;
   /** Id of the chosen profile banner color preset — see BANNER_PRESETS in Profile.tsx. */
   bannerColor?: string;
+  /** Id of the chosen sweater colour for the student avatar — see SWEATER_COLORS in data/avatarColors.ts. Saved on this device only. */
+  sweaterColor?: string;
+  /** Id of the chosen picture behind the student avatar — see AVATAR_BACKGROUNDS in data/avatarColors.ts. Saved on this device only. */
+  avatarBackground?: string;
 }
 
 export function getUserData(): UserData | null {

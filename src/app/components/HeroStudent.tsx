@@ -2,6 +2,8 @@ import { motion } from "motion/react";
 import { Link } from "react-router-dom";
 import type { StudentId } from "../data/studentsData";
 import { GearLayer, STUDENT_RIG, isEyewearItem } from "./AvatarGear";
+import { getUserData } from "../utils/userData";
+import { getAvatarBackground, getSweaterColor } from "../data/avatarColors";
 
 const CHIPS = [
   { text: "💡 Write a clear prompt", left: "-18%", top: "6%", delay: 0 },
@@ -25,7 +27,6 @@ const LOOKS: Record<StudentId, Look> = {
 };
 
 const HOODIE = "#8C1D40";
-const HOODIE_DARK = "#6B1530";
 const GOLD = "#FFC627";
 
 // "scene" is the whole banner picture (laptop, desk, books, mug). "badge" is a tight head-and-shoulders crop for the
@@ -37,8 +38,10 @@ const VIEW_BOX: Record<Exclude<StudentView, "scene">, string> = {
   bust: "60 0 220 220",
 };
 
-function Student({ look, view = "scene", equipped = [] }: { look: Look; view?: StudentView; equipped?: string[] }) {
+function Student({ look, view = "scene", equipped = [], sweater }: { look: Look; view?: StudentView; equipped?: string[]; sweater?: string }) {
   const { skin, hair, style, glasses, blush } = look;
+  // The learner's chosen sweater colour (maroon until they pick another). The book on the desk stays maroon.
+  const sweaterColor = getSweaterColor(sweater);
   const scene = view === "scene";
   const wearsEyewear = equipped.some(isEyewearItem);
   return (
@@ -63,9 +66,9 @@ function Student({ look, view = "scene", equipped = [] }: { look: Look; view?: S
       )}
 
       {/* torso: hoodie */}
-      <path d="M104 236 L104 168 Q104 132 142 126 L198 126 Q236 132 236 168 L236 236 Z" fill={HOODIE} />
+      <path d="M104 236 L104 168 Q104 132 142 126 L198 126 Q236 132 236 168 L236 236 Z" fill={sweaterColor.main} />
       {/* hood behind the neck */}
-      <path d="M134 124 Q170 156 206 124 Q202 110 170 108 Q138 110 134 124 Z" fill={HOODIE_DARK} />
+      <path d="M134 124 Q170 156 206 124 Q202 110 170 108 Q138 110 134 124 Z" fill={sweaterColor.dark} />
       {/* drawstrings */}
       <path d="M160 140 L158 172" stroke={GOLD} strokeWidth="3" strokeLinecap="round" />
       <path d="M180 140 L182 172" stroke={GOLD} strokeWidth="3" strokeLinecap="round" />
@@ -75,8 +78,8 @@ function Student({ look, view = "scene", equipped = [] }: { look: Look; view?: S
       {/* arms reaching to the keyboard (hands tuck behind the laptop) */}
       {scene && (
         <>
-          <path d="M118 146 Q92 184 128 222" stroke={HOODIE} strokeWidth="24" strokeLinecap="round" fill="none" />
-          <path d="M222 146 Q248 184 212 222" stroke={HOODIE} strokeWidth="24" strokeLinecap="round" fill="none" />
+          <path d="M118 146 Q92 184 128 222" stroke={sweaterColor.main} strokeWidth="24" strokeLinecap="round" fill="none" />
+          <path d="M222 146 Q248 184 212 222" stroke={sweaterColor.main} strokeWidth="24" strokeLinecap="round" fill="none" />
           <circle cx="124" cy="220" r="10" fill={skin} />
           <circle cx="216" cy="220" r="10" fill={skin} />
         </>
@@ -172,27 +175,28 @@ function Student({ look, view = "scene", equipped = [] }: { look: Look; view?: S
 }
 
 /** The student on their own, head and shoulders in a round badge (shown on the "Choose your character" cards). */
-export function StudentPortrait({ student, size = 96 }: { student: StudentId; size?: number }) {
+export function StudentPortrait({ student, size = 96, sweater, background }: { student: StudentId; size?: number; sweater?: string; background?: string }) {
   return (
     <div
       className="overflow-hidden rounded-full flex-shrink-0"
       style={{
         width: size,
         height: size,
-        background: "radial-gradient(circle at 50% 35%, #A02450 0%, #7A1736 55%, #5A1228 100%)",
+        // A neutral picture by default, so the (maroon) sweater does not blend into it.
+        background: getAvatarBackground(background).css,
         border: "3px solid rgba(255,198,39,0.55)",
       }}
     >
-      <Student look={LOOKS[student]} view="badge" />
+      <Student look={LOOKS[student]} view="badge" sweater={sweater} />
     </div>
   );
 }
 
 /** The student wearing whatever accessories are equipped (profile picture and the zoomable preview). Square, `size` px. */
-export function StudentBust({ student, size = 120, equipped = [] }: { student: StudentId; size?: number; equipped?: string[] }) {
+export function StudentBust({ student, size = 120, equipped = [], sweater }: { student: StudentId; size?: number; equipped?: string[]; sweater?: string }) {
   return (
     <div style={{ width: size, height: size }}>
-      <Student look={LOOKS[student]} view="bust" equipped={equipped} />
+      <Student look={LOOKS[student]} view="bust" equipped={equipped} sweater={sweater} />
     </div>
   );
 }
@@ -203,6 +207,7 @@ export function StudentBust({ student, size = 120, equipped = [] }: { student: S
  */
 export function HeroStudent({ subtitle, student }: { subtitle: string; student?: StudentId }) {
   const look = LOOKS[student ?? "maya"] ?? LOOKS.maya;
+  const sweater = getUserData()?.sweaterColor;
   return (
     <div
       className="relative overflow-hidden rounded-2xl px-6 py-10 md:py-8"
@@ -269,7 +274,7 @@ export function HeroStudent({ subtitle, student }: { subtitle: string; student?:
             }}
           />
 
-          <Student look={look} />
+          <Student look={look} sweater={sweater} />
 
           {/* a small floating "AI chat" card */}
           <motion.div

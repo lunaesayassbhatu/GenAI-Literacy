@@ -24,7 +24,7 @@ export const MODULES: Module[] = [
     number: 0,
     name: "GenAI Literacy",
     description: "AI literacy is becoming an increasingly important skillset for everyone to learn",
-    icon: "🌍",
+    icon: "📖",
     iconColor: "#8B1A2E",
     xpReward: 150,
     timeEstimate: "15 min",

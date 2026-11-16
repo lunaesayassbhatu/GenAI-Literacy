@@ -37,6 +37,31 @@ function arrowHead(tipX: number, tipY: number, ux: number, uy: number, size = 15
 }
 
 /**
+ * Points spread at equal distances along the ring (an ellipse), starting half a step to the right of the top.
+ * Spacing the circles by equal angle would crowd them together at the top and bottom of the oval.
+ */
+function evenRingPoints(count: number): { x: number; y: number }[] {
+  const STEPS = 720;
+  const pts: { x: number; y: number; len: number }[] = [];
+  let total = 0;
+  for (let k = 0; k <= STEPS; k++) {
+    const t = -Math.PI / 2 + (k / STEPS) * 2 * Math.PI;
+    const x = CX + RING_X * Math.cos(t);
+    const y = CY + RING_Y * Math.sin(t);
+    if (k > 0) total += Math.hypot(x - pts[k - 1].x, y - pts[k - 1].y);
+    pts.push({ x, y, len: total });
+  }
+  const out: { x: number; y: number }[] = [];
+  let k = 0;
+  for (let i = 0; i < count; i++) {
+    const target = ((i + 0.5) / count) * total;
+    while (k < pts.length - 1 && pts[k].len < target) k++;
+    out.push({ x: pts[k].x, y: pts[k].y });
+  }
+  return out;
+}
+
+/**
  * Web map: one main circle in the middle with a ring of circles around it, each
  * joined to the middle by a two-way arrow. Used to show how many separate
  * issues all trace back to the same thing (e.g. the ethics of Generative AI).
@@ -47,10 +72,9 @@ export function WebMapStep({ data, colors }: { data: any; colors: any }) {
   const center: string = data.center ?? "";
   const plainLabel = (n: WebMapNode) => n.lines.join(" ");
 
+  const slots = evenRingPoints(nodes.length);
   const placed = nodes.map((node, i) => {
-    const angle = -Math.PI / 2 + ((i + 0.5) * 2 * Math.PI) / nodes.length;
-    const x = CX + RING_X * Math.cos(angle);
-    const y = CY + RING_Y * Math.sin(angle);
+    const { x, y } = slots[i];
     const dx = x - CX;
     const dy = y - CY;
     const len = Math.hypot(dx, dy);

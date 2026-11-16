@@ -4,7 +4,7 @@ export const module4Steps: Step[] = [
   {
     type: "intro",
     data: {
-      emoji: "🌍",
+      emoji: "📖",
       badge: "Module 0",
       title: "What is GenAI literacy?",
       highlightWord: "GenAI literacy?",
@@ -163,7 +163,7 @@ export const module4Steps: Step[] = [
           mood: "celebrate"
         },
         {
-          text: "Jordan was using their GenAI tool like it was google, thinking they can just find answers to any questions. But after doing module 3 about how GenAI trains and produces outputs, they realized that GenAI generates answers, rather than finding them, which means that they may or may not be true. Jordan now knows that the tool can't be used exactly like a search engine, so they modified their use accordingly.",
+          text: "Jordan was using his GenAI tool like it was google, thinking he can just find answers to any questions. But after doing module 3 about how GenAI trains and produces outputs, he realized that GenAI generates answers, rather than finding them, which means that they may or may not be true. Jordan now knows that the tool can't be used exactly like a search engine, so he modified his use accordingly.",
           mood: "celebrate"
         }
       ]

@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { ArrowLeft, Zap, ArrowRight, CheckCircle2, Search, X as XIcon } from "lucide-react";
+import { ArrowLeft, Zap, ArrowRight, CheckCircle2, X as XIcon } from "lucide-react";
 import { WaveMascot } from "./WaveMascot";
 import { CharacterMascot } from "./CharacterMascot";
 import { PlayerAvatar } from "./PlayerAvatar";
@@ -23,11 +23,11 @@ import {
 import { GuideMascot } from "./GuideMascot";
 import type { CharacterId } from "../utils/userData";
 import { getCharacterInfo } from "../data/charactersData";
-import { personalizeSteps } from "../utils/personalizeStory";
 import { GuideWaveIntro, hasSeenGuideWaveIntro } from "./GuideWaveIntro";
 import { WebMapStep } from "./WebMapStep";
 import { ProcessStep, FrameworkTableStep } from "./ConceptVisuals";
 import { VideoStep } from "./VideoStep";
+import { SourceMagnifier } from "./SourceMagnifier";
 
 type WaveMood = "default" | "thinking" | "celebrate" | "hint" | "spin";
 
@@ -236,11 +236,11 @@ function ModuleLearningInner() {
     return advanceVariantCounter(moduleId ?? "", MODULE1_SECTION1_VARIANT_COUNT);
   });
 
-  // Stories and scenarios star the learner's chosen character (until they pick another on purpose).
-  const chosenCharacter: CharacterId = userData?.selectedCharacter ?? "aisha";
+  // Stories and scenarios keep the cast they were written with (Aisha, Dev, Jordan and others), whichever
+  // animal the learner picked for Wave. The animal only changes how Wave looks, never who the stories are about.
   const steps: Step[] = useMemo(
-    () => personalizeSteps(getStepsForModule(moduleId ?? "", variantIndex), chosenCharacter),
-    [moduleId, variantIndex, chosenCharacter]
+    () => getStepsForModule(moduleId ?? "", variantIndex),
+    [moduleId, variantIndex]
   );
 
   // Resume from the last saved position, or start at 0
@@ -305,7 +305,7 @@ function ModuleLearningInner() {
     // Reset proceed state
     setCanProceed(
       currentStepIndex < furthestStepRef.current ||
-      currentStep.type === "intro" || currentStep.type === "reading" || currentStep.type === "transition" || currentStep.type === "pros-cons" || currentStep.type === "web-map" || currentStep.type === "process" || currentStep.type === "framework-table" || currentStep.type === "video"
+      currentStep.type === "intro" || currentStep.type === "reading" || currentStep.type === "transition" || currentStep.type === "pros-cons" || currentStep.type === "web-map" || currentStep.type === "framework-table" || currentStep.type === "video"
     );
     setHintClickCount(0);
   }, [currentStepIndex]);
@@ -674,7 +674,12 @@ function ModuleLearningInner() {
               )}
 
               {currentStep.type === "process" && (
-                <ProcessStep data={currentStep.data} colors={colors} />
+                <ProcessStep
+                  data={currentStep.data}
+                  colors={colors}
+                  onAllViewed={() => setCanProceed(true)}
+                  unlocked={canProceed}
+                />
               )}
 
               {currentStep.type === "framework-table" && (
@@ -729,7 +734,8 @@ function ModuleLearningInner() {
         currentStep.type !== "completion" &&
         currentStep.type !== "wave-talk" && (
         <div
-          className="fixed bottom-10 left-0 right-0 z-30 border-t"
+          // Below ~1220px wide the page buttons stop short of the right edge, so Wave and the chat button never sit on top of Next.
+          className="fixed bottom-10 left-0 right-0 z-30 border-t pr-40 min-[1220px]:pr-0"
           style={{ backgroundColor: colors.background, borderColor: colors.cardBorder }}
         >
           <div className="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
@@ -2285,7 +2291,7 @@ function CompletionStep({ data, colors, totalXP, onComplete, nextModule, onNextM
 export function WaveTalkStep({ data, colors, onNext, onBackStep }: { data: any; colors: any; onNext: () => void; onBackStep?: () => void }) {
   const [msgIndex, setMsgIndex] = useState(0);
   const [maxReached, setMaxReached] = useState(0);
-  const messages: { text: string; mood: string; link?: string; scenario?: boolean; emoji?: string; example?: boolean }[] = data.messages;
+  const messages: { text: string; mood: string; link?: string; citation?: string; scenario?: boolean; emoji?: string; example?: boolean }[] = data.messages;
   const isLast = msgIndex === messages.length - 1;
   const current = messages[msgIndex];
   const currentStoryCharacter = detectStoryCharacter(current.text);
@@ -2311,6 +2317,25 @@ export function WaveTalkStep({ data, colors, onNext, onBackStep }: { data: any; 
 
   // Width of the dolphin column — used to indent previous messages so they align
   const DOLPHIN_COL = "w-28"; // ~112 px
+
+  // Long messages shrink their text a little (down to 13px) until they sit inside the bubble instead of spilling over its edges.
+  const textBoxRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const fit = () => {
+      const box = textBoxRef.current;
+      const text = box?.querySelector("p");
+      if (!box || !text) return;
+      let size = 18;
+      text.style.fontSize = `${size}px`;
+      while (box.scrollHeight > box.clientHeight + 1 && size > 13) {
+        size -= 1;
+        text.style.fontSize = `${size}px`;
+      }
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, [msgIndex]);
 
   const advance = () => {
     if (!isLast) {
@@ -2391,7 +2416,7 @@ export function WaveTalkStep({ data, colors, onNext, onBackStep }: { data: any; 
 
         {/* Active row — dolphin bounces in, bubble fades up smoothly */}
         <AnimatePresence mode="wait">
-          <div key={msgIndex} className="flex items-center gap-4 h-[230px] flex-shrink-0">
+          <div key={msgIndex} className="flex items-center gap-4 h-[clamp(240px,36vh,330px)] flex-shrink-0">
 
             {/* Wave, drawn as the animal the learner picked */}
             <motion.div
@@ -2464,12 +2489,12 @@ export function WaveTalkStep({ data, colors, onNext, onBackStep }: { data: any; 
                   🌍 REAL-WORLD EXAMPLE
                 </span>
               )}
-              <div className="flex items-center gap-4 min-h-0">
+              <div ref={textBoxRef} className="flex items-center gap-4 min-h-0 overflow-y-auto">
                 {current.emoji && (
                   <span className="text-5xl flex-shrink-0" aria-hidden>{current.emoji}</span>
                 )}
                 <p
-                  className="leading-relaxed text-lg overflow-y-auto min-h-0"
+                  className="leading-relaxed text-lg"
                   style={{ color: colors.textPrimary, whiteSpace: "pre-line" }}
                   dangerouslySetInnerHTML={{
                     __html: highlightCharacterName(
@@ -2480,36 +2505,10 @@ export function WaveTalkStep({ data, colors, onNext, onBackStep }: { data: any; 
                 />
               </div>
 
-              {/* "Learn more" magnifying glass — hover reveals a message with a link to the
-                  related learning module, opening in a new tab. */}
-              {current.link && (
-                <div className="group absolute -right-6 top-1/2 -translate-y-1/2 z-20">
-                  <a
-                    href={current.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="relative block"
-                    aria-label="More information available"
-                  >
-                    <motion.div
-                      animate={{ scale: [1, 1.12, 1] }}
-                      transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-                      className="w-12 h-12 rounded-full flex items-center justify-center transition-transform group-hover:scale-110"
-                      style={{
-                        backgroundColor: colors.accentPink,
-                        border: "2px solid #FFFFFF",
-                        boxShadow: `0 0 14px ${colors.accentPink}, 0 0 28px ${colors.accentPink}66`,
-                      }}
-                    >
-                      <Search size={24} color="#FFFFFF" strokeWidth={3} />
-                    </motion.div>
-                    <div
-                      className="pointer-events-none absolute right-0 top-full mt-2 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg px-3 py-2 text-xs font-semibold shadow-lg"
-                      style={{ backgroundColor: colors.cardBackground, border: `1px solid ${colors.accentPink}`, color: colors.textPrimary, width: 200 }}
-                    >
-                      Want to learn more? Click <span style={{ textDecoration: "underline", color: colors.accentPink }}>here</span> for more information!
-                    </div>
-                  </a>
+              {/* Magnifying glass: a web link opens the page; a book citation opens a small box with the reference. */}
+              {(current.link || current.citation) && (
+                <div className="absolute -right-6 top-1/2 -translate-y-1/2 z-20">
+                  <SourceMagnifier link={current.link} citation={current.link ? undefined : current.citation} colors={colors} />
                 </div>
               )}
             </motion.div>

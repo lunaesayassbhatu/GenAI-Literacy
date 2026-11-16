@@ -13,5 +13,5 @@ export function PlayerAvatar({ size = 64 }: { size?: number }) {
   // A learner who has not picked a student yet gets the one that used to go with their saved character.
   const student = resolveStudentId(user?.selectedStudent, user?.selectedCharacter);
   if (!student) return null;
-  return <StudentBust student={student} size={size} equipped={getEquippedItemIds()} />;
+  return <StudentBust student={student} size={size} equipped={getEquippedItemIds()} sweater={user?.sweaterColor} />;
 }

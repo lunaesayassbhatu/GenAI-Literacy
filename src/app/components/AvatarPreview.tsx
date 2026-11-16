@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Minus, Plus, X } from "lucide-react";
 import { StudentBust } from "./HeroStudent";
 import type { StudentId } from "../data/studentsData";
+import { getAvatarBackground } from "../data/avatarColors";
 
 interface AvatarPreviewProps {
   student?: StudentId;
@@ -12,6 +13,10 @@ interface AvatarPreviewProps {
   baseSize?: number;
   /** Height of the window the picture is shown in, in px. */
   viewportHeight?: number;
+  /** Id of the chosen sweater colour (see data/avatarColors.ts). */
+  sweater?: string;
+  /** Id of the chosen picture behind the student (see data/avatarColors.ts). Neutral grey by default. */
+  background?: string;
 }
 
 const MIN_ZOOM = 1;
@@ -22,7 +27,7 @@ const ZOOM_STEP = 0.25;
  * A big picture of the student wearing whatever is equipped, with a zoom slider (the picture grows and the
  * window scrolls).
  */
-export function AvatarPreview({ student, equipped, colors, baseSize = 240, viewportHeight = 320 }: AvatarPreviewProps) {
+export function AvatarPreview({ student, equipped, colors, baseSize = 240, viewportHeight = 320, sweater, background }: AvatarPreviewProps) {
   const [zoom, setZoom] = useState(1);
   const viewport = useRef<HTMLDivElement>(null);
 
@@ -44,7 +49,7 @@ export function AvatarPreview({ student, equipped, colors, baseSize = 240, viewp
         className="rounded-2xl overflow-auto"
         style={{
           height: viewportHeight,
-          background: "radial-gradient(circle at 50% 30%, #A02450 0%, #7A1736 55%, #5A1228 100%)",
+          background: getAvatarBackground(background).css,
           border: "2px solid rgba(255,198,39,0.45)",
         }}
         aria-label="Zoomable preview of your avatar"
@@ -52,12 +57,12 @@ export function AvatarPreview({ student, equipped, colors, baseSize = 240, viewp
         {student ? (
           // the picture is resized (not just scaled) so the window can scroll around it
           <div style={{ width: Math.max(size, 1), minWidth: "100%", minHeight: "100%", display: "flex", justifyContent: "center", alignItems: "flex-end" }}>
-            <StudentBust student={student} size={size} equipped={equipped} />
+            <StudentBust student={student} size={size} equipped={equipped} sweater={sweater} />
           </div>
         ) : (
-          <div className="h-full flex flex-col items-center justify-center gap-2 p-4 text-center" style={{ color: "#F0E0E4" }}>
+          <div className="h-full flex flex-col items-center justify-center gap-2 p-4 text-center" style={{ color: "#1F2933" }}>
             <p className="text-sm font-semibold">Choose a student to see your avatar here.</p>
-            <Link to="/choose-character" className="text-sm font-bold underline" style={{ color: "#FFC627" }}>
+            <Link to="/choose-character" className="text-sm font-bold underline" style={{ color: "#8C1D40" }}>
               Choose my student
             </Link>
           </div>
