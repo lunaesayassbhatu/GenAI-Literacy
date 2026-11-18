@@ -47,11 +47,15 @@ export const module3Steps: Step[] = [
     data: {
       section: "1 of 3",
       title: "The process of AI learning",
-      subtitle: "Click each step to read how it works.",
+      // The big title drawn on the chart itself, as in Halle's picture.
+      diagramTitle: "How AI learns",
+      subtitle: "Click each step to read more about how it works.",
+      // The look from Halle's Canva reference: numbered cards with the short explanation, joined by arrows.
+      variant: "flow",
       steps: [
         {
           title: "Training data collection and preparation",
-          summary: "Gather lots of human-made content, then clean it and have people label it.",
+          summary: "Relevant data must be collected and then cleaned & labeled through data annotation.",
           paragraphs: [
             "Data is the foundation of AI learning. First, relevant training data that models can learn language and information patterns from must be collected. This process requires a lot of time and resources, relying on the data that humans have created throughout history (e.g., books, catalogs, online resources, works of art). Then, the data must be processed and cleaned.",
             "GenAI companies scrape the internet and history of content produced by humans to generate these datasets.",
@@ -60,30 +64,30 @@ export const module3Steps: Step[] = [
           citation: "Hao, K. (2025). *Empire of AI: Dreams and Nightmares in Sam Altman’s OpenAI*. Penguin Press, New York."
         },
         {
-          title: "Model and algorithm selection",
-          summary: "Choose the kind of model and learning method that fits the data and the goal.",
+          title: "Model & Algorithm Selection",
+          summary: "Appropriate model and algorithm must be chosen that aligns with goals & expectations.",
           paragraphs: [
             "Depending on the available data and expectations of the model, the appropriate model and algorithm for learning must be selected."
           ]
         },
         {
-          title: "Model training",
-          summary: "Feed the data to the model and adjust it, round after round, until it spots patterns.",
+          title: "Model Training",
+          summary: "Model is fed the training data and its parameters are adjusted as needed. Iterative process that needs large datasets.",
           paragraphs: [
             "The model is then fed the training data and its prediction parameters are adjusted as needed. This is often an iterative process that requires large datasets. Training can differ depending on the goals of the model (i.e., linguistic, visual, auditory), but the general process is the same.",
             "As models train, they map out categories of data, relationships between pieces of data, etc. Different models are likely to make different inferences about relationships between data."
           ]
         },
         {
-          title: "Validation and testing",
-          summary: "Test the model on data it has never seen. If it falls short, train it again.",
+          title: "Validation and Testing",
+          summary: "Model must be tested on previously unseen data. Additional training occurs if needed.",
           paragraphs: [
             "The chosen model must be tested on previously unseen data to ensure it works appropriately. Otherwise, additional iterations of training occur."
           ]
         },
         {
-          title: "Implementation and monitoring",
-          summary: "Put the model to work in the real world, then keep watching and updating it.",
+          title: "Implementation and Monitoring",
+          summary: "Model implemented in real world environment. Must be monitored and regularly updated.",
           paragraphs: [
             "Final model is implemented in a real world environment. It must be monitored and regularly updated until the next version comes out."
           ],

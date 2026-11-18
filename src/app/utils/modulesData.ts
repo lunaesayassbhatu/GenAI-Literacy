@@ -95,7 +95,7 @@ export const MODULES: Module[] = [
     icon: "⚖️",
     iconColor: "#9D4EDD",
     xpReward: 150,
-    timeEstimate: "10 min",
+    timeEstimate: "15 min",
     lessons: [
       { id: "m5-l1", title: "Not Everyone Gets the Same AI", completed: false },
       { id: "m5-l2", title: "AI in Education: A Question of Trust", completed: false },

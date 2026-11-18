@@ -357,10 +357,10 @@ function ModuleLearningInner() {
           setWaveMessage("Here's a quick look at where GenAI shines, and where it doesn't.");
           break;
         case "web-map":
-          setWaveMessage("Every one of these circles connects back to GenAI. Take a moment to look at how many there are!");
+          setWaveMessage(step.data?.waveMessage ?? "Every one of these circles connects back to GenAI. Take a moment to look at how many there are!");
           break;
         case "process":
-          setWaveMessage("Here are the main stages. We'll look at each one in more detail next!");
+          setWaveMessage(step.data?.waveMessage ?? "Here are the main stages. Click each one to read about it!");
           break;
         case "framework-table":
           setWaveMessage("Take a look at the three main areas of GenAI literacy.");
@@ -2505,10 +2505,11 @@ export function WaveTalkStep({ data, colors, onNext, onBackStep }: { data: any; 
                 />
               </div>
 
-              {/* Magnifying glass: a web link opens the page; a book citation opens a small box with the reference. */}
+              {/* Magnifying glass: a web link opens the page; a citation opens a small box with the reference
+                  (and, when the message has both, a button to open the page). */}
               {(current.link || current.citation) && (
                 <div className="absolute -right-6 top-1/2 -translate-y-1/2 z-20">
-                  <SourceMagnifier link={current.link} citation={current.link ? undefined : current.citation} colors={colors} />
+                  <SourceMagnifier link={current.link} citation={current.citation} colors={colors} />
                 </div>
               )}
             </motion.div>

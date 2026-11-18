@@ -31,12 +31,7 @@ import { module3Steps } from "./steps/module3Steps";
 
 import { module4Steps } from "./steps/module4Steps";
 
-import {
-  module5Steps,
-  module5Section1Variants,
-  module5Section2Variants,
-  module5Section3Variants,
-} from "./steps/module5Steps";
+import { module5Steps } from "./steps/module5Steps";
 
 import {
   module6Steps,
@@ -78,19 +73,8 @@ export function getStepsForModule(moduleId: string, questionVariant: number = 0)
   const base = MODULE_STEPS[moduleId];
   if (!base) return [];
 
-  // Modules 1 to 4 now carry fixed content written to match the team's module document (no
-  // rotating variants — the same questions are shown every time).
-
-  if (moduleId === "module-5") {
-    const idx = questionVariant % module5Section1Variants.length;
-    return base.map(step => {
-      const section = (step.data as any)?.section;
-      if (step.type === "knowledge-check" && section === "1") return module5Section1Variants[idx];
-      if (step.type === "knowledge-check" && section === "2") return module5Section2Variants[idx];
-      if (step.type === "knowledge-check" && section === "3") return module5Section3Variants[idx];
-      return step;
-    });
-  }
+  // Modules 0 to 4 (ids module-1 to module-5) carry fixed content written to match the team's module document
+  // (no rotating variants — the same questions are shown every time).
 
   if (moduleId === "module-6") {
     const idx = questionVariant % module6Section1Variants.length;
